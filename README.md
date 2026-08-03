@@ -53,6 +53,7 @@ dotnet build -c Release
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Systems + patches |
 | [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) | Traps / limits |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Freeze + next work |
+| [docs/BUG_CHECKLIST.md](docs/BUG_CHECKLIST.md) | In-game bug test checklist |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | PR / agent report format |
 
 ## License
