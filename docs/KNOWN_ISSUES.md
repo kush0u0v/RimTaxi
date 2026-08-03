@@ -35,6 +35,7 @@
 
 - `drawSize (7.2, 5.8)` vs collision `size (5,3)`.
 - Skyfaller shadow tracks craft XZ (`RimTaxiIncoming` / `RimTaxiLeaving`) so angled approach does not look like a vertical drop pad-only blob.
+- World flight marker: `Textures/World/WorldObjects(/Expanding)/RimTaxi.png` (not yellow caravan circle).
 - Shadow intentionally small; replace PNGs under `Textures/` if art updates.
 
 ## Compatibility

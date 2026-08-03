@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
 
-  <!-- Core abstract base: ShuttleWorldObjectBase (TravellingTransporters) -->
+  <!-- World-map flight marker: taxi sprite instead of default yellow caravan circle -->
   <WorldObjectDef ParentName="ShuttleWorldObjectBase">
     <defName>TravelingRimTaxi</defName>
     <label>taxi shuttle</label>
     <description>A civilian taxi shuttle in flight.</description>
-    <expandingIconColor>(80,160,220)</expandingIconColor>
-    <expandingIconDrawSize>1.2</expandingIconDrawSize>
+    <!-- Compact world-map disc / non-expanded drawer -->
+    <texture>World/WorldObjects/RimTaxi</texture>
+    <!-- Expanded / zoomed world map icon -->
+    <expandingIcon>true</expandingIcon>
+    <expandingIconTexture>World/WorldObjects/Expanding/RimTaxi</expandingIconTexture>
+    <!-- White so the taxi art is not recolored -->
+    <expandingIconColor>(255,255,255)</expandingIconColor>
+    <expandingIconDrawSize>1.5</expandingIconDrawSize>
+    <expandingIconPriority>65</expandingIconPriority>
   </WorldObjectDef>
 
 </Defs>
