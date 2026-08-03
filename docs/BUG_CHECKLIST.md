@@ -94,7 +94,9 @@
 | G2 | Settlement **without** beacon | Pays from **stockpile/storage** + carried | |
 | G3 | Silver only outside beacon (beacon exists) | Call fails if not enough in radius+carried | |
 | G4 | Field map depart | Only **carried** silver counts (not random piles) | |
-| G5 | Caravan | Inventory silver only | |
+| G5 | Caravan taxi: silver only at home (beacon) | Pays from settlement beacon; caravan inv optional | |
+| G5b | Caravan taxi: silver only on caravan | Pays from caravan inv | |
+| G5c | Caravan: combine beacon + caravan silver | Can split across both pools | |
 | G6 | Fare math | ~`ceil(massKg × tiles × 0.1)` | |
 
 ---

@@ -7,16 +7,18 @@ using Verse;
 namespace RimTaxi
 {
     /// <summary>
-    /// Silver payment rules (trade beacon = orbital trade beacon on the settlement):
+    /// Silver payment rules (trade beacon = orbital trade beacon on player settlements):
     ///
-    /// Player settlement / home:
-    ///   - If the map has trade beacons: silver in beacon radius + silver carried by player pawns
-    ///   - If no trade beacons: stockpile/storage silver + silver carried by player pawns
+    /// Player settlement / home (map call / depart on that map):
+    ///   - With trade beacon(s): silver in beacon radius + silver carried by player pawns
+    ///   - Without trade beacon: stockpile/storage silver + silver carried by player pawns
     ///
-    /// Field / temp maps (not a player settlement):
-    ///   - Silver carried by player pawns only (settlement beacons do not apply here)
+    /// Field / temp maps:
+    ///   - Silver carried by player pawns only
     ///
-    /// Caravan: caravan inventory.
+    /// Caravan taxi (call / boarding / depart):
+    ///   - Silver in trade-beacon radius on any open player settlement map
+    ///   - PLUS silver the caravan is carrying
     /// </summary>
     public static class TaxiPayment
     {
@@ -44,9 +46,6 @@ namespace RimTaxi
             return false;
         }
 
-        /// <summary>
-        /// True if this settlement map has at least one orbital trade beacon (powered or not).
-        /// </summary>
         public static bool SettlementHasTradeBeacon(Map map)
         {
             if (map == null)
@@ -54,7 +53,6 @@ namespace RimTaxi
                 return false;
             }
 
-            // Powered beacons first; also any placed beacon (unpowered still counts for rule branch)
             if (Building_OrbitalTradeBeacon.AllPowered(map).Any())
             {
                 return true;
@@ -71,21 +69,15 @@ namespace RimTaxi
                 return 0;
             }
 
-            CollectPayableSilver(map, tmpSilvers);
-            int total = 0;
-            for (int i = 0; i < tmpSilvers.Count; i++)
-            {
-                Thing t = tmpSilvers[i];
-                if (t != null && !t.Destroyed)
-                {
-                    total += t.stackCount;
-                }
-            }
-
+            CollectPayableMapSilver(map, tmpSilvers);
+            int total = SumStacks(tmpSilvers);
             tmpSilvers.Clear();
             return total;
         }
 
+        /// <summary>
+        /// Caravan taxi pool: caravan inventory + all open player settlements' trade-beacon silver.
+        /// </summary>
         public static int CountSilver(Caravan caravan)
         {
             if (caravan == null)
@@ -93,18 +85,7 @@ namespace RimTaxi
                 return 0;
             }
 
-            int total = 0;
-            List<Thing> items = CaravanInventoryUtility.AllInventoryItems(caravan);
-            for (int i = 0; i < items.Count; i++)
-            {
-                Thing t = items[i];
-                if (t != null && t.def == ThingDefOf.Silver)
-                {
-                    total += t.stackCount;
-                }
-            }
-
-            return total;
+            return CountCaravanInventorySilver(caravan) + CountAllSettlementBeaconSilver();
         }
 
         public static bool CanAfford(Map map, int amount)
@@ -127,9 +108,6 @@ namespace RimTaxi
             return CountSilver(caravan) >= amount;
         }
 
-        /// <summary>
-        /// Removes payable silver. Order: ground/storage/beacon piles first, then pawn inventory.
-        /// </summary>
         public static bool TryPay(Map map, int amount)
         {
             if (amount <= 0)
@@ -142,28 +120,16 @@ namespace RimTaxi
                 return false;
             }
 
-            CollectPayableSilver(map, tmpSilvers);
+            CollectPayableMapSilver(map, tmpSilvers);
             tmpSilvers.Sort(ComparePayPriority);
-
-            int remaining = amount;
-            for (int i = 0; i < tmpSilvers.Count && remaining > 0; i++)
-            {
-                Thing silver = tmpSilvers[i];
-                if (silver == null || silver.Destroyed || silver.stackCount <= 0)
-                {
-                    continue;
-                }
-
-                int take = remaining < silver.stackCount ? remaining : silver.stackCount;
-                Thing split = silver.SplitOff(take);
-                split.Destroy(DestroyMode.Vanish);
-                remaining -= take;
-            }
-
+            bool ok = SpendFromThingList(tmpSilvers, amount);
             tmpSilvers.Clear();
-            return remaining <= 0;
+            return ok;
         }
 
+        /// <summary>
+        /// Caravan taxi pay: settlement beacon silver first (all open player colonies), then caravan inventory.
+        /// </summary>
         public static bool TryPay(Caravan caravan, int amount)
         {
             if (amount <= 0)
@@ -177,6 +143,19 @@ namespace RimTaxi
             }
 
             int remaining = amount;
+
+            // 1) Settlement trade-beacon silver (open player settlement maps)
+            CollectAllSettlementBeaconSilver(tmpSilvers);
+            tmpSilvers.Sort(ComparePayPriority);
+            remaining = SpendFromThingListPartial(tmpSilvers, remaining);
+            tmpSilvers.Clear();
+
+            if (remaining <= 0)
+            {
+                return true;
+            }
+
+            // 2) Caravan-carried silver
             List<Thing> taken = CaravanInventoryUtility.TakeThings(caravan, t =>
             {
                 if (t == null || t.def != ThingDefOf.Silver || remaining <= 0)
@@ -229,7 +208,9 @@ namespace RimTaxi
             GenPlace.TryPlaceThing(silver, near, map, ThingPlaceMode.Near);
         }
 
-        private static void CollectPayableSilver(Map map, List<Thing> into)
+        // ─── Map collect ─────────────────────────────────────────
+
+        private static void CollectPayableMapSilver(Map map, List<Thing> into)
         {
             into.Clear();
             var seen = new HashSet<Thing>();
@@ -238,43 +219,105 @@ namespace RimTaxi
             {
                 if (SettlementHasTradeBeacon(map))
                 {
-                    // Settlement with trade beacon(s): silver in beacon coverage (orbital trade range)
-                    foreach (Thing t in TradeUtility.AllLaunchableThingsForTrade(map, null))
-                    {
-                        if (t == null || t.def != ThingDefOf.Silver || !IsUsableMapSilver(t))
-                        {
-                            continue;
-                        }
-
-                        if (seen.Add(t))
-                        {
-                            into.Add(t);
-                        }
-                    }
+                    AddLaunchableSilver(map, into, seen);
                 }
                 else
                 {
-                    // Settlement without trade beacon: stockpile / storage silver
-                    List<Thing> mapSilvers = map.listerThings.ThingsOfDef(ThingDefOf.Silver);
-                    for (int i = 0; i < mapSilvers.Count; i++)
-                    {
-                        Thing t = mapSilvers[i];
-                        if (!IsUsableMapSilver(t) || !IsInColonyStorage(t, map))
-                        {
-                            continue;
-                        }
-
-                        if (seen.Add(t))
-                        {
-                            into.Add(t);
-                        }
-                    }
+                    AddStorageSilver(map, into, seen);
                 }
             }
-            // Field maps: no settlement trade-beacon rule — carried silver only (added below)
 
-            // Always on any map: silver carried by player pawns
             AddPawnCarriedSilver(map, into, seen);
+        }
+
+        // ─── Caravan / settlement beacon pool ────────────────────
+
+        private static int CountCaravanInventorySilver(Caravan caravan)
+        {
+            if (caravan == null)
+            {
+                return 0;
+            }
+
+            int total = 0;
+            List<Thing> items = CaravanInventoryUtility.AllInventoryItems(caravan);
+            for (int i = 0; i < items.Count; i++)
+            {
+                Thing t = items[i];
+                if (t != null && t.def == ThingDefOf.Silver)
+                {
+                    total += t.stackCount;
+                }
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Sum of silver in trade-beacon range on every open player settlement map.
+        /// </summary>
+        public static int CountAllSettlementBeaconSilver()
+        {
+            CollectAllSettlementBeaconSilver(tmpSilvers);
+            int total = SumStacks(tmpSilvers);
+            tmpSilvers.Clear();
+            return total;
+        }
+
+        private static void CollectAllSettlementBeaconSilver(List<Thing> into)
+        {
+            into.Clear();
+            var seen = new HashSet<Thing>();
+
+            if (Find.Maps == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < Find.Maps.Count; i++)
+            {
+                Map map = Find.Maps[i];
+                if (!IsSettlementPaymentMap(map) || !SettlementHasTradeBeacon(map))
+                {
+                    continue;
+                }
+
+                AddLaunchableSilver(map, into, seen);
+            }
+        }
+
+        private static void AddLaunchableSilver(Map map, List<Thing> into, HashSet<Thing> seen)
+        {
+            foreach (Thing t in TradeUtility.AllLaunchableThingsForTrade(map, null))
+            {
+                if (t == null || t.def != ThingDefOf.Silver || !IsUsableMapSilver(t))
+                {
+                    continue;
+                }
+
+                if (seen.Add(t))
+                {
+                    into.Add(t);
+                }
+            }
+        }
+
+        private static void AddStorageSilver(Map map, List<Thing> into, HashSet<Thing> seen)
+        {
+            List<Thing> mapSilvers = map.listerThings.ThingsOfDef(ThingDefOf.Silver);
+            for (int i = 0; i < mapSilvers.Count; i++)
+            {
+                Thing t = mapSilvers[i];
+                if (!IsUsableMapSilver(t) || !IsInColonyStorage(t, map))
+                {
+                    continue;
+                }
+
+                if (seen.Add(t))
+                {
+                    into.Add(t);
+                }
+            }
         }
 
         private static void AddPawnCarriedSilver(Map map, List<Thing> into, HashSet<Thing> seen)
@@ -312,6 +355,46 @@ namespace RimTaxi
                     into.Add(carried);
                 }
             }
+        }
+
+        private static int SumStacks(List<Thing> things)
+        {
+            int total = 0;
+            for (int i = 0; i < things.Count; i++)
+            {
+                Thing t = things[i];
+                if (t != null && !t.Destroyed)
+                {
+                    total += t.stackCount;
+                }
+            }
+
+            return total;
+        }
+
+        private static bool SpendFromThingList(List<Thing> things, int amount)
+        {
+            return SpendFromThingListPartial(things, amount) <= 0;
+        }
+
+        /// <returns>Remaining amount not spent.</returns>
+        private static int SpendFromThingListPartial(List<Thing> things, int remaining)
+        {
+            for (int i = 0; i < things.Count && remaining > 0; i++)
+            {
+                Thing silver = things[i];
+                if (silver == null || silver.Destroyed || silver.stackCount <= 0)
+                {
+                    continue;
+                }
+
+                int take = remaining < silver.stackCount ? remaining : silver.stackCount;
+                Thing split = silver.SplitOff(take);
+                split.Destroy(DestroyMode.Vanish);
+                remaining -= take;
+            }
+
+            return remaining;
         }
 
         private static bool IsUsableMapSilver(Thing t)

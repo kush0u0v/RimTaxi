@@ -70,7 +70,7 @@
   <RimTaxi_MapUnreachable>이 맵에는 택시가 도착할 수 없습니다.</RimTaxi_MapUnreachable>
   <RimTaxi_CommsUnavailable>지금 통신기를 사용할 수 없습니다.</RimTaxi_CommsUnavailable>
   <RimTaxi_OnCooldown>택시 쿨다운 중 (남은 시간: {0}).</RimTaxi_OnCooldown>
-  <RimTaxi_NeedSilver>은 {0} 필요 (가용 {1}). 정착지+무역송신기: 송신기 범위+소지 / 송신기 없음: 저장소+소지 / 현장: 소지만.</RimTaxi_NeedSilver>
+  <RimTaxi_NeedSilver>은 {0} 필요 (가용 {1}). 정착지+송신기: 범위+소지 / 송신기 없음: 저장소+소지 / 현장: 소지 / 캐러밴 택시: 정착지 송신기 범위 은+캐러밴 소지.</RimTaxi_NeedSilver>
   <RimTaxi_DefsMissing>RimTaxi Def 로드에 실패했습니다.</RimTaxi_DefsMissing>
   <RimTaxi_SpawnFailed>택시 도착에 실패했습니다. 가능하면 은을 환불했습니다.</RimTaxi_SpawnFailed>
   <RimTaxi_CallSuccessTrip>택시 호출. 호출비 {0} 은 결제. 목적지 {1}타일 — 운행 요금(무게×거리)은 출발 시 청구. 탑승하거나 대기를 기다리세요.</RimTaxi_CallSuccessTrip>
