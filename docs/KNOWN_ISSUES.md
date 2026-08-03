@@ -27,7 +27,7 @@
 ## Economy
 
 - Call fee spent even if player never boards (dispatch no-show cost).
-- Silver rules: **settlement** = storage + carried; **field map** = trade-beacon radius + carried; **caravan** = inventory.
+- Silver rules: **settlement + trade beacon** = beacon radius + carried; **settlement no beacon** = stockpile + carried; **field** = carried only; **caravan** = inventory.
 - Trip fare from taxi’s current map / caravan — remote depart needs silver under those rules there.
 - Large mass × long distance can dwarf the 200 call fee.
 

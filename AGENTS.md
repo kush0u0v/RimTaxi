@@ -131,12 +131,13 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 | **5. Depart** | `ceil(massKg × tiles × farePerKgPerTile)` | Taxi map / caravan via `TaxiPayment` |
 | Empty leave | Trip fare 0 | — |
 
-**Map silver sources (`TaxiPayment`):**
+**Map silver sources (`TaxiPayment`) — trade beacon = settlement orbital trade beacon:**
 
-- **Player settlement / home:** stockpile & storage silver + silver carried by player pawns (**no** trade beacon required)
-- **Field / temp maps:** silver in **orbital trade beacon** radius (`TradeUtility.AllLaunchableThingsForTrade`) + carried by player pawns
+- **Player settlement with trade beacon(s):** silver in beacon radius + carried by player pawns
+- **Player settlement without trade beacon:** stockpile/storage + carried (beacon not required)
+- **Field / temp maps:** carried by player pawns only (settlement beacons do not apply)
 - **Caravan:** caravan inventory
-- Spend order: ground/storage first, then pawn inventory
+- Spend order: ground/storage/beacon piles first, then pawn inventory
 
 Defaults:
 

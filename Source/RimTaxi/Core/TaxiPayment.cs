@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -6,11 +7,16 @@ using Verse;
 namespace RimTaxi
 {
     /// <summary>
-    /// Silver payment rules:
-    /// - Player settlement / home: stockpile (storage) silver + silver carried by player pawns.
-    ///   No orbital trade beacon required.
-    /// - Other maps (field/quest): silver under trade-beacon coverage + carried by player pawns.
-    /// - Caravan: caravan inventory (includes carried).
+    /// Silver payment rules (trade beacon = orbital trade beacon on the settlement):
+    ///
+    /// Player settlement / home:
+    ///   - If the map has trade beacons: silver in beacon radius + silver carried by player pawns
+    ///   - If no trade beacons: stockpile/storage silver + silver carried by player pawns
+    ///
+    /// Field / temp maps (not a player settlement):
+    ///   - Silver carried by player pawns only (settlement beacons do not apply here)
+    ///
+    /// Caravan: caravan inventory.
     /// </summary>
     public static class TaxiPayment
     {
@@ -36,6 +42,26 @@ namespace RimTaxi
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// True if this settlement map has at least one orbital trade beacon (powered or not).
+        /// </summary>
+        public static bool SettlementHasTradeBeacon(Map map)
+        {
+            if (map == null)
+            {
+                return false;
+            }
+
+            // Powered beacons first; also any placed beacon (unpowered still counts for rule branch)
+            if (Building_OrbitalTradeBeacon.AllPowered(map).Any())
+            {
+                return true;
+            }
+
+            List<Thing> built = map.listerThings?.ThingsOfDef(ThingDefOf.OrbitalTradeBeacon);
+            return built != null && built.Count > 0;
         }
 
         public static int CountSilver(Map map)
@@ -102,8 +128,7 @@ namespace RimTaxi
         }
 
         /// <summary>
-        /// Removes payable silver. Returns false if not enough (nothing spent).
-        /// Order: storage/beacon piles first, then pawn inventories.
+        /// Removes payable silver. Order: ground/storage/beacon piles first, then pawn inventory.
         /// </summary>
         public static bool TryPay(Map map, int amount)
         {
@@ -118,7 +143,6 @@ namespace RimTaxi
             }
 
             CollectPayableSilver(map, tmpSilvers);
-            // Prefer ground/storage first (not held by pawns), then inventory
             tmpSilvers.Sort(ComparePayPriority);
 
             int remaining = amount;
@@ -205,9 +229,6 @@ namespace RimTaxi
             GenPlace.TryPlaceThing(silver, near, map, ThingPlaceMode.Near);
         }
 
-        /// <summary>
-        /// Gather unique silver stacks that may be spent on this map.
-        /// </summary>
         private static void CollectPayableSilver(Map map, List<Thing> into)
         {
             into.Clear();
@@ -215,40 +236,44 @@ namespace RimTaxi
 
             if (IsSettlementPaymentMap(map))
             {
-                // Settlement: stockpile / storage silver (no beacon required)
-                List<Thing> mapSilvers = map.listerThings.ThingsOfDef(ThingDefOf.Silver);
-                for (int i = 0; i < mapSilvers.Count; i++)
+                if (SettlementHasTradeBeacon(map))
                 {
-                    Thing t = mapSilvers[i];
-                    if (!IsUsableMapSilver(t) || !IsInColonyStorage(t, map))
+                    // Settlement with trade beacon(s): silver in beacon coverage (orbital trade range)
+                    foreach (Thing t in TradeUtility.AllLaunchableThingsForTrade(map, null))
                     {
-                        continue;
-                    }
+                        if (t == null || t.def != ThingDefOf.Silver || !IsUsableMapSilver(t))
+                        {
+                            continue;
+                        }
 
-                    if (seen.Add(t))
+                        if (seen.Add(t))
+                        {
+                            into.Add(t);
+                        }
+                    }
+                }
+                else
+                {
+                    // Settlement without trade beacon: stockpile / storage silver
+                    List<Thing> mapSilvers = map.listerThings.ThingsOfDef(ThingDefOf.Silver);
+                    for (int i = 0; i < mapSilvers.Count; i++)
                     {
-                        into.Add(t);
+                        Thing t = mapSilvers[i];
+                        if (!IsUsableMapSilver(t) || !IsInColonyStorage(t, map))
+                        {
+                            continue;
+                        }
+
+                        if (seen.Add(t))
+                        {
+                            into.Add(t);
+                        }
                     }
                 }
             }
-            else
-            {
-                // Field / temporary map: only silver in trade-beacon radius (orbital launchable)
-                foreach (Thing t in TradeUtility.AllLaunchableThingsForTrade(map, null))
-                {
-                    if (t == null || t.def != ThingDefOf.Silver || !IsUsableMapSilver(t))
-                    {
-                        continue;
-                    }
+            // Field maps: no settlement trade-beacon rule — carried silver only (added below)
 
-                    if (seen.Add(t))
-                    {
-                        into.Add(t);
-                    }
-                }
-            }
-
-            // Always: silver carried by player-controlled pawns on this map
+            // Always on any map: silver carried by player pawns
             AddPawnCarriedSilver(map, into, seen);
         }
 
@@ -268,7 +293,6 @@ namespace RimTaxi
                     continue;
                 }
 
-                // Inventory
                 if (pawn.inventory?.innerContainer != null)
                 {
                     for (int j = 0; j < pawn.inventory.innerContainer.Count; j++)
@@ -281,7 +305,6 @@ namespace RimTaxi
                     }
                 }
 
-                // Carried in hands / equipment if any (rare for silver stacks)
                 if (pawn.carryTracker?.CarriedThing is Thing carried
                     && carried.def == ThingDefOf.Silver
                     && seen.Add(carried))
@@ -298,7 +321,6 @@ namespace RimTaxi
                 return false;
             }
 
-            // Don't spend silver belonging to other factions / quest stuff if forbidden? Allow all player-accessible.
             if (t.Faction != null && t.Faction != Faction.OfPlayer && t.Faction.HostileTo(Faction.OfPlayer))
             {
                 return false;
@@ -307,9 +329,6 @@ namespace RimTaxi
             return true;
         }
 
-        /// <summary>
-        /// Silver in stockpile zones or any storage building (shelf, etc.).
-        /// </summary>
         private static bool IsInColonyStorage(Thing t, Map map)
         {
             if (t == null || !t.Spawned || t.Map != map)
@@ -323,22 +342,12 @@ namespace RimTaxi
             }
 
             Zone zone = t.Position.GetZone(map);
-            if (zone is Zone_Stockpile)
-            {
-                return true;
-            }
-
-            return false;
+            return zone is Zone_Stockpile;
         }
 
-        /// <summary>
-        /// Prefer storage/beacon piles (spawned on map) over pawn inventory.
-        /// </summary>
         private static int ComparePayPriority(Thing a, Thing b)
         {
-            int pa = PayPriority(a);
-            int pb = PayPriority(b);
-            return pa.CompareTo(pb);
+            return PayPriority(a).CompareTo(PayPriority(b));
         }
 
         private static int PayPriority(Thing t)
@@ -348,13 +357,11 @@ namespace RimTaxi
                 return 99;
             }
 
-            // Spawned on map (storage / beacon) first
             if (t.Spawned)
             {
                 return 0;
             }
 
-            // In inventory / carried
             return 1;
         }
     }
