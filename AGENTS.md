@@ -78,7 +78,12 @@ Call (comms gizmo/right-click)
 - Hospitality
 - Taxi company / NPC contracts / reputation
 - Odyssey as hard dependency
+- **Full custom GUI panel** — deferred; keep step gizmos until user asks for GUI pass
 - Fancy boarding UI (vanilla transporter load is OK)
+
+## Current locked flow (do not redesign unless asked)
+
+1. Call (200s) → 2. Dispatch ETA → 3. Arrive at pickup → 4. Set destination → 5. Depart (mass×distance)
 
 ## Build
 

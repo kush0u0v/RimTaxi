@@ -1,27 +1,39 @@
 # Roadmap
 
-## Done
+## Done (current playable baseline — freeze feature creep)
 
-- Phase 0: scaffold, defs, Harmony, settings
-- Phase 1+: call via comms, landing, wait, depart
-- Distance booking + slower travel
-- World caravan drop (forced)
-- Call fee + mass×distance trip fee
-- Trip booking on vehicle Comp
-- Early depart gizmo
+Core loop (keep working; polish later via GUI, not new systems unless bugfix):
 
-## Next candidates
+1. **Call** — 200 silver from comms map  
+2. **Dispatch** — ETA delay (no world map at call)  
+3. **Arrive** — land at chosen pickup (other settlements / field maps OK)  
+4. **Set destination** — world map; fare preview = mass × distance  
+5. **Depart** — pay trip fare, fly; map land or caravan drop-off  
 
-1. Empty auto-leave warning / refund option for call fee
-2. Inspect/gizmo shows estimated trip fare live
-3. Clearer arrival letter (caravan beside settlement)
-4. Min-passenger option (optional setting)
-5. Better graphics / shadow polish
-6. Optional peaceful map-edge drop mode (setting)
+Also in: remote pickup list, delayed dispatch, trip booking on Comp, map landing NRE fix, dual fare model.
+
+## Deferred: dedicated GUI
+
+Do **not** build a full custom control panel yet. Current gizmos/float menus/letters are enough.
+
+Later GUI pass (when requested) should make the same steps intuitive:
+
+- One taxi desk / panel: call fee, pickup, ETA, load, destination, fare meter, depart  
+- Live fare estimate, clearer state (“en route / boarding / ready”)  
+- Fewer nested float menus  
+
+Until then: bugfixes and small UX text only.
+
+## Next candidates (after baseline stable)
+
+1. Empty auto-leave warning / optional call-fee refund  
+2. Caravan-on-world-map pickup (no open map yet)  
+3. Graphics polish  
+4. **GUI overhaul** (above)
 
 ## Explicit non-goals
 
-- Hospitality
-- Player-owned spaceship fleet / SRTS-style ship progression (wrong fantasy)
-- Player taxi company / multi-company (later maybe; not required for identity)
-- Odyssey required integration
+- Hospitality  
+- Player-owned spaceship fleet / SRTS-style progression  
+- Treating SRTS as identity reference in UI/docs  
+- Odyssey required integration  
