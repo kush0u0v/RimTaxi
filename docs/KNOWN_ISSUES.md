@@ -27,7 +27,8 @@
 ## Economy
 
 - Call fee spent even if player never boards (dispatch no-show cost).
-- Trip fare on **taxi’s current map** silver — remote pickup needs silver there to depart (or haul silver first).
+- Silver rules: **settlement** = storage + carried; **field map** = trade-beacon radius + carried; **caravan** = inventory.
+- Trip fare from taxi’s current map / caravan — remote depart needs silver under those rules there.
 - Large mass × long distance can dwarf the 200 call fee.
 
 ## Graphics

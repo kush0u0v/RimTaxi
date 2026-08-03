@@ -70,7 +70,7 @@
   <RimTaxi_MapUnreachable>Taxi cannot reach this map.</RimTaxi_MapUnreachable>
   <RimTaxi_CommsUnavailable>Comms console cannot be used right now.</RimTaxi_CommsUnavailable>
   <RimTaxi_OnCooldown>Taxi on cooldown ({0} remaining).</RimTaxi_OnCooldown>
-  <RimTaxi_NeedSilver>Need {0} silver (have {1}).</RimTaxi_NeedSilver>
+  <RimTaxi_NeedSilver>Need {0} silver (have {1}). Settlement: stockpiles + carried. Field maps: trade-beacon radius + carried.</RimTaxi_NeedSilver>
   <RimTaxi_DefsMissing>RimTaxi defs failed to load.</RimTaxi_DefsMissing>
   <RimTaxi_SpawnFailed>Taxi failed to arrive. Silver refunded if possible.</RimTaxi_SpawnFailed>
   <RimTaxi_CallSuccessTrip>Taxi called. Paid {0} silver dispatch. Destination {1} tiles away — trip fare (mass × distance) is charged when it leaves. Board or wait for auto-depart.</RimTaxi_CallSuccessTrip>

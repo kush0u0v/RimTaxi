@@ -127,9 +127,16 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 | When | Silver | Taken from |
 |------|--------|------------|
-| **1. Call** | `baseFare` (200) | Comms / call map stockpile |
-| **5. Depart** | `ceil(massKg × tiles × farePerKgPerTile)` | Map where taxi currently is |
+| **1. Call** | `baseFare` (200) | Call map via `TaxiPayment` rules |
+| **5. Depart** | `ceil(massKg × tiles × farePerKgPerTile)` | Taxi map / caravan via `TaxiPayment` |
 | Empty leave | Trip fare 0 | — |
+
+**Map silver sources (`TaxiPayment`):**
+
+- **Player settlement / home:** stockpile & storage silver + silver carried by player pawns (**no** trade beacon required)
+- **Field / temp maps:** silver in **orbital trade beacon** radius (`TradeUtility.AllLaunchableThingsForTrade`) + carried by player pawns
+- **Caravan:** caravan inventory
+- Spend order: ground/storage first, then pawn inventory
 
 Defaults:
 
