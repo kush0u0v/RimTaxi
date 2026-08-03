@@ -2,30 +2,32 @@
 
 ## For humans
 
-1. Fork / branch from `main`.
-2. Keep changes scoped to one feature or fix.
+1. Branch from `main`.
+2. Keep the **5-step loop** unless the issue is a redesign request.
 3. Build: `dotnet build -c Release` in `Source/RimTaxi`.
-4. Smoke-test in RimWorld 1.6 with Harmony.
-5. Open a PR with: summary, test steps, known risks.
+4. Smoke-test in RimWorld 1.6 + Harmony.
+5. PR: summary, test steps, risks.
 
 ## For AI agents
 
-1. Read **`AGENTS.md`** first (mandatory).
-2. Skim `docs/ARCHITECTURE.md` and `docs/KNOWN_ISSUES.md`.
-3. Prefer smallest diff that fixes the issue.
-4. Do not add Hospitality or Odyssey hard deps.
-5. Report: changed files, build result, in-game test steps, remaining limits.
+1. Read **`AGENTS.md`** and **`docs/HANDOFF.md`** first.
+2. Skim `docs/ARCHITECTURE.md` + `docs/KNOWN_ISSUES.md`.
+3. Prefer smallest fix; no full GUI unless asked.
+4. No Hospitality; no SRTS branding; no Odyssey hard dep.
+5. End report: files changed, build result, in-game steps, remaining limits.
 
 ## Commit messages
 
-Use clear present tense, e.g.:
+Present tense, e.g.:
 
-- `Fix trip booking lost on load/unload`
-- `Charge trip fare from mass and distance at depart`
-- `Force world caravan drop on settlement tiles`
+- `Fix map land DropShuttle NRE with DropRimTaxi`
+- `Add field-map pickup without requiring camp`
+- `Set dispatch ETA default to 1–3 hours`
 
-## Code review focus
+## Review focus
 
-- Arrival still forced to world caravan?
-- Call fee vs trip fee still split correctly?
-- Harmony patches null-safe and def-filtered to RimTaxi only?
+- Call still has **no world map**?
+- Call fee vs trip fee still split (comms map vs taxi map)?
+- Destination still **after** land?
+- Arrival still uses our actions (map land / caravan), not vanilla StillValid wipe?
+- `CompProperties_Shuttle.shipDef` still `Ship_RimTaxi`?

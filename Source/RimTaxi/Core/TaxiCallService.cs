@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -8,7 +9,10 @@ using Verse.AI;
 namespace RimTaxi
 {
     /// <summary>
-    /// Call (200 silver) → land → wait 5h / early depart → trip fare = mass × distance → fly.
+    /// Flow:
+    /// 1) Call (200 silver) → 2) Dispatch ETA → 3) Arrive at pickup
+    /// 4) Set destination (book; fare = mass×distance shown)
+    /// 5) Depart (charge trip fare + fly)
     /// </summary>
     public static class TaxiCallService
     {
@@ -18,14 +22,49 @@ namespace RimTaxi
 
         public static int MaxDistance => RimTaxiMod.Settings?.maxLaunchDistance ?? 70;
 
-        public static string GetBlockedReason(Map map, Building_CommsConsole console = null, int? requiredSilver = null)
+        public static int RollDispatchDelayTicks(int tripDistance)
         {
-            if (map == null || !map.IsPlayerHome)
+            TaxiSettings s = RimTaxiMod.Settings;
+            int bas = s?.dispatchBaseTicks ?? 2500;
+            int variance = s?.dispatchVarianceTicks ?? 5000;
+            int perTile = s?.dispatchTicksPerTripTile ?? 0;
+            if (bas < 0)
+            {
+                bas = 0;
+            }
+
+            if (variance < 0)
+            {
+                variance = 0;
+            }
+
+            if (tripDistance < 0)
+            {
+                tripDistance = 0;
+            }
+
+            int delay = bas + (perTile * tripDistance);
+            if (variance > 0)
+            {
+                delay += Rand.RangeInclusive(0, variance);
+            }
+
+            if (delay > 0 && delay < 1250)
+            {
+                delay = 1250;
+            }
+
+            return delay;
+        }
+
+        public static string GetBlockedReason(Map callMap, Building_CommsConsole console = null, int? requiredSilver = null)
+        {
+            if (callMap == null || !callMap.IsPlayerHome)
             {
                 return "RimTaxi_NotPlayerHome".Translate();
             }
 
-            if (map.generatorDef != null && map.generatorDef.isUnderground)
+            if (callMap.generatorDef != null && callMap.generatorDef.isUnderground)
             {
                 return "RimTaxi_MapUnreachable".Translate();
             }
@@ -53,9 +92,9 @@ namespace RimTaxi
             }
 
             int need = requiredSilver ?? CallFee;
-            if (!TaxiPayment.CanAfford(map, need))
+            if (!TaxiPayment.CanAfford(callMap, need))
             {
-                return "RimTaxi_NeedSilver".Translate(need, TaxiPayment.CountSilver(map));
+                return "RimTaxi_NeedSilver".Translate(need, TaxiPayment.CountSilver(callMap));
             }
 
             if (RimTaxiDefOf.Ship_RimTaxi == null || RimTaxiDefOf.RimTaxiShuttle == null)
@@ -104,6 +143,8 @@ namespace RimTaxi
             return new FloatMenuOption(label, () => BeginCallFromConsole(console, pawn), MenuOptionPriority.Default);
         }
 
+        // ─── 1) Call ─────────────────────────────────────────────
+
         public static void BeginCallFromConsole(Building_CommsConsole console, Pawn caller)
         {
             if (console == null || !console.Spawned)
@@ -111,24 +152,285 @@ namespace RimTaxi
                 return;
             }
 
-            Map map = console.Map;
-            string blocked = GetBlockedReason(map, console);
+            Map callMap = console.Map;
+            string blocked = GetBlockedReason(callMap, console);
             if (blocked != null)
             {
                 Messages.Message(blocked, console, MessageTypeDefOf.RejectInput, historical: false);
                 return;
             }
 
-            BeginDestinationTargeting(caller, map);
+            ShowPickupSiteMenu(callMap, caller);
         }
 
-        public static void BeginDestinationTargeting(Pawn caller, Map map)
+        public static void ShowPickupSiteMenu(Map callMap, Pawn caller)
         {
-            if (map == null)
+            // Always show menu so "send to other settlement" is obvious.
+            List<TaxiPickupSite> sites = TaxiPickupSite.GetAll(callMap);
+            if (sites.Count == 0)
+            {
+                Messages.Message("RimTaxi_NoPickupSites".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            var options = new List<FloatMenuOption>();
+            options.Add(new FloatMenuOption("RimTaxi_PickupMenuHeader".Translate(), null));
+
+            TaxiGameComponent gc = Comp;
+            for (int i = 0; i < sites.Count; i++)
+            {
+                TaxiPickupSite site = sites[i];
+                Map open = site.openMap;
+                if (open != null && gc != null && gc.HasPendingDispatch(open))
+                {
+                    TaxiPendingDispatch p = gc.GetPendingDispatch(open);
+                    string eta = p != null ? p.TicksRemaining.ToStringTicksToPeriod() : "";
+                    options.Add(new FloatMenuOption(
+                        site.label + " — " + "RimTaxi_TaxiEnRoute".Translate(eta),
+                        null));
+                    continue;
+                }
+
+                options.Add(new FloatMenuOption(
+                    site.label,
+                    () => BeginPickupFlow(callMap, caller, site)));
+            }
+
+            options.Add(new FloatMenuOption("CancelButton".Translate(), null));
+            Find.WindowStack.Add(new FloatMenu(options));
+            Messages.Message("RimTaxi_ChoosePickup".Translate(), MessageTypeDefOf.NeutralEvent, historical: false);
+        }
+
+        public static void BeginPickupFlow(Map callMap, Pawn caller, TaxiPickupSite site)
+        {
+            if (site == null)
             {
                 return;
             }
 
+            if (site.HasOpenMap)
+            {
+                BeginPickupLandingTargeting(callMap, caller, site.openMap);
+                return;
+            }
+
+            MapParent parent = site.mapParent;
+            if (parent == null)
+            {
+                Messages.Message("RimTaxi_PickupMapFailed".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            LongEventHandler.QueueLongEvent(
+                delegate
+                {
+                    Map map = GetOrGenerateMapUtility.GetOrGenerateMap(parent.Tile, null);
+                    LongEventHandler.ExecuteWhenFinished(delegate
+                    {
+                        if (map == null)
+                        {
+                            Messages.Message("RimTaxi_PickupMapFailed".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                            return;
+                        }
+
+                        BeginPickupLandingTargeting(callMap, caller, map);
+                    });
+                },
+                "GeneratingMap",
+                doAsynchronously: false,
+                exceptionHandler: null);
+        }
+
+        public static void BeginPickupLandingTargeting(Map callMap, Pawn caller, Map pickupMap)
+        {
+            if (pickupMap == null)
+            {
+                return;
+            }
+
+            Messages.Message(
+                "RimTaxi_ChoosePickupLanding".Translate(pickupMap.Parent?.LabelCap ?? pickupMap.ToString()),
+                MessageTypeDefOf.NeutralEvent,
+                historical: false);
+
+            CameraJumper.TryJump(pickupMap.Center, pickupMap);
+            Current.Game.CurrentMap = pickupMap;
+
+            TargetingParameters parms = new TargetingParameters
+            {
+                canTargetLocations = true,
+                canTargetSelf = false,
+                canTargetPawns = false,
+                canTargetFires = false,
+                canTargetBuildings = true,
+                canTargetItems = true,
+                validator = (TargetInfo t) =>
+                {
+                    if (!t.IsValid || t.Map != pickupMap)
+                    {
+                        return false;
+                    }
+
+                    return TaxiLandingUtility.CanLandHere(t.Cell, pickupMap).Accepted;
+                }
+            };
+
+            Find.Targeter.BeginTargeting(
+                parms,
+                (LocalTargetInfo target) => TryCompleteCall(caller, callMap, pickupMap, target.Cell),
+                (LocalTargetInfo target) => TaxiLandingUtility.DrawGhost(target, pickupMap),
+                null,
+                null);
+        }
+
+        // ─── 1–2) Call fee + Dispatch (no world map, no destination yet) ───
+
+        public static void TryCompleteCall(Pawn negotiator, Map callMap, Map pickupMap, IntVec3 pickupCell)
+        {
+            if (pickupMap == null)
+            {
+                return;
+            }
+
+            AcceptanceReport landReport = TaxiLandingUtility.CanLandHere(pickupCell, pickupMap);
+            if (!landReport.Accepted)
+            {
+                Messages.Message(landReport.Reason, new LookTargets(pickupCell, pickupMap), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            TaxiGameComponent taxiComp = Comp;
+            if (taxiComp != null && taxiComp.OnCooldown)
+            {
+                Messages.Message("RimTaxi_OnCooldown".Translate(taxiComp.CooldownTicksRemaining.ToStringTicksToPeriod()), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            if (taxiComp != null && taxiComp.HasPendingDispatch(pickupMap))
+            {
+                Messages.Message("RimTaxi_TaxiEnRoute".Translate(""), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            Map payMap = callMap ?? pickupMap;
+            int callFee = CallFee;
+            if (!TaxiPayment.TryPay(payMap, callFee))
+            {
+                Messages.Message("RimTaxi_NeedSilver".Translate(callFee, TaxiPayment.CountSilver(payMap)), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            if (taxiComp == null)
+            {
+                if (callFee > 0)
+                {
+                    Thing refund = ThingMaker.MakeThing(ThingDefOf.Silver);
+                    refund.stackCount = callFee;
+                    GenPlace.TryPlaceThing(refund, payMap.Center, payMap, ThingPlaceMode.Near);
+                }
+
+                Messages.Message("RimTaxi_SpawnFailed".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            // Step 2: dispatch — destination not chosen yet
+            taxiComp.NotifyCalled();
+            taxiComp.QueueDispatch(pickupMap, pickupCell, PlanetTile.Invalid, 0, callFee);
+
+            TaxiPendingDispatch pending = taxiComp.GetPendingDispatch(pickupMap);
+            string eta = pending != null
+                ? pending.TicksRemaining.ToStringTicksToPeriod()
+                : "—";
+
+            string pickupName = pickupMap.Parent?.LabelCap ?? pickupMap.ToString();
+
+            Messages.Message(
+                "RimTaxi_CallDispatchedSimple".Translate(callFee, pickupName, eta),
+                new LookTargets(pickupCell, pickupMap),
+                MessageTypeDefOf.PositiveEvent);
+
+            Find.LetterStack.ReceiveLetter(
+                "RimTaxi_LetterDispatchedLabel".Translate(),
+                "RimTaxi_LetterDispatchedSimpleText".Translate(callFee, pickupName, eta),
+                LetterDefOf.PositiveEvent,
+                new LookTargets(pickupCell, pickupMap));
+
+            Log.Message($"[RimTaxi] Step1-2 Call+Dispatch pickup={pickupName} cell={pickupCell} fee={callFee} eta={eta}");
+        }
+
+        // ─── 3) Arrive (spawn at pickup after ETA) ────────────────
+
+        public static bool SpawnTaxi(Map map, IntVec3 cell, PlanetTile destTile, int distance)
+        {
+            try
+            {
+                ThingDef shuttleDef = RimTaxiDefOf.RimTaxiShuttle;
+                TransportShipDef shipDef = RimTaxiDefOf.Ship_RimTaxi;
+                if (shuttleDef == null || shipDef == null || map?.Parent == null)
+                {
+                    Log.Error("[RimTaxi] Missing defs or map parent.");
+                    return false;
+                }
+
+                Thing shuttle = ThingMaker.MakeThing(shuttleDef);
+                CompShuttle compShuttle = shuttle.TryGetComp<CompShuttle>();
+                if (compShuttle != null)
+                {
+                    compShuttle.permitShuttle = true;
+                    compShuttle.acceptChildren = true;
+                    compShuttle.acceptColonists = true;
+                    compShuttle.acceptColonyPrisoners = true;
+                }
+
+                TransportShip transportShip = TransportShipMaker.MakeTransportShip(shipDef, null, shuttle);
+
+                // Destination is set in step 4, not at spawn (unless already provided)
+                if (destTile.Valid && distance > 0)
+                {
+                    TaxiTripLookup.Book(transportShip, destTile, distance);
+                }
+
+                int wait = RimTaxiMod.Settings?.waitTicks ?? 12500;
+                if (wait < 2500)
+                {
+                    wait = 2500;
+                }
+
+                ShipJob_WaitTime waitJob = (ShipJob_WaitTime)ShipJobMaker.MakeShipJob(ShipJobDefOf.WaitTime);
+                waitJob.duration = wait;
+                waitJob.showGizmos = true;
+                transportShip.AddJob(waitJob);
+
+                // After wait: empty leave, or require destination if loaded (billing patch)
+                ShipJob_FlyAway flyJob = (ShipJob_FlyAway)ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway);
+                if (destTile.Valid)
+                {
+                    flyJob.destinationTile = destTile;
+                    flyJob.dropMode = TransportShipDropMode.None;
+                    flyJob.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(destTile);
+                }
+
+                transportShip.AddJob(flyJob);
+                transportShip.ArriveAt(cell, map.Parent);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Log.Error("[RimTaxi] SpawnTaxi failed: " + e);
+                return false;
+            }
+        }
+
+        // ─── 4) Set destination only (no payment, no depart) ─────
+
+        public static void BeginSetDestination(TransportShip ship)
+        {
+            if (ship?.shipThing?.Map == null)
+            {
+                return;
+            }
+
+            Map map = ship.shipThing.Map;
             PlanetTile origin = map.Tile;
             int maxDist = MaxDistance;
 
@@ -136,21 +438,21 @@ namespace RimTaxi
             Find.WorldSelector.ClearSelection();
 
             Find.WorldTargeter.BeginTargeting(
-                (GlobalTargetInfo t) => ChoseWorldDestination(t, origin, map, caller, maxDist),
+                (GlobalTargetInfo t) => ChoseSetDestination(t, origin, maxDist, ship),
                 canTargetTiles: true,
                 CompLaunchable.TargeterMouseAttachment,
-                closeWorldTabWhenFinished: false,
+                closeWorldTabWhenFinished: true,
                 delegate
                 {
                     GenDraw.DrawWorldRadiusRing(origin, maxDist);
                 },
-                (GlobalTargetInfo t) => DestinationLabel(t, origin, maxDist, map),
+                (GlobalTargetInfo t) => SetDestinationLabel(t, origin, maxDist, ship),
                 null,
                 origin,
                 showCancelButton: true);
         }
 
-        private static string DestinationLabel(GlobalTargetInfo target, PlanetTile origin, int maxDist, Map map)
+        private static string SetDestinationLabel(GlobalTargetInfo target, PlanetTile origin, int maxDist, TransportShip ship)
         {
             if (!target.IsValid)
             {
@@ -164,12 +466,13 @@ namespace RimTaxi
                 return "TransportPodDestinationBeyondMaximumRange".Translate();
             }
 
-            // Call fee only now; trip fare depends on mass at depart.
+            float mass = TaxiTripBilling.GetCargoMass(ship);
+            int fare = TaxiFareCalculator.TripFare(mass, dist);
             GUI.color = Color.white;
-            return "RimTaxi_DestLabel".Translate(CallFee, dist, TaxiFareCalculator.FarePerKgPerTile.ToString("0.00"));
+            return "RimTaxi_SetDestLabel".Translate(dist, mass.ToString("0.0"), fare);
         }
 
-        private static bool ChoseWorldDestination(GlobalTargetInfo target, PlanetTile origin, Map map, Pawn caller, int maxDist)
+        private static bool ChoseSetDestination(GlobalTargetInfo target, PlanetTile origin, int maxDist, TransportShip ship)
         {
             if (!target.IsValid)
             {
@@ -196,162 +499,80 @@ namespace RimTaxi
                 return false;
             }
 
-            // Only need call fee to book.
-            string blocked = GetBlockedReason(map, null, CallFee);
-            if (blocked != null)
-            {
-                Messages.Message(blocked, MessageTypeDefOf.RejectInput, historical: false);
-                return false;
-            }
+            // Step 4 only: book destination + show estimated fare. No payment, no depart.
+            TaxiTripLookup.Book(ship, target.Tile, dist);
+            float mass = TaxiTripBilling.GetCargoMass(ship);
+            int fare = TaxiFareCalculator.TripFare(mass, dist);
 
-            PlanetTile destTile = target.Tile;
             CameraJumper.TryHideWorld();
-            BeginLandingTargeting(caller, map, dist, destTile);
+            Messages.Message(
+                "RimTaxi_DestinationSet".Translate(dist, mass.ToString("0.0"), fare),
+                ship.shipThing,
+                MessageTypeDefOf.TaskCompletion,
+                historical: false);
+
+            Log.Message($"[RimTaxi] Step4 destination set ship#{ship.loadID} → {target.Tile} dist={dist} estFare={fare}");
             return true;
         }
 
-        public static void BeginLandingTargeting(Pawn negotiator, Map map, int distance, PlanetTile destTile)
+        // ─── 5) Depart (charge mass×distance + fly) ──────────────
+
+        public static void Depart(TransportShip ship)
         {
+            if (ship == null)
+            {
+                return;
+            }
+
+            if (!TaxiTripLookup.TryGetTrip(ship, out PlanetTile dest, out int distance))
+            {
+                Messages.Message("RimTaxi_NeedDestinationBeforeDepart".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            CompTransporter transporter = ship.TransporterComp;
+            if (transporter?.innerContainer == null || !transporter.innerContainer.Any)
+            {
+                Messages.Message("RimTaxi_DepartEmpty".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            Map map = ship.shipThing?.Map;
             if (map == null)
             {
                 return;
             }
 
-            Messages.Message(
-                "RimTaxi_ChooseLanding".Translate(TaxiFareCalculator.DescribeCallFee()),
-                MessageTypeDefOf.NeutralEvent,
-                historical: false);
-
-            CameraJumper.TryJump(map.Center, map);
-
-            TargetingParameters parms = new TargetingParameters
+            if (!TaxiTripBilling.TryChargeTripFare(ship, map, distance, out int charged, out float mass))
             {
-                canTargetLocations = true,
-                canTargetSelf = false,
-                canTargetPawns = false,
-                canTargetFires = false,
-                canTargetBuildings = true,
-                canTargetItems = true,
-                validator = (TargetInfo t) =>
-                {
-                    if (!t.IsValid || t.Map != map)
-                    {
-                        return false;
-                    }
-
-                    return TaxiLandingUtility.CanLandHere(t.Cell, map).Accepted;
-                }
-            };
-
-            Find.Targeter.BeginTargeting(
-                parms,
-                (LocalTargetInfo target) => TryCompleteCall(negotiator, map, target.Cell, distance, destTile),
-                (LocalTargetInfo target) => TaxiLandingUtility.DrawGhost(target, map),
-                null,
-                null);
-        }
-
-        public static void TryCompleteCall(Pawn negotiator, Map map, IntVec3 cell, int distance, PlanetTile destTile)
-        {
-            AcceptanceReport landReport = TaxiLandingUtility.CanLandHere(cell, map);
-            if (!landReport.Accepted)
-            {
-                Messages.Message(landReport.Reason, new LookTargets(cell, map), MessageTypeDefOf.RejectInput, historical: false);
+                int need = TaxiFareCalculator.TripFare(mass, distance);
+                Messages.Message("RimTaxi_NeedSilver".Translate(need, TaxiPayment.CountSilver(map)), MessageTypeDefOf.RejectInput, historical: false);
                 return;
             }
 
-            TaxiGameComponent taxiComp = Comp;
-            if (taxiComp != null && taxiComp.OnCooldown)
+            if (!transporter.LoadingInProgressOrReadyToLaunch)
             {
-                Messages.Message("RimTaxi_OnCooldown".Translate(taxiComp.CooldownTicksRemaining.ToStringTicksToPeriod()), MessageTypeDefOf.RejectInput, historical: false);
-                return;
+                TransporterUtility.InitiateLoading(Gen.YieldSingle(transporter));
             }
 
-            int callFee = CallFee;
-            if (!TaxiPayment.TryPay(map, callFee))
+            ShipJob_FlyAway fly = (ShipJob_FlyAway)ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway);
+            fly.destinationTile = dest;
+            fly.dropMode = TransportShipDropMode.None;
+            fly.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(dest);
+
+            ship.ForceJob(fly);
+            TaxiTripLookup.Clear(ship);
+
+            if (charged > 0)
             {
-                Messages.Message("RimTaxi_NeedSilver".Translate(callFee, TaxiPayment.CountSilver(map)), MessageTypeDefOf.RejectInput, historical: false);
-                return;
+                Messages.Message("RimTaxi_DepartingPaid".Translate(charged, mass.ToString("0.0"), distance), ship.shipThing, MessageTypeDefOf.TaskCompletion, historical: false);
+            }
+            else
+            {
+                Messages.Message("RimTaxi_Departing".Translate(), ship.shipThing, MessageTypeDefOf.TaskCompletion, historical: false);
             }
 
-            if (!SpawnTaxi(map, cell, destTile, distance))
-            {
-                if (callFee > 0)
-                {
-                    Thing refund = ThingMaker.MakeThing(ThingDefOf.Silver);
-                    refund.stackCount = callFee;
-                    if (!GenPlace.TryPlaceThing(refund, cell, map, ThingPlaceMode.Near))
-                    {
-                        refund.Destroy();
-                        Log.Warning("[RimTaxi] Paid call fee but failed to spawn taxi and could not refund.");
-                    }
-                }
-
-                Messages.Message("RimTaxi_SpawnFailed".Translate(), MessageTypeDefOf.RejectInput, historical: false);
-                return;
-            }
-
-            taxiComp?.NotifyCalled();
-
-            Messages.Message(
-                "RimTaxi_CallSuccessTrip".Translate(callFee, distance),
-                new LookTargets(cell, map),
-                MessageTypeDefOf.PositiveEvent);
-
-            Log.Message($"[RimTaxi] Called by {negotiator?.LabelShort ?? "console"} cell={cell} dest={destTile} dist={distance} callFee={callFee}");
-        }
-
-        public static bool SpawnTaxi(Map map, IntVec3 cell, PlanetTile destTile, int distance)
-        {
-            try
-            {
-                ThingDef shuttleDef = RimTaxiDefOf.RimTaxiShuttle;
-                TransportShipDef shipDef = RimTaxiDefOf.Ship_RimTaxi;
-                if (shuttleDef == null || shipDef == null || map?.Parent == null)
-                {
-                    Log.Error("[RimTaxi] Missing defs or map parent.");
-                    return false;
-                }
-
-                Thing shuttle = ThingMaker.MakeThing(shuttleDef);
-                CompShuttle compShuttle = shuttle.TryGetComp<CompShuttle>();
-                if (compShuttle != null)
-                {
-                    compShuttle.permitShuttle = true;
-                    compShuttle.acceptChildren = true;
-                    compShuttle.acceptColonists = true;
-                    compShuttle.acceptColonyPrisoners = true;
-                }
-
-                TransportShip transportShip = TransportShipMaker.MakeTransportShip(shipDef, null, shuttle);
-                // Store on shuttle Comp + GameComponent (load/unload must not erase booking)
-                TaxiTripLookup.Book(transportShip, destTile, distance);
-
-                int wait = RimTaxiMod.Settings?.waitTicks ?? 12500;
-                if (wait < 2500)
-                {
-                    wait = 2500;
-                }
-
-                ShipJob_WaitTime waitJob = (ShipJob_WaitTime)ShipJobMaker.MakeShipJob(ShipJobDefOf.WaitTime);
-                waitJob.duration = wait;
-                waitJob.showGizmos = true;
-                transportShip.AddJob(waitJob);
-
-                ShipJob_FlyAway flyJob = (ShipJob_FlyAway)ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway);
-                flyJob.destinationTile = destTile;
-                flyJob.dropMode = TransportShipDropMode.None;
-                flyJob.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(destTile);
-                transportShip.AddJob(flyJob);
-
-                transportShip.ArriveAt(cell, map.Parent);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Log.Error("[RimTaxi] SpawnTaxi failed: " + e);
-                return false;
-            }
+            Log.Message($"[RimTaxi] Step5 Depart ship#{ship.loadID} → {dest} mass={mass:0.0} dist={distance} fare={charged}");
         }
     }
 }

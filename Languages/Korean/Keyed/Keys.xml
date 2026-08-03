@@ -13,7 +13,34 @@
   <RimTaxi_Settings_Reset>기본값으로 재설정</RimTaxi_Settings_Reset>
 
   <RimTaxi_CallOptionWithFee>택시 호출 ({0} 은)…</RimTaxi_CallOptionWithFee>
-  <RimTaxi_CallGizmoDesc>지금 호출비 {0} 은. 출발 시 화물 무게(kg) × 거리(타일) × {1} 은을 추가로 받습니다. 대기 중 탑승하거나 즉시 출발을 누르세요.</RimTaxi_CallGizmoDesc>
+  <RimTaxi_CallGizmoDesc>호출비 {0} 은. 픽업 위치만 고르면 배차됩니다(월드맵 없음). 도착 후 탑승하고 출발할 때 목적지를 고릅니다. 출발 시 무게×거리×{1} 은.</RimTaxi_CallGizmoDesc>
+  <RimTaxi_CallDispatchedSimple>호출비 {0} 은. 픽업: {1}. 택시 오는 중… 예상 도착 {2}. 목적지는 착륙 후 출발 때 선택합니다.</RimTaxi_CallDispatchedSimple>
+  <RimTaxi_LetterDispatchedSimpleText>호출비 {0} 은 결제.\n\n픽업: {1}\n예상 도착: {2}\n\n택시가 착륙하면 승객을 태운 뒤 「출발」로 목적지를 고르세요. 운행 요금은 출발 시 무게×거리로 청구됩니다.</RimTaxi_LetterDispatchedSimpleText>
+  <RimTaxi_LetterArrivedTextNoDest>택시가 착륙했습니다.\n\n승객·화물을 태운 뒤 「출발(목적지 선택)」을 누르세요. 대기 시간이 끝나도 목적지가 없으면 출발하지 않고 다시 기다립니다(빈 차는 떠날 수 있음).</RimTaxi_LetterArrivedTextNoDest>
+  <RimTaxi_DepartChooseDest>출발 (목적지 선택) ({0}명)</RimTaxi_DepartChooseDest>
+  <RimTaxi_DepartChooseDestDesc>월드맵에서 목적지를 고른 뒤 운행 요금을 내고 출발합니다.</RimTaxi_DepartChooseDestDesc>
+  <RimTaxi_DepartDestLabel>{0}타일 · 무게 {1}kg · 운행 약 {2}은</RimTaxi_DepartDestLabel>
+  <RimTaxi_NeedDestinationBeforeDepart>목적지가 없습니다. 먼저 「목적지 설정」을 하세요.</RimTaxi_NeedDestinationBeforeDepart>
+  <RimTaxi_SetDestination>4. 목적지 설정</RimTaxi_SetDestination>
+  <RimTaxi_SetDestinationChange>4. 목적지 변경 ({0}타일, 약 {1}은)</RimTaxi_SetDestinationChange>
+  <RimTaxi_SetDestinationDesc>월드맵에서 목적지를 고릅니다. 요금은 거리×무게로 표시만 하고, 결제는 출발 때 합니다.</RimTaxi_SetDestinationDesc>
+  <RimTaxi_SetDestLabel>{0}타일 · 무게 {1}kg · 운행 요금 약 {2}은 (출발 시 결제)</RimTaxi_SetDestLabel>
+  <RimTaxi_DestinationSet>목적지 설정: {0}타일. 현재 짐 {1}kg → 출발 시 약 {2}은. 「5. 출발」을 누르세요.</RimTaxi_DestinationSet>
+  <RimTaxi_DepartStep>5. 출발 ({0}명, {1}은)</RimTaxi_DepartStep>
+  <RimTaxi_DepartStepDesc>거리×무게 운행 요금을 결제하고 예약 목적지로 출발합니다.</RimTaxi_DepartStepDesc>
+  <RimTaxi_ChoosePickup>택시가 착륙할 곳(픽업)을 고르세요. 전초·원정 맵에 있는 정착민도 고를 수 있습니다. 야영지를 만들 필요 없습니다.</RimTaxi_ChoosePickup>
+  <RimTaxi_PickupMenuHeader>— 택시를 어디로 보낼까요? (픽업) —</RimTaxi_PickupMenuHeader>
+  <RimTaxi_ChoosePickupLanding>{0} 맵에서 택시가 내려앉을 칸을 클릭하세요.</RimTaxi_ChoosePickupLanding>
+  <RimTaxi_PickupSiteHere>여기서 픽업: {0} (지금 맵)</RimTaxi_PickupSiteHere>
+  <RimTaxi_PickupSiteOtherOpen>다른 정착지에서 픽업: {0}</RimTaxi_PickupSiteOtherOpen>
+  <RimTaxi_PickupSiteOtherClosed>다른 정착지에서 픽업: {0} (맵 열기)</RimTaxi_PickupSiteOtherClosed>
+  <RimTaxi_PickupSiteTempMap>현장 맵에서 픽업: {0} (정착민 {1}명 · 야영지 불필요)</RimTaxi_PickupSiteTempMap>
+  <RimTaxi_PickupSiteMap>픽업: {0} (맵 열림)</RimTaxi_PickupSiteMap>
+  <RimTaxi_PickupSiteSettlement>픽업: {0} (정착지)</RimTaxi_PickupSiteSettlement>
+  <RimTaxi_NoPickupSites>호출 가능한 플레이어 정착지가 없습니다.</RimTaxi_NoPickupSites>
+  <RimTaxi_PickupMapFailed>픽업 맵을 열지 못했습니다.</RimTaxi_PickupMapFailed>
+  <RimTaxi_CallDispatchedRemote>호출비 {0} 은. 픽업: {1}. 목적지 {2}타일. 예상 도착 {3}.</RimTaxi_CallDispatchedRemote>
+  <RimTaxi_LetterDispatchedRemoteText>호출비 {0} 은 결제.\n\n픽업 위치: {1}\n목적지 거리: {2} 타일\n예상 배차 도착: {3}\n\n택시가 픽업 지점에 착륙하면 탑승 후 출발하세요. 운행 요금은 출발 시 무게×거리로 청구됩니다.</RimTaxi_LetterDispatchedRemoteText>
   <RimTaxi_CallFeeOnly>호출비 {0} 은 (운행 요금은 출발 시 무게×거리로 청구)</RimTaxi_CallFeeOnly>
   <RimTaxi_TripFareBreakdown>무게 {0}kg × {1}타일 × {2} = {3} 은</RimTaxi_TripFareBreakdown>
   <RimTaxi_DestLabel>호출 {0}은 · {1}타일 · 운행요금 = 무게×거리×{2} (출발 시)</RimTaxi_DestLabel>
@@ -27,6 +54,17 @@
   <RimTaxi_DefsMissing>RimTaxi Def 로드에 실패했습니다.</RimTaxi_DefsMissing>
   <RimTaxi_SpawnFailed>택시 도착에 실패했습니다. 가능하면 은을 환불했습니다.</RimTaxi_SpawnFailed>
   <RimTaxi_CallSuccessTrip>택시 호출. 호출비 {0} 은 결제. 목적지 {1}타일 — 운행 요금(무게×거리)은 출발 시 청구. 탑승하거나 대기를 기다리세요.</RimTaxi_CallSuccessTrip>
+  <RimTaxi_CallDispatched>호출비 {0} 은 결제. 택시가 오는 중… 예상 도착 {2}. 목적지 거리 {1}타일. 착륙 후 탑승하세요.</RimTaxi_CallDispatched>
+  <RimTaxi_LetterDispatchedLabel>택시 배차됨</RimTaxi_LetterDispatchedLabel>
+  <RimTaxi_LetterDispatchedText>호출비 {0} 은을 결제했습니다.\n\n택시가 정착지로 이동 중입니다. 예상 도착: {2}.\n예약 목적지 거리: {1} 타일.\n\n착륙 후 승객·화물을 태우고 출발하세요. 운행 요금(무게×거리)은 출발 시 청구됩니다.</RimTaxi_LetterDispatchedText>
+  <RimTaxi_LetterArrivedLabel>택시 도착</RimTaxi_LetterArrivedLabel>
+  <RimTaxi_LetterArrivedText>호출한 택시가 정착지에 착륙했습니다.\n\n예약 목적지: {0} 타일.\n승객·화물을 태운 뒤 「즉시 출발」하거나, 대기 시간이 끝나면 자동 출발합니다.</RimTaxi_LetterArrivedText>
+  <RimTaxi_TaxiArrivedAtColony>호출한 택시가 착륙했습니다.</RimTaxi_TaxiArrivedAtColony>
+  <RimTaxi_TaxiEnRoute>이미 택시가 오는 중입니다 (남은 시간: {0}).</RimTaxi_TaxiEnRoute>
+  <RimTaxi_DispatchLandingFailed>택시가 도착했으나 착륙할 칸을 찾지 못했습니다. 호출비를 환불했습니다.</RimTaxi_DispatchLandingFailed>
+  <RimTaxi_Settings_DispatchBase>배차 기본 대기: {0}시간 (호출 후 도착까지)</RimTaxi_Settings_DispatchBase>
+  <RimTaxi_Settings_DispatchVariance>배차 추가 랜덤: 최대 {0}시간</RimTaxi_Settings_DispatchVariance>
+  <RimTaxi_Settings_DispatchPerTile>목적지 타일당 배차 지연(틱): {0}</RimTaxi_Settings_DispatchPerTile>
   <RimTaxi_Arrived>RimTaxi 셔틀이 도착했습니다.</RimTaxi_Arrived>
   <RimTaxi_ArrivedCaravan>RimTaxi가 월드맵에 카러밴을 내려주었습니다. 준비되면 정착지에 직접 진입하세요.</RimTaxi_ArrivedCaravan>
   <RimTaxi_ArrivedNoPawns>RimTaxi가 도착했지만 카러밴을 만들 승객이 없었습니다.</RimTaxi_ArrivedNoPawns>

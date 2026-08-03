@@ -1,39 +1,47 @@
 # Roadmap
 
-## Done (current playable baseline — freeze feature creep)
+## Done — playable baseline (feature freeze for systems)
 
-Core loop (keep working; polish later via GUI, not new systems unless bugfix):
+Canonical loop:
 
-1. **Call** — 200 silver from comms map  
-2. **Dispatch** — ETA delay (no world map at call)  
-3. **Arrive** — land at chosen pickup (other settlements / field maps OK)  
-4. **Set destination** — world map; fare preview = mass × distance  
-5. **Depart** — pay trip fare, fly; map land or caravan drop-off  
+1. **Call** — 200 silver (comms map); pick pickup site + landing cell; **no world map**  
+2. **Dispatch** — ETA **1–3 hours**  
+3. **Arrive** — land at pickup  
+4. **Set destination** — world map; mass×distance **preview**  
+5. **Depart** — charge trip fare; fly; map land or caravan  
 
-Also in: remote pickup list, delayed dispatch, trip booking on Comp, map landing NRE fix, dual fare model.
+Also delivered:
 
-## Deferred: dedicated GUI
+- Remote pickup (other player settlements + open field maps; no camp)
+- Dual billing (call vs trip)
+- Trip booking on vehicle Comp
+- Map landing without vanilla DropShuttle NRE
+- Slower world flight
+- Docs for AI handoff (`AGENTS.md`, `docs/HANDOFF.md`, …)
 
-Do **not** build a full custom control panel yet. Current gizmos/float menus/letters are enough.
+## Deferred — dedicated GUI
 
-Later GUI pass (when requested) should make the same steps intuitive:
+Do **not** build a full taxi control panel unless the user asks.
 
-- One taxi desk / panel: call fee, pickup, ETA, load, destination, fare meter, depart  
-- Live fare estimate, clearer state (“en route / boarding / ready”)  
-- Fewer nested float menus  
+Later GUI should re-skin the **same five steps**:
 
-Until then: bugfixes and small UX text only.
+- Single panel: fee, pickup, ETA, load, destination, meter, depart  
+- Clear states: en route / boarding / dest set / ready  
+- Fewer nested menus  
 
-## Next candidates (after baseline stable)
+Until then: **bugfixes and small string/UX only**.
 
-1. Empty auto-leave warning / optional call-fee refund  
-2. Caravan-on-world-map pickup (no open map yet)  
-3. Graphics polish  
-4. **GUI overhaul** (above)
+## Next candidates (after baseline)
+
+1. Call-fee refund / warning on empty no-show leave  
+2. World **caravan** pickup without open map  
+3. Trip fare always payable from home map (optional setting)  
+4. Graphics polish  
+5. **GUI overhaul**
 
 ## Explicit non-goals
 
 - Hospitality  
-- Player-owned spaceship fleet / SRTS-style progression  
-- Treating SRTS as identity reference in UI/docs  
-- Odyssey required integration  
+- Player ship fleet / SRTS-style progression or branding  
+- Odyssey hard dependency  
+- Redesigning the 5-step economy without a clear request  

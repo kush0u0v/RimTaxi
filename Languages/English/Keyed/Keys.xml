@@ -13,7 +13,34 @@
   <RimTaxi_Settings_Reset>Reset to defaults</RimTaxi_Settings_Reset>
 
   <RimTaxi_CallOptionWithFee>Call taxi ({0} silver)…</RimTaxi_CallOptionWithFee>
-  <RimTaxi_CallGizmoDesc>Dispatch fee {0} silver now. At departure you also pay cargo mass × distance × {1} silver. Board during the wait or press Depart now.</RimTaxi_CallGizmoDesc>
+  <RimTaxi_CallGizmoDesc>Dispatch fee {0} silver. Choose pickup only (no world map at call). After the taxi lands, board and pick the destination when departing. At depart: mass × distance × {1} silver.</RimTaxi_CallGizmoDesc>
+  <RimTaxi_CallDispatchedSimple>Paid {0} silver. Pickup: {1}. Taxi en route — ETA {2}. Choose destination when you depart after landing.</RimTaxi_CallDispatchedSimple>
+  <RimTaxi_LetterDispatchedSimpleText>Paid {0} silver.\n\nPickup: {1}\nETA: {2}\n\nWhen the taxi lands, load passengers and press Depart to choose a destination. Trip fare is mass × distance at depart.</RimTaxi_LetterDispatchedSimpleText>
+  <RimTaxi_LetterArrivedTextNoDest>Your taxi has landed.\n\nLoad passengers/cargo, then press Depart to choose a destination. If the wait ends with no destination, boarded taxis wait again; empty taxis may leave.</RimTaxi_LetterArrivedTextNoDest>
+  <RimTaxi_DepartChooseDest>Depart (choose destination) ({0} aboard)</RimTaxi_DepartChooseDest>
+  <RimTaxi_DepartChooseDestDesc>Open the world map to pick a destination, pay trip fare, and leave.</RimTaxi_DepartChooseDestDesc>
+  <RimTaxi_DepartDestLabel>{0} tiles · mass {1} kg · trip ~{2} silver</RimTaxi_DepartDestLabel>
+  <RimTaxi_NeedDestinationBeforeDepart>No destination. Use Set destination first.</RimTaxi_NeedDestinationBeforeDepart>
+  <RimTaxi_SetDestination>4. Set destination</RimTaxi_SetDestination>
+  <RimTaxi_SetDestinationChange>4. Change destination ({0} tiles, ~{1} silver)</RimTaxi_SetDestinationChange>
+  <RimTaxi_SetDestinationDesc>Pick a world destination. Shows mass×distance fare estimate; payment is at Depart.</RimTaxi_SetDestinationDesc>
+  <RimTaxi_SetDestLabel>{0} tiles · mass {1} kg · trip ~{2} silver (pay at depart)</RimTaxi_SetDestLabel>
+  <RimTaxi_DestinationSet>Destination set: {0} tiles. Cargo {1} kg → about {2} silver at depart. Press 5. Depart.</RimTaxi_DestinationSet>
+  <RimTaxi_DepartStep>5. Depart ({0} aboard, {1} silver)</RimTaxi_DepartStep>
+  <RimTaxi_DepartStepDesc>Pay mass×distance trip fare and fly to the booked destination.</RimTaxi_DepartStepDesc>
+  <RimTaxi_ChoosePickup>Choose pickup landing. Other settlements and field maps with colonists work — no camp required.</RimTaxi_ChoosePickup>
+  <RimTaxi_PickupMenuHeader>— Where should the taxi go? (pickup) —</RimTaxi_PickupMenuHeader>
+  <RimTaxi_ChoosePickupLanding>Click a landing cell on {0}.</RimTaxi_ChoosePickupLanding>
+  <RimTaxi_PickupSiteHere>Pickup here: {0} (current map)</RimTaxi_PickupSiteHere>
+  <RimTaxi_PickupSiteOtherOpen>Pickup at other settlement: {0}</RimTaxi_PickupSiteOtherOpen>
+  <RimTaxi_PickupSiteOtherClosed>Pickup at other settlement: {0} (open map)</RimTaxi_PickupSiteOtherClosed>
+  <RimTaxi_PickupSiteTempMap>Pickup on field map: {0} ({1} colonists · no camp needed)</RimTaxi_PickupSiteTempMap>
+  <RimTaxi_PickupSiteMap>Pickup: {0} (map open)</RimTaxi_PickupSiteMap>
+  <RimTaxi_PickupSiteSettlement>Pickup: {0} (settlement)</RimTaxi_PickupSiteSettlement>
+  <RimTaxi_NoPickupSites>No player settlements available for pickup.</RimTaxi_NoPickupSites>
+  <RimTaxi_PickupMapFailed>Could not open the pickup map.</RimTaxi_PickupMapFailed>
+  <RimTaxi_CallDispatchedRemote>Paid {0} silver. Pickup: {1}. Trip {2} tiles. ETA {3}.</RimTaxi_CallDispatchedRemote>
+  <RimTaxi_LetterDispatchedRemoteText>Paid {0} silver dispatch.\n\nPickup: {1}\nTrip distance: {2} tiles\nETA: {3}\n\nWhen the taxi lands at the pickup site, board and depart. Trip fare is charged at departure from mass × distance.</RimTaxi_LetterDispatchedRemoteText>
   <RimTaxi_CallFeeOnly>Call fee {0} silver (trip fare charged at departure from mass × distance)</RimTaxi_CallFeeOnly>
   <RimTaxi_TripFareBreakdown>Mass {0} kg × {1} tiles × {2} = {3} silver</RimTaxi_TripFareBreakdown>
   <RimTaxi_DestLabel>Call {0} silver · {1} tiles · trip = mass × dist × {2} at depart</RimTaxi_DestLabel>
@@ -27,6 +54,17 @@
   <RimTaxi_DefsMissing>RimTaxi defs failed to load.</RimTaxi_DefsMissing>
   <RimTaxi_SpawnFailed>Taxi failed to arrive. Silver refunded if possible.</RimTaxi_SpawnFailed>
   <RimTaxi_CallSuccessTrip>Taxi called. Paid {0} silver dispatch. Destination {1} tiles away — trip fare (mass × distance) is charged when it leaves. Board or wait for auto-depart.</RimTaxi_CallSuccessTrip>
+  <RimTaxi_CallDispatched>Paid {0} silver. Taxi en route — ETA {2}. Trip distance {1} tiles. Board after it lands.</RimTaxi_CallDispatched>
+  <RimTaxi_LetterDispatchedLabel>Taxi dispatched</RimTaxi_LetterDispatchedLabel>
+  <RimTaxi_LetterDispatchedText>You paid {0} silver dispatch fee.\n\nA taxi is en route to your colony. ETA: {2}.\nBooked trip distance: {1} tiles.\n\nAfter it lands, load passengers/cargo and depart. Trip fare (mass × distance) is charged when it leaves.</RimTaxi_LetterDispatchedText>
+  <RimTaxi_LetterArrivedLabel>Taxi arrived</RimTaxi_LetterArrivedLabel>
+  <RimTaxi_LetterArrivedText>Your taxi has landed at the colony.\n\nBooked trip: {0} tiles.\nLoad passengers/cargo, then Depart now, or wait for auto-depart.</RimTaxi_LetterArrivedText>
+  <RimTaxi_TaxiArrivedAtColony>Your taxi has landed.</RimTaxi_TaxiArrivedAtColony>
+  <RimTaxi_TaxiEnRoute>A taxi is already en route (ETA {0}).</RimTaxi_TaxiEnRoute>
+  <RimTaxi_DispatchLandingFailed>Taxi arrived but could not find a landing spot. Call fee refunded.</RimTaxi_DispatchLandingFailed>
+  <RimTaxi_Settings_DispatchBase>Dispatch base wait: {0} hours (call → land)</RimTaxi_Settings_DispatchBase>
+  <RimTaxi_Settings_DispatchVariance>Dispatch random extra: up to {0} hours</RimTaxi_Settings_DispatchVariance>
+  <RimTaxi_Settings_DispatchPerTile>Extra dispatch ticks per trip tile: {0}</RimTaxi_Settings_DispatchPerTile>
   <RimTaxi_Arrived>RimTaxi shuttle arrived.</RimTaxi_Arrived>
   <RimTaxi_ArrivedCaravan>RimTaxi dropped off a caravan on the world map. Enter the settlement when you are ready.</RimTaxi_ArrivedCaravan>
   <RimTaxi_ArrivedNoPawns>RimTaxi arrived but no passengers were found to form a caravan.</RimTaxi_ArrivedNoPawns>

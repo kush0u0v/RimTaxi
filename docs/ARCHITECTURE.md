@@ -1,63 +1,76 @@
 # Architecture
 
+## High-level flow
+
+```
+Comms (gizmo / right-click)
+  └─ TaxiCallService.BeginCallFromConsole
+       ├─ TaxiPickupSite.GetAll  → float menu (pickup)
+       ├─ landing cell targeter on pickup map
+       ├─ pay CallFee from call map
+       └─ TaxiGameComponent.QueueDispatch (ETA 1–3h)
+            └─ GameComponentTick → SpawnTaxi (step 3)
+
+Spawned TransportShip (Ship_RimTaxi)
+  ├─ WaitTime (boarding, gizmos)
+  │    ├─ Set destination → TaxiCallService.BeginSetDestination → CompRimTaxiTrip.Book
+  │    └─ Depart → TaxiCallService.Depart → charge trip → FlyAway
+  └─ queued FlyAway (auto after wait; billing patch)
+
+TravellingTransporters (TravelingRimTaxi)
+  └─ Arrival patch → TaxiArrivalUtility.CreateArrivalAction
+       ├─ MapLand (settlement / map parent) → DropRimTaxi
+       └─ WorldDrop → caravan
+```
+
 ## Layers
 
-```
-UI entry
-  Building_CommsConsole gizmo + float menu (Harmony)
-    → TaxiCallService
+| Layer | Responsibility |
+|-------|----------------|
+| UI entry | Comms Harmony; wait-job gizmos; letters/messages |
+| Dispatch | `TaxiPendingDispatch` list on `TaxiGameComponent` |
+| Billing | Call fee vs mass×distance at depart |
+| Booking | `CompRimTaxiTrip` primary; GC dict backup |
+| Ship | Vanilla TransportShip + ShipJob Wait/FlyAway |
+| Arrival | Custom actions + Harmony force for our WorldObject def |
 
-Billing
-  Call: TaxiFareCalculator.CallFee → TaxiPayment
-  Depart: TaxiTripBilling (mass × distance × rate)
+## Harmony patches
 
-Booking
-  CompRimTaxiTrip on RimTaxiShuttle (primary)
-  TaxiGameComponent trips dict (backup / save)
-
-Ship lifecycle
-  TransportShipMaker + Ship_RimTaxi
-  WaitTime (boarding window)
-  FlyAway → TravellingTransporters (TravelingRimTaxi)
-
-Arrival
-  Harmony Prefix TravellingTransporters.Arrived for TravelingRimTaxi
-  TransportersArrivalAction_RimTaxiWorldDrop
-```
+| Patch | Target | Intent |
+|-------|--------|--------|
+| `Building_CommsConsole_Patch` | `Thing.GetGizmos`, `Building_CommsConsole.GetFloatMenuOptions` | Call UI |
+| `ShipJob_Wait_Gizmos_Patch` | `ShipJob_Wait.GetJobGizmos` | Set dest / Depart / Dismiss |
+| `ShipJob_FlyAway_Billing_Patch` | `ShipJob_FlyAway.TryStart` | Auto fare / re-wait / empty leave |
+| `TravellingTransporters_Arrival_Patch` | `TravellingTransporters.Arrived` | Force our arrival chooser |
+| `TravellingTransporters_Speed_Patch` | `get_TraveledPctStepPerTick` | Slower RimTaxi flights |
 
 ## Defs
 
 | Def | Purpose |
 |-----|---------|
 | `Ship_RimTaxi` | TransportShipDef |
-| `TravelingRimTaxi` | WorldObject (parent ShuttleWorldObjectBase) |
-| `RimTaxiShuttle` | Building / ship thing + comps |
-| `RimTaxiIncoming` / `RimTaxiLeaving` | Skyfallers + custom shadow |
+| `TravelingRimTaxi` | In-flight world object |
+| `RimTaxiShuttle` | Vehicle; **CompProperties_Shuttle.shipDef = Ship_RimTaxi** (required) |
+| `RimTaxiIncoming` / `RimTaxiLeaving` | Skyfallers + `RimTaxiShadow` |
 
-## Harmony patches
+## Settings defaults
 
-| Patch | Target | Intent |
-|-------|--------|--------|
-| `Building_CommsConsole_Patch` | Thing.GetGizmos / GetFloatMenuOptions | Call taxi |
-| `ShipJob_Wait_Gizmos_Patch` | ShipJob_Wait.GetJobGizmos | Depart now / dismiss |
-| `ShipJob_FlyAway_Billing_Patch` | ShipJob_FlyAway.TryStart | Auto trip fare |
-| `TravellingTransporters_Arrival_Patch` | TravellingTransporters.Arrived | Force world drop |
-| `TravellingTransporters_Speed_Patch` | get_TraveledPctStepPerTick | Slower flight |
-
-## Settings (`TaxiSettings`)
-
-| Field | Default | Meaning |
-|-------|---------|---------|
-| baseFare | 200 | Call fee |
-| farePerKgPerTile | 0.1 | Trip rate |
-| waitTicks | 12500 | 5 in-game hours |
-| cooldownTicks | 2500 | 1 in-game hour |
-| maxLaunchDistance | 70 | World tiles |
-| travelSpeedFactor | 0.6 | Flight speed mult |
+| Field | Default | Notes |
+|-------|---------|--------|
+| baseFare | 200 | Call |
+| farePerKgPerTile | 0.1 | Trip |
+| dispatchBaseTicks | 2500 | 1h |
+| dispatchVarianceTicks | 5000 | 0–2h → **1–3h ETA** |
+| dispatchTicksPerTripTile | 0 | Off by default |
+| waitTicks | 12500 | 5h board window |
+| cooldownTicks | 2500 | 1h |
+| maxLaunchDistance | 70 | |
+| travelSpeedFactor | 0.6 | |
+| landOnSettlementMaps | true | |
 
 ## Build paths
 
 `Source/RimTaxi/RimTaxi.csproj`:
 
-- `RimWorldDir` → Managed assemblies
-- `HarmonyDll` → `0Harmony.dll` (Workshop Harmony `Current/Assemblies`)
+- `RimWorldDir` → `...\RimWorldWin64_Data\Managed`
+- `HarmonyDll` → Workshop Harmony `Current\Assemblies\0Harmony.dll`

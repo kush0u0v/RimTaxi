@@ -6,8 +6,10 @@ using Verse;
 namespace RimTaxi.Patches
 {
     /// <summary>
-    /// Auto-depart after wait: charge mass×distance when loaded; empty leaves free.
-    /// Trip booking is read from shuttle Comp (not cleared by load/unload).
+    /// After boarding wait expires:
+    /// - empty + no dest → leave
+    /// - cargo + no dest → re-wait, ask to set destination
+    /// - cargo + dest → charge mass×distance and fly
     /// </summary>
     [HarmonyPatch(typeof(ShipJob_FlyAway), nameof(ShipJob_FlyAway.TryStart))]
     public static class ShipJob_FlyAway_Billing_Patch
@@ -21,9 +23,28 @@ namespace RimTaxi.Patches
                 return true;
             }
 
-            // Dismiss path: no booking → plain leave
-            if (!TaxiTripLookup.TryGetTrip(ship, out PlanetTile dest, out int distance))
+            bool hasTrip = TaxiTripLookup.TryGetTrip(ship, out PlanetTile dest, out int distance);
+            bool hasContents = ship.TransporterComp?.innerContainer != null && ship.TransporterComp.innerContainer.Any;
+            float mass = TaxiTripBilling.GetCargoMass(ship);
+            Map map = ship.shipThing?.Map;
+
+            // No booking: dismiss / empty leave
+            if (!hasTrip)
             {
+                if (hasContents && mass > 0.01f)
+                {
+                    Messages.Message(
+                        "RimTaxi_NeedDestinationBeforeDepart".Translate(),
+                        ship.shipThing,
+                        MessageTypeDefOf.RejectInput,
+                        historical: false);
+
+                    ReWait(ship, null);
+                    __result = false;
+                    return false;
+                }
+
+                // Empty leave
                 return true;
             }
 
@@ -32,20 +53,13 @@ namespace RimTaxi.Patches
                 __instance.destinationTile = dest;
             }
 
-            // Always re-resolve so settlement map land works even if old WorldDrop was queued.
             __instance.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(dest);
             __instance.dropMode = TransportShipDropMode.None;
 
-            Map map = ship.shipThing?.Map;
-            bool hasContents = ship.TransporterComp?.innerContainer != null && ship.TransporterComp.innerContainer.Any;
-            float mass = TaxiTripBilling.GetCargoMass(ship);
-
-            // Empty after wait: leave, then clear booking
             if (!hasContents || mass <= 0.01f)
             {
-                Log.Message($"[RimTaxi] Auto leave empty ship#{ship.loadID}");
-                // Clear after allowing fly — use postfix pattern: clear here is OK (leaving empty)
                 TaxiTripLookup.Clear(ship);
+                Log.Message($"[RimTaxi] Auto leave empty ship#{ship.loadID}");
                 return true;
             }
 
@@ -63,18 +77,7 @@ namespace RimTaxi.Patches
                     MessageTypeDefOf.RejectInput,
                     historical: false);
 
-                // Keep booking; re-wait so player can get silver
-                ShipJob_WaitTime wait = (ShipJob_WaitTime)ShipJobMaker.MakeShipJob(ShipJobDefOf.WaitTime);
-                wait.duration = 7500;
-                wait.showGizmos = true;
-                ship.ForceJob(wait);
-
-                ShipJob_FlyAway fly = (ShipJob_FlyAway)ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway);
-                fly.destinationTile = dest;
-                fly.dropMode = TransportShipDropMode.None;
-                fly.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(dest);
-                ship.AddJob(fly);
-
+                ReWait(ship, dest);
                 __result = false;
                 return false;
             }
@@ -91,6 +94,24 @@ namespace RimTaxi.Patches
             TaxiTripLookup.Clear(ship);
             Log.Message($"[RimTaxi] Auto depart ship#{ship.loadID} mass={mass:0.0} dist={distance} fare={charged}");
             return true;
+        }
+
+        private static void ReWait(TransportShip ship, PlanetTile? bookedDest)
+        {
+            ShipJob_WaitTime wait = (ShipJob_WaitTime)ShipJobMaker.MakeShipJob(ShipJobDefOf.WaitTime);
+            wait.duration = 7500;
+            wait.showGizmos = true;
+            ship.ForceJob(wait);
+
+            ShipJob_FlyAway fly = (ShipJob_FlyAway)ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway);
+            if (bookedDest.HasValue && bookedDest.Value.Valid)
+            {
+                fly.destinationTile = bookedDest.Value;
+                fly.dropMode = TransportShipDropMode.None;
+                fly.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(bookedDest.Value);
+            }
+
+            ship.AddJob(fly);
         }
     }
 }

@@ -16,8 +16,17 @@ namespace RimTaxi
         /// <summary>Reuse cooldown. Default 1 in-game hour.</summary>
         public int cooldownTicks = 2500;
 
-        /// <summary>Boarding wait. Default 5 in-game hours — then leaves (empty or with whoever boarded).</summary>
+        /// <summary>Boarding wait after taxi lands. Default 5 in-game hours.</summary>
         public int waitTicks = 12500;
+
+        /// <summary>Base time until taxi arrives after call. Default 1 hour.</summary>
+        public int dispatchBaseTicks = 2500;
+
+        /// <summary>Extra random dispatch delay (0..this). Default up to 2 hours → total ETA 1–3 hours.</summary>
+        public int dispatchVarianceTicks = 5000;
+
+        /// <summary>Optional extra ticks per trip tile. Default 0 so call ETA stays in 1–3h band.</summary>
+        public int dispatchTicksPerTripTile = 0;
 
         public int maxLaunchDistance = 70;
 
@@ -33,13 +42,15 @@ namespace RimTaxi
         {
             Scribe_Values.Look(ref baseFare, "baseFare", 200);
             Scribe_Values.Look(ref farePerKgPerTile, "farePerKgPerTile", 0.1f);
-            // Migrate old saves that only had farePerTile
             int legacyPerTile = 15;
             Scribe_Values.Look(ref legacyPerTile, "farePerTile", 15);
 
             Scribe_Values.Look(ref maxPassengers, "maxPassengers", 4);
             Scribe_Values.Look(ref cooldownTicks, "cooldownTicks", 2500);
             Scribe_Values.Look(ref waitTicks, "waitTicks", 12500);
+            Scribe_Values.Look(ref dispatchBaseTicks, "dispatchBaseTicks", 2500);
+            Scribe_Values.Look(ref dispatchVarianceTicks, "dispatchVarianceTicks", 5000);
+            Scribe_Values.Look(ref dispatchTicksPerTripTile, "dispatchTicksPerTripTile", 0);
             Scribe_Values.Look(ref maxLaunchDistance, "maxLaunchDistance", 70);
             Scribe_Values.Look(ref travelSpeedFactor, "travelSpeedFactor", 0.6f);
             Scribe_Values.Look(ref landOnSettlementMaps, "landOnSettlementMaps", true);
@@ -53,6 +64,9 @@ namespace RimTaxi
             maxPassengers = 4;
             cooldownTicks = 2500;
             waitTicks = 12500;
+            dispatchBaseTicks = 2500;
+            dispatchVarianceTicks = 5000;
+            dispatchTicksPerTripTile = 0;
             maxLaunchDistance = 70;
             travelSpeedFactor = 0.6f;
             landOnSettlementMaps = true;
@@ -84,9 +98,17 @@ namespace RimTaxi
                 cooldownTicks = 2500;
             }
 
+            listing.Label("RimTaxi_Settings_DispatchBase".Translate((dispatchBaseTicks / 2500f).ToString("0.0")));
+            dispatchBaseTicks = (int)listing.Slider(dispatchBaseTicks, 0f, 60000f);
+
+            listing.Label("RimTaxi_Settings_DispatchVariance".Translate((dispatchVarianceTicks / 2500f).ToString("0.0")));
+            dispatchVarianceTicks = (int)listing.Slider(dispatchVarianceTicks, 0f, 30000f);
+
+            listing.Label("RimTaxi_Settings_DispatchPerTile".Translate(dispatchTicksPerTripTile));
+            dispatchTicksPerTripTile = (int)listing.Slider(dispatchTicksPerTripTile, 0f, 250f);
+
             listing.Label("RimTaxi_Settings_Wait".Translate((waitTicks / 2500f).ToString("0.0")));
             waitTicks = (int)listing.Slider(waitTicks, 2500f, 180000f);
-            // Snap near 5h
             if (waitTicks > 11000 && waitTicks < 14000)
             {
                 waitTicks = 12500;

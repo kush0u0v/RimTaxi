@@ -26,7 +26,10 @@
     <highlightColor>(1.0, 0.85, 0.2)</highlightColor>
     <uiIconScale>1.0</uiIconScale>
     <comps Inherit="False">
-      <li Class="CompProperties_Shuttle" />
+      <!-- shipDef required so shuttle systems (and any DropShuttle path) are not null -->
+      <li Class="CompProperties_Shuttle">
+        <shipDef>Ship_RimTaxi</shipDef>
+      </li>
       <li Class="CompProperties_Transporter">
         <massCapacity>500</massCapacity>
         <max1PerGroup>true</max1PerGroup>

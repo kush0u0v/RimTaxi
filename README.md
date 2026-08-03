@@ -1,35 +1,40 @@
 # RimTaxi
 
-Civilian **taxi shuttle** mod for **RimWorld 1.6**.
+Civilian **on-demand taxi** mod for **RimWorld 1.6**.
 
-Call a taxi from the **comms console**, pay a dispatch fee, board colonists and limited cargo, then fly to a world destination. Arrival drops a **caravan on the world map** (does not force-enter settlement combat maps).
+Call a taxi from a **comms console**, wait for dispatch, board at a **pickup** (including other settlements or open field maps), set a destination, pay **mass × distance**, and fly. Not a player-owned spaceship mod.
 
 | | |
 |--|--|
+| **GitHub** | https://github.com/kush0u0v/RimTaxi |
 | **packageId** | `kush.rimtaxi` |
 | **Requires** | [Harmony](https://steamcommunity.com/sharedfiles/filedetails/?id=2009463077) |
-| **DLC** | None required (Odyssey/Royalty not required) |
+| **DLC** | None required |
 
-## Features (current)
+## Play loop (baseline)
 
-- Comms console **gizmo** + colonist **right-click** call (no faction dialog)
-- **Call fee** (default 200 silver)
-- **Trip fare at depart** = cargo mass (kg) × distance (tiles) × rate (default 0.1)
-- Boarding wait (default **5 hours**), or **Depart now** when loaded
-- Empty taxi leaves after wait (no trip fare)
-- Destination booked on the vehicle (`CompRimTaxiTrip`) so load/unload does not wipe it
-- Custom yellow taxi graphics + silhouette shadow
-- Configurable speed / cooldown / fares in mod settings
+1. **Call** — pay **200** silver (from the comms map). Choose **pickup** (this map / other colony / field map with colonists). Choose landing cell. **No world map yet.**  
+2. **Dispatch** — taxi is en route (**about 1–3 hours**).  
+3. **Arrive** — taxi lands at the pickup.  
+4. **Set destination** — taxi gizmo; world map; shows estimated fare.  
+5. **Depart** — pay **kg × tiles × rate**, then fly. Lands on destination map when possible, else world caravan.
+
+## Features
+
+- Comms **gizmo** + colonist **right-click** (no faction dialog)
+- Remote pickup without founding a camp on field maps
+- Dual fare: call fee + trip fare at depart
+- Destination booking on the vehicle (`CompRimTaxiTrip`)
+- Configurable settings (fees, ETA, wait, speed, map land toggle)
+- Custom taxi texture / shadow
 
 ## Install
 
-1. Place this folder in `RimWorld/Mods/RimTaxi` (or junction/symlink).
-2. Enable **Harmony**, then **RimTaxi**.
-3. Ensure `Assemblies/RimTaxi.dll` exists (build below).
+1. Put this folder in `RimWorld/Mods/RimTaxi` (or symlink).  
+2. Enable **Harmony**, then **RimTaxi**.  
+3. Build so `Assemblies/RimTaxi.dll` exists.
 
 ## Build
-
-Requirements: .NET SDK with `net472`, RimWorld install, Harmony `0Harmony.dll`.
 
 ```powershell
 .\build.ps1
@@ -38,34 +43,18 @@ cd Source\RimTaxi
 dotnet build -c Release
 ```
 
-Path overrides:
+## Docs (humans & AI)
 
-```powershell
-dotnet build -c Release `
-  -p:RimWorldDir="C:\Program Files (x86)\Steam\steamapps\common\RimWorld" `
-  -p:HarmonyDll="C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\Current\Assemblies\0Harmony.dll"
-```
-
-## Play loop
-
-1. Comms console → **Call taxi**  
-2. Pick **world destination** (call fee charged)  
-3. Pick **landing cell** on home map  
-4. Load passengers/cargo  
-5. **Depart now** (pay trip fare) **or** wait until auto-depart  
-6. Arrive as **world caravan** near the destination  
-
-## Docs for contributors & AI
-
-| Document | Purpose |
-|----------|---------|
-| [AGENTS.md](AGENTS.md) | **Start here if you are an AI agent** |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Systems map |
-| [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) | Bugs / UX traps |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Next work / non-goals |
+| Doc | Purpose |
+|-----|---------|
+| [AGENTS.md](AGENTS.md) | **AI agents start here** |
+| [docs/HANDOFF.md](docs/HANDOFF.md) | Current baseline handoff |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Systems + patches |
+| [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) | Traps / limits |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Freeze + next work |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | PR / agent report format |
 
 ## License
 
-Mod code and assets in this repository: see repository license (if none is set, treat as all-rights-reserved by the author until specified).  
-RimWorld is © Ludeon Studios — this mod is unofficial fan content.
+MIT for this mod’s original code/assets (see `LICENSE`).  
+RimWorld © Ludeon Studios — unofficial fan mod.

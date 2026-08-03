@@ -8,12 +8,15 @@ using Verse;
 namespace RimTaxi.Patches
 {
     /// <summary>
-    /// Early depart: charge mass×distance, fly to destination stored on the shuttle Comp.
+    /// Step 4: Set destination. Step 5: Depart (pay mass×distance + fly).
     /// </summary>
     [HarmonyPatch(typeof(ShipJob_Wait), nameof(ShipJob_Wait.GetJobGizmos))]
     public static class ShipJob_Wait_Gizmos_Patch
     {
         private static readonly Texture2D SendTex = CompLaunchable.LaunchCommandTex;
+        private static readonly Texture2D WorldTex =
+            ContentFinder<Texture2D>.Get("UI/Commands/LaunchShip", reportFailure: false)
+            ?? CompLaunchable.LaunchCommandTex;
         private static readonly Texture2D DismissTex =
             ContentFinder<Texture2D>.Get("UI/Commands/DismissShuttle", reportFailure: false);
 
@@ -35,37 +38,52 @@ namespace RimTaxi.Patches
             CompTransporter transporter = ship.TransporterComp;
             int passengerCount = CountPassengers(transporter);
             bool hasBoarded = passengerCount > 0 || (transporter?.innerContainer?.Any ?? false);
-
             bool hasTrip = TaxiTripLookup.TryGetTrip(ship, out PlanetTile dest, out int distance);
             float mass = TaxiTripBilling.GetCargoMass(ship);
             int tripFare = hasTrip ? TaxiFareCalculator.TripFare(mass, distance) : 0;
             Map map = ship.shipThing?.Map;
 
-            Command_Action departNow = new Command_Action
+            // ─── Step 4: Set destination ───
+            Command_Action setDest = new Command_Action
             {
-                defaultLabel = "RimTaxi_DepartNowFare".Translate(passengerCount, tripFare),
-                defaultDesc = "RimTaxi_DepartNowDesc".Translate(),
+                defaultLabel = hasTrip
+                    ? "RimTaxi_SetDestinationChange".Translate(distance, tripFare)
+                    : "RimTaxi_SetDestination".Translate(),
+                defaultDesc = "RimTaxi_SetDestinationDesc".Translate(),
+                icon = WorldTex,
+                alsoClickIfOtherInGroupClicked = false,
+                Order = -21f,
+                action = () => TaxiCallService.BeginSetDestination(ship)
+            };
+            yield return setDest;
+
+            // ─── Step 5: Depart ───
+            Command_Action depart = new Command_Action
+            {
+                defaultLabel = "RimTaxi_DepartStep".Translate(passengerCount, tripFare),
+                defaultDesc = "RimTaxi_DepartStepDesc".Translate(),
                 icon = SendTex,
                 alsoClickIfOtherInGroupClicked = false,
                 Order = -20f,
-                action = () => DepartToBookedDestination(ship)
+                action = () => TaxiCallService.Depart(ship)
             };
 
             if (!hasBoarded)
             {
-                departNow.Disable("RimTaxi_DepartEmpty".Translate());
+                depart.Disable("RimTaxi_DepartEmpty".Translate());
             }
             else if (!hasTrip)
             {
-                departNow.Disable("RimTaxi_DepartNoDest".Translate());
+                depart.Disable("RimTaxi_NeedDestinationBeforeDepart".Translate());
             }
             else if (map != null && !TaxiTripBilling.CanAffordTripFare(ship, map, distance, out int need, out _))
             {
-                departNow.Disable("RimTaxi_NeedSilver".Translate(need, TaxiPayment.CountSilver(map)));
+                depart.Disable("RimTaxi_NeedSilver".Translate(need, TaxiPayment.CountSilver(map)));
             }
 
-            yield return departNow;
+            yield return depart;
 
+            // Dismiss
             Command_Action dismiss = new Command_Action
             {
                 defaultLabel = "CommandShuttleDismiss".Translate(),
@@ -100,66 +118,6 @@ namespace RimTaxi.Patches
             }
 
             return n;
-        }
-
-        public static void DepartToBookedDestination(TransportShip ship)
-        {
-            if (ship == null)
-            {
-                return;
-            }
-
-            if (!TaxiTripLookup.TryGetTrip(ship, out PlanetTile dest, out int distance))
-            {
-                Messages.Message("RimTaxi_DepartNoDest".Translate(), MessageTypeDefOf.RejectInput, historical: false);
-                Log.Warning($"[RimTaxi] Depart failed: no trip on ship#{ship.loadID} thing={ship.shipThing} comp={TaxiTripLookup.GetComp(ship) != null}");
-                return;
-            }
-
-            CompTransporter transporter = ship.TransporterComp;
-            if (transporter?.innerContainer == null || !transporter.innerContainer.Any)
-            {
-                Messages.Message("RimTaxi_DepartEmpty".Translate(), MessageTypeDefOf.RejectInput, historical: false);
-                return;
-            }
-
-            Map map = ship.shipThing?.Map;
-            if (map == null)
-            {
-                return;
-            }
-
-            if (!TaxiTripBilling.TryChargeTripFare(ship, map, distance, out int charged, out float mass))
-            {
-                int need = TaxiFareCalculator.TripFare(mass, distance);
-                Messages.Message("RimTaxi_NeedSilver".Translate(need, TaxiPayment.CountSilver(map)), MessageTypeDefOf.RejectInput, historical: false);
-                return;
-            }
-
-            if (!transporter.LoadingInProgressOrReadyToLaunch)
-            {
-                TransporterUtility.InitiateLoading(Gen.YieldSingle(transporter));
-            }
-
-            ShipJob_FlyAway fly = (ShipJob_FlyAway)ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway);
-            fly.destinationTile = dest;
-            fly.dropMode = TransportShipDropMode.None;
-            fly.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(dest);
-
-            ship.ForceJob(fly);
-            // Clear only after we successfully issued the fly job
-            TaxiTripLookup.Clear(ship);
-
-            if (charged > 0)
-            {
-                Messages.Message("RimTaxi_DepartingPaid".Translate(charged, mass.ToString("0.0"), distance), ship.shipThing, MessageTypeDefOf.TaskCompletion, historical: false);
-            }
-            else
-            {
-                Messages.Message("RimTaxi_Departing".Translate(), ship.shipThing, MessageTypeDefOf.TaskCompletion, historical: false);
-            }
-
-            Log.Message($"[RimTaxi] Early depart ship#{ship.loadID} → {dest} mass={mass:0.0} dist={distance} fare={charged}");
         }
     }
 }
