@@ -48,9 +48,10 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 ### Arrival at trip destination
 
-- Prefer **map land** on settlement/map parent (`TransportersArrivalAction_RimTaxiMapLand` / custom `DropRimTaxi`)
+- Prefer **map land** only on **player-owned** settlements/maps (`TransportersArrivalAction_RimTaxiMapLand` / custom `DropRimTaxi`)
+- **Foreign faction settlements: always world caravan** beside the tile — never generate/enter their map (no auto-combat)
 - Else **world caravan** (`TransportersArrivalAction_RimTaxiWorldDrop`)
-- Setting: `landOnSettlementMaps` (default true)
+- Setting: `landOnSettlementMaps` (default true) — affects player maps only; foreign bases always caravan
 - Harmony forces RimTaxi arrival path so vanilla `StillValid` fallback cannot wipe/banish pawns
 
 ---

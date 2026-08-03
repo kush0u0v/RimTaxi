@@ -19,8 +19,8 @@ Spawned TransportShip (Ship_RimTaxi)
 
 TravellingTransporters (TravelingRimTaxi)
   └─ Arrival patch → TaxiArrivalUtility.CreateArrivalAction
-       ├─ MapLand (settlement / map parent) → DropRimTaxi
-       └─ WorldDrop → caravan
+       ├─ MapLand (player settlement / player map only) → DropRimTaxi
+       └─ WorldDrop → caravan (always for foreign settlements; never enter their map)
 ```
 
 ## Layers

@@ -17,7 +17,7 @@
 ## Arrival
 
 - Map land uses **custom DropRimTaxi** (vanilla DropShuttle NRE if `shipDef` missing).
-- Hostile settlements: generating/landing on map can still cause combat/relations (vanilla-like).
+- **Player colonies only** for map land. **Foreign faction settlements never open the map** — always world caravan beside the tile (avoids instant combat).
 - If map land fails, fallback is **world caravan** drop-off.
 - World drop may place caravan on a **neighbor tile** beside a settlement.
 
