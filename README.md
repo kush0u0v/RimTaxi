@@ -13,7 +13,7 @@ Call a taxi from a **comms console**, wait for dispatch, board at a **pickup** (
 
 ## Play loop (baseline)
 
-1. **Call** — pay **200** silver from **comms map** or **caravan inventory**. Comms: choose pickup + landing cell. Caravan: call from the world-map caravan bar.  
+1. **Call** — pay **200** silver from **comms map** or **caravan inventory**. Comms: pick pickup (this map / other colony / field map / caravan / world map click) then landing cell if needed. Caravan: call from the world-map caravan bar.  
 2. **Dispatch** — taxi is en route (**about 1–3 hours**).  
 3. **Arrive** — lands on map **or** ready at caravan (world only).  
 4. **Set destination** — taxi / caravan gizmo; shows estimated fare.  

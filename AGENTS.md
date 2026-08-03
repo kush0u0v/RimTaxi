@@ -35,8 +35,9 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 **From comms** (float menu — where to send the taxi):
 
-- Current map / other **player** settlements / **field maps** with free colonists — **no camp required**
-- Call fee from the **comms console map**
+- Current map / other **player** settlements / **field maps** with free colonists / **player caravans**
+- **「월드맵에서 픽업 위치 선택…」** world targeter (caravan / colony / open map)
+- Call fee from the **comms console map** (including when sending to a caravan)
 
 **From player caravan** (world map top-bar gizmo):
 

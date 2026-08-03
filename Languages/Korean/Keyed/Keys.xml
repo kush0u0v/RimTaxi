@@ -28,8 +28,14 @@
   <RimTaxi_DestinationSet>목적지 설정: {0}타일. 현재 짐 {1}kg → 출발 시 약 {2}은. 「5. 출발」을 누르세요.</RimTaxi_DestinationSet>
   <RimTaxi_DepartStep>5. 출발 ({0}명, {1}은)</RimTaxi_DepartStep>
   <RimTaxi_DepartStepDesc>거리×무게 운행 요금을 결제하고 예약 목적지로 출발합니다.</RimTaxi_DepartStepDesc>
-  <RimTaxi_ChoosePickup>택시가 착륙할 곳(픽업)을 고르세요. 전초·원정 맵에 있는 정착민도 고를 수 있습니다. 야영지를 만들 필요 없습니다.</RimTaxi_ChoosePickup>
+  <RimTaxi_ChoosePickup>픽업 위치를 고르세요: 지금 맵 / 다른 정착지 / 현장 맵 / 캐러밴 / 월드맵에서 선택. 야영지 불필요.</RimTaxi_ChoosePickup>
   <RimTaxi_PickupMenuHeader>— 택시를 어디로 보낼까요? (픽업) —</RimTaxi_PickupMenuHeader>
+  <RimTaxi_PickupFromWorldMap>월드맵에서 픽업 위치 선택…</RimTaxi_PickupFromWorldMap>
+  <RimTaxi_PickWorldPickup>월드맵에서 플레이어 캐러밴·정착지·정착민이 있는 열린 맵을 클릭하세요.</RimTaxi_PickWorldPickup>
+  <RimTaxi_WorldPickupInvalid>유효한 픽업이 아닙니다 (플레이어 캐러밴·정착지·정착민이 있는 맵만).</RimTaxi_WorldPickupInvalid>
+  <RimTaxi_WorldPickupValid>픽업: {0}</RimTaxi_WorldPickupValid>
+  <RimTaxi_PickupSiteCaravan>캐러밴에서 픽업: {0} ({1}명)</RimTaxi_PickupSiteCaravan>
+  <RimTaxi_NoListedPickupsHint>(목록에 다른 곳 없음 — 월드맵 선택을 쓰거나, 정착민이 있는 맵을 여세요)</RimTaxi_NoListedPickupsHint>
   <RimTaxi_ChoosePickupLanding>{0} 맵에서 택시가 내려앉을 칸을 클릭하세요.</RimTaxi_ChoosePickupLanding>
   <RimTaxi_PickupSiteHere>여기서 픽업: {0} (지금 맵)</RimTaxi_PickupSiteHere>
   <RimTaxi_PickupSiteOtherOpen>다른 정착지에서 픽업: {0}</RimTaxi_PickupSiteOtherOpen>

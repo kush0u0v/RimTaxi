@@ -38,7 +38,7 @@ Comms call: no world map during step 1–3. Caravan call: stays on world map thr
 
 | Concern | Files |
 |---------|--------|
-| Call / pickup / dispatch | `TaxiCallService.cs`, `TaxiPickupSite.cs`, `TaxiPendingDispatch.cs`, `TaxiGameComponent.cs` |
+| Call / pickup / dispatch | `TaxiCallService.cs`, `TaxiPickupSite.cs` (maps + caravans + world pick), `TaxiPendingDispatch.cs`, `TaxiGameComponent.cs` |
 | Caravan board | `TaxiCaravanUtility.cs`, `TaxiCaravanBoarding.cs`, `Caravan_Gizmos_Patch.cs` |
 | Destination + depart | `TaxiCallService.BeginSetDestination` / `Depart` / caravan variants, `ShipJob_Wait_Gizmos_Patch.cs` |
 | Fare | `TaxiFareCalculator.cs`, `TaxiTripBilling.cs`, `TaxiPayment.cs`, `TaxiSettings.cs` |

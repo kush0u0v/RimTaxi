@@ -165,35 +165,40 @@ namespace RimTaxi
 
         public static void ShowPickupSiteMenu(Map callMap, Pawn caller)
         {
-            // Always show menu so "send to other settlement" is obvious.
+            // Always show menu so remote pickup / caravan / world pick is obvious.
             List<TaxiPickupSite> sites = TaxiPickupSite.GetAll(callMap);
-            if (sites.Count == 0)
-            {
-                Messages.Message("RimTaxi_NoPickupSites".Translate(), MessageTypeDefOf.RejectInput, historical: false);
-                return;
-            }
 
             var options = new List<FloatMenuOption>();
             options.Add(new FloatMenuOption("RimTaxi_PickupMenuHeader".Translate(), null));
 
+            // World map picker first — works even with a single colony
+            options.Add(new FloatMenuOption(
+                "RimTaxi_PickupFromWorldMap".Translate(),
+                () => BeginPickupWorldTargeting(callMap, caller)));
+
             TaxiGameComponent gc = Comp;
+            int listed = 0;
             for (int i = 0; i < sites.Count; i++)
             {
                 TaxiPickupSite site = sites[i];
-                Map open = site.openMap;
-                if (open != null && gc != null && gc.HasPendingDispatch(open))
+                string blocked = GetPickupSiteBlockedReason(site, gc);
+                if (blocked != null)
                 {
-                    TaxiPendingDispatch p = gc.GetPendingDispatch(open);
-                    string eta = p != null ? p.TicksRemaining.ToStringTicksToPeriod() : "";
-                    options.Add(new FloatMenuOption(
-                        site.label + " — " + "RimTaxi_TaxiEnRoute".Translate(eta),
-                        null));
+                    options.Add(new FloatMenuOption(site.label + " — " + blocked, null));
+                    listed++;
                     continue;
                 }
 
+                TaxiPickupSite captured = site;
                 options.Add(new FloatMenuOption(
                     site.label,
-                    () => BeginPickupFlow(callMap, caller, site)));
+                    () => BeginPickupFlow(callMap, caller, captured)));
+                listed++;
+            }
+
+            if (listed == 0)
+            {
+                options.Add(new FloatMenuOption("RimTaxi_NoListedPickupsHint".Translate(), null));
             }
 
             options.Add(new FloatMenuOption("CancelButton".Translate(), null));
@@ -201,10 +206,117 @@ namespace RimTaxi
             Messages.Message("RimTaxi_ChoosePickup".Translate(), MessageTypeDefOf.NeutralEvent, historical: false);
         }
 
+        private static string GetPickupSiteBlockedReason(TaxiPickupSite site, TaxiGameComponent gc)
+        {
+            if (site == null || gc == null)
+            {
+                return null;
+            }
+
+            if (site.IsCaravan)
+            {
+                if (gc.HasPendingDispatch(site.caravan))
+                {
+                    TaxiPendingDispatch p = gc.GetPendingDispatch(site.caravan);
+                    string eta = p != null ? p.TicksRemaining.ToStringTicksToPeriod() : "";
+                    return "RimTaxi_TaxiEnRoute".Translate(eta);
+                }
+
+                if (gc.HasBoarding(site.caravan))
+                {
+                    return "RimTaxi_CaravanTaxiReady".Translate();
+                }
+
+                return null;
+            }
+
+            Map open = site.openMap;
+            if (open != null && gc.HasPendingDispatch(open))
+            {
+                TaxiPendingDispatch p = gc.GetPendingDispatch(open);
+                string eta = p != null ? p.TicksRemaining.ToStringTicksToPeriod() : "";
+                return "RimTaxi_TaxiEnRoute".Translate(eta);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Open world map and click a player caravan / settlement / open map with colonists.
+        /// </summary>
+        public static void BeginPickupWorldTargeting(Map callMap, Pawn caller)
+        {
+            if (callMap == null)
+            {
+                return;
+            }
+
+            CameraJumper.TryJump(CameraJumper.GetWorldTarget(new GlobalTargetInfo(callMap.Tile)));
+            Find.WorldSelector.ClearSelection();
+
+            Find.WorldTargeter.BeginTargeting(
+                (GlobalTargetInfo t) => ChosePickupWorldTarget(t, callMap, caller),
+                canTargetTiles: true,
+                CompLaunchable.TargeterMouseAttachment,
+                closeWorldTabWhenFinished: true,
+                null,
+                (GlobalTargetInfo t) => PickupWorldTargetLabel(t),
+                null,
+                callMap.Tile,
+                showCancelButton: true);
+
+            Messages.Message("RimTaxi_PickWorldPickup".Translate(), MessageTypeDefOf.NeutralEvent, historical: false);
+        }
+
+        private static string PickupWorldTargetLabel(GlobalTargetInfo target)
+        {
+            if (!target.IsValid)
+            {
+                return null;
+            }
+
+            TaxiPickupSite site = TaxiPickupSite.FromWorldTarget(target);
+            if (site == null)
+            {
+                GUI.color = ColorLibrary.RedReadable;
+                return "RimTaxi_WorldPickupInvalid".Translate();
+            }
+
+            GUI.color = Color.white;
+            return "RimTaxi_WorldPickupValid".Translate(site.label);
+        }
+
+        private static bool ChosePickupWorldTarget(GlobalTargetInfo target, Map callMap, Pawn caller)
+        {
+            TaxiPickupSite site = TaxiPickupSite.FromWorldTarget(target);
+            if (site == null)
+            {
+                Messages.Message("RimTaxi_WorldPickupInvalid".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return false;
+            }
+
+            string blocked = GetPickupSiteBlockedReason(site, Comp);
+            if (blocked != null)
+            {
+                Messages.Message(blocked, MessageTypeDefOf.RejectInput, historical: false);
+                return false;
+            }
+
+            BeginPickupFlow(callMap, caller, site);
+            return true;
+        }
+
         public static void BeginPickupFlow(Map callMap, Pawn caller, TaxiPickupSite site)
         {
             if (site == null)
             {
+                return;
+            }
+
+            // Caravan pickup: no map / landing cell — pay + queue caravan dispatch
+            if (site.IsCaravan)
+            {
+                TryCompleteCallToCaravan(callMap, site.caravan);
                 return;
             }
 
@@ -239,6 +351,82 @@ namespace RimTaxi
                 "GeneratingMap",
                 doAsynchronously: false,
                 exceptionHandler: null);
+        }
+
+        /// <summary>
+        /// Comms-origin call that sends the taxi to a world caravan (fee from call map).
+        /// </summary>
+        public static void TryCompleteCallToCaravan(Map callMap, Caravan caravan)
+        {
+            if (caravan == null || caravan.Destroyed || !caravan.IsPlayerControlled)
+            {
+                Messages.Message("RimTaxi_CaravanInvalid".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            string blocked = GetBlockedReason(callMap, console: null);
+            if (blocked != null)
+            {
+                Messages.Message(blocked, MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            TaxiGameComponent taxiComp = Comp;
+            if (taxiComp != null && taxiComp.HasPendingDispatch(caravan))
+            {
+                TaxiPendingDispatch p = taxiComp.GetPendingDispatch(caravan);
+                string eta = p != null ? p.TicksRemaining.ToStringTicksToPeriod() : "";
+                Messages.Message("RimTaxi_TaxiEnRoute".Translate(eta), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            if (taxiComp != null && taxiComp.HasBoarding(caravan))
+            {
+                Messages.Message("RimTaxi_CaravanTaxiReady".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            int callFee = CallFee;
+            if (!TaxiPayment.TryPay(callMap, callFee))
+            {
+                Messages.Message(
+                    "RimTaxi_NeedSilver".Translate(callFee, TaxiPayment.CountSilver(callMap)),
+                    MessageTypeDefOf.RejectInput,
+                    historical: false);
+                return;
+            }
+
+            if (taxiComp == null)
+            {
+                // Refund
+                Thing refund = ThingMaker.MakeThing(ThingDefOf.Silver);
+                refund.stackCount = callFee;
+                GenPlace.TryPlaceThing(refund, callMap.Center, callMap, ThingPlaceMode.Near);
+                Messages.Message("RimTaxi_SpawnFailed".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            taxiComp.NotifyCalled();
+            taxiComp.QueueCaravanDispatch(caravan, callFee);
+
+            TaxiPendingDispatch pending = taxiComp.GetPendingDispatch(caravan);
+            string etaText = pending != null
+                ? pending.TicksRemaining.ToStringTicksToPeriod()
+                : "—";
+
+            string caravanName = caravan.Name ?? caravan.LabelCap;
+            Messages.Message(
+                "RimTaxi_CallDispatchedSimple".Translate(callFee, caravanName, etaText),
+                caravan,
+                MessageTypeDefOf.PositiveEvent);
+
+            Find.LetterStack.ReceiveLetter(
+                "RimTaxi_LetterDispatchedLabel".Translate(),
+                "RimTaxi_LetterDispatchedCaravanText".Translate(callFee, etaText),
+                LetterDefOf.PositiveEvent,
+                caravan);
+
+            Log.Message($"[RimTaxi] Comms→caravan call caravan#{caravan.ID} fee={callFee} eta={etaText}");
         }
 
         public static void BeginPickupLandingTargeting(Map callMap, Pawn caller, Map pickupMap)

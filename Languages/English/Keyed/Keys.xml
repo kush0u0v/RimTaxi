@@ -28,8 +28,14 @@
   <RimTaxi_DestinationSet>Destination set: {0} tiles. Cargo {1} kg → about {2} silver at depart. Press 5. Depart.</RimTaxi_DestinationSet>
   <RimTaxi_DepartStep>5. Depart ({0} aboard, {1} silver)</RimTaxi_DepartStep>
   <RimTaxi_DepartStepDesc>Pay mass×distance trip fare and fly to the booked destination.</RimTaxi_DepartStepDesc>
-  <RimTaxi_ChoosePickup>Choose pickup landing. Other settlements and field maps with colonists work — no camp required.</RimTaxi_ChoosePickup>
+  <RimTaxi_ChoosePickup>Choose pickup: this map, other colonies, field maps, caravans, or pick on the world map. No camp required.</RimTaxi_ChoosePickup>
   <RimTaxi_PickupMenuHeader>— Where should the taxi go? (pickup) —</RimTaxi_PickupMenuHeader>
+  <RimTaxi_PickupFromWorldMap>Pick pickup on world map…</RimTaxi_PickupFromWorldMap>
+  <RimTaxi_PickWorldPickup>Click a player caravan, colony, or open map with colonists on the world map.</RimTaxi_PickWorldPickup>
+  <RimTaxi_WorldPickupInvalid>Not a valid taxi pickup (need player caravan, colony, or map with colonists).</RimTaxi_WorldPickupInvalid>
+  <RimTaxi_WorldPickupValid>Pickup: {0}</RimTaxi_WorldPickupValid>
+  <RimTaxi_PickupSiteCaravan>Pickup caravan: {0} ({1} pawns)</RimTaxi_PickupSiteCaravan>
+  <RimTaxi_NoListedPickupsHint>(No other listed sites — use world map pick, or open a map with colonists)</RimTaxi_NoListedPickupsHint>
   <RimTaxi_ChoosePickupLanding>Click a landing cell on {0}.</RimTaxi_ChoosePickupLanding>
   <RimTaxi_PickupSiteHere>Pickup here: {0} (current map)</RimTaxi_PickupSiteHere>
   <RimTaxi_PickupSiteOtherOpen>Pickup at other settlement: {0}</RimTaxi_PickupSiteOtherOpen>
