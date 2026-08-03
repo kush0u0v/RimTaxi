@@ -341,7 +341,7 @@ namespace RimTaxi
                 ShipJob_FlyAway flyJob = (ShipJob_FlyAway)ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway);
                 flyJob.destinationTile = destTile;
                 flyJob.dropMode = TransportShipDropMode.None;
-                flyJob.arrivalAction = new TransportersArrivalAction_RimTaxiWorldDrop("RimTaxi_ArrivedCaravan");
+                flyJob.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(destTile);
                 transportShip.AddJob(flyJob);
 
                 transportShip.ArriveAt(cell, map.Parent);

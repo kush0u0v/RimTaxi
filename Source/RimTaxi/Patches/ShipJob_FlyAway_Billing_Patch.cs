@@ -32,11 +32,8 @@ namespace RimTaxi.Patches
                 __instance.destinationTile = dest;
             }
 
-            if (__instance.arrivalAction == null)
-            {
-                __instance.arrivalAction = new TransportersArrivalAction_RimTaxiWorldDrop("RimTaxi_ArrivedCaravan");
-            }
-
+            // Always re-resolve so settlement map land works even if old WorldDrop was queued.
+            __instance.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(dest);
             __instance.dropMode = TransportShipDropMode.None;
 
             Map map = ship.shipThing?.Map;
@@ -75,7 +72,7 @@ namespace RimTaxi.Patches
                 ShipJob_FlyAway fly = (ShipJob_FlyAway)ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway);
                 fly.destinationTile = dest;
                 fly.dropMode = TransportShipDropMode.None;
-                fly.arrivalAction = new TransportersArrivalAction_RimTaxiWorldDrop("RimTaxi_ArrivedCaravan");
+                fly.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(dest);
                 ship.AddJob(fly);
 
                 __result = false;

@@ -144,7 +144,7 @@ namespace RimTaxi.Patches
             ShipJob_FlyAway fly = (ShipJob_FlyAway)ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway);
             fly.destinationTile = dest;
             fly.dropMode = TransportShipDropMode.None;
-            fly.arrivalAction = new TransportersArrivalAction_RimTaxiWorldDrop("RimTaxi_ArrivedCaravan");
+            fly.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(dest);
 
             ship.ForceJob(fly);
             // Clear only after we successfully issued the fly job

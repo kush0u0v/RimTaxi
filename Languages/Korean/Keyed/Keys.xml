@@ -39,5 +39,8 @@
   <RimTaxi_DepartingPaid>택시 출발. 운행 요금 {0} 은 (무게 {1} kg × {2} 타일).</RimTaxi_DepartingPaid>
   <RimTaxi_AutoDepartNeedSilver>자동 출발 연기: 운행 요금 {0} 은 필요 (보유 {1}). 은을 준비하거나 짐을 내리세요.</RimTaxi_AutoDepartNeedSilver>
   <RimTaxi_InspectBooked>예약 목적지: {0} 타일 (탑승/하역해도 유지)</RimTaxi_InspectBooked>
+  <RimTaxi_ArrivedOnMap>RimTaxi 셔틀이 {0} 맵에 착륙했습니다.</RimTaxi_ArrivedOnMap>
+  <RimTaxi_Settings_LandOnMaps>정착지/맵에 직접 착륙 (SRTS 방식)</RimTaxi_Settings_LandOnMaps>
+  <RimTaxi_Settings_LandOnMapsTip>켜면 다른 정착지·기존 맵 타일로 갈 때 월드 카러밴이 아니라 맵 위에 셔틀을 내립니다. 끄면 항상 월드맵 카러밴 하차입니다.</RimTaxi_Settings_LandOnMapsTip>
 
 </LanguageData>

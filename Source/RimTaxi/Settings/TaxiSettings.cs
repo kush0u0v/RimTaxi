@@ -23,6 +23,12 @@ namespace RimTaxi
 
         public float travelSpeedFactor = 0.6f;
 
+        /// <summary>
+        /// If true (default), land the shuttle on settlement/map tiles (SRTS-like).
+        /// If false, always form a world caravan beside the tile.
+        /// </summary>
+        public bool landOnSettlementMaps = true;
+
         public override void ExposeData()
         {
             Scribe_Values.Look(ref baseFare, "baseFare", 200);
@@ -36,6 +42,7 @@ namespace RimTaxi
             Scribe_Values.Look(ref waitTicks, "waitTicks", 12500);
             Scribe_Values.Look(ref maxLaunchDistance, "maxLaunchDistance", 70);
             Scribe_Values.Look(ref travelSpeedFactor, "travelSpeedFactor", 0.6f);
+            Scribe_Values.Look(ref landOnSettlementMaps, "landOnSettlementMaps", true);
             base.ExposeData();
         }
 
@@ -48,6 +55,7 @@ namespace RimTaxi
             waitTicks = 12500;
             maxLaunchDistance = 70;
             travelSpeedFactor = 0.6f;
+            landOnSettlementMaps = true;
         }
 
         public void DoWindowContents(Rect inRect)
@@ -89,6 +97,11 @@ namespace RimTaxi
 
             listing.Label("RimTaxi_Settings_TravelSpeed".Translate(travelSpeedFactor.ToString("0.00")));
             travelSpeedFactor = listing.Slider(travelSpeedFactor, 0.25f, 1.5f);
+
+            listing.CheckboxLabeled(
+                "RimTaxi_Settings_LandOnMaps".Translate(),
+                ref landOnSettlementMaps,
+                "RimTaxi_Settings_LandOnMapsTip".Translate());
 
             if (listing.ButtonText("RimTaxi_Settings_Reset".Translate()))
             {

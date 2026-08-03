@@ -8,9 +8,8 @@ using Verse;
 namespace RimTaxi.Patches
 {
     /// <summary>
-    /// Hard-force RimTaxi flights to use world-map caravan drop.
-    /// Vanilla Arrived() replaces invalid/null arrivalAction with LandInSpecificCell
-    /// when a map already exists on the destination tile (combat / pawn bugs).
+    /// RimTaxi flights: run our arrival action (map land or world caravan).
+    /// Skips vanilla StillValid fallback that can LandInSpecificCell incorrectly.
     /// </summary>
     [HarmonyPatch]
     public static class TravellingTransporters_Arrival_Patch
@@ -29,9 +28,6 @@ namespace RimTaxi.Patches
             return AccessTools.Method(typeof(TravellingTransporters), "Arrived");
         }
 
-        /// <summary>
-        /// Skip vanilla Arrived entirely for RimTaxi world objects.
-        /// </summary>
         [HarmonyPrefix]
         public static bool Prefix(TravellingTransporters __instance)
         {
@@ -52,10 +48,24 @@ namespace RimTaxi.Patches
 
             ArrivedField?.SetValue(__instance, true);
 
-            // Always overwrite — do not trust StillValid / save-loaded alternate actions.
-            __instance.arrivalAction = new TransportersArrivalAction_RimTaxiWorldDrop("RimTaxi_ArrivedCaravan");
+            // Prefer action already set on the flight; otherwise pick from destination tile.
+            TransportersArrivalAction action = __instance.arrivalAction;
+            if (action == null
+                || action is TransportersArrivalAction_RimTaxiWorldDrop
+                || action is TransportersArrivalAction_RimTaxiMapLand)
+            {
+                // Re-pick so setting landOnSettlementMaps is honored at arrival time.
+                action = TaxiArrivalUtility.CreateArrivalAction(__instance.destinationTile);
+            }
+            else
+            {
+                // Unknown action type — still force our chooser for safety.
+                action = TaxiArrivalUtility.CreateArrivalAction(__instance.destinationTile);
+            }
 
-            Log.Message($"[RimTaxi] Forced WorldDrop arrival on tile {__instance.destinationTile} (def={__instance.def?.defName}).");
+            __instance.arrivalAction = action;
+
+            Log.Message($"[RimTaxi] Arrival via {action.GetType().Name} on tile {__instance.destinationTile}");
 
             if (DoArrivalActionMethod != null)
             {
@@ -63,7 +73,6 @@ namespace RimTaxi.Patches
             }
             else
             {
-                // Fallback: call action directly
                 List<ActiveTransporterInfo> list = TransportersField?.GetValue(__instance) as List<ActiveTransporterInfo>;
                 if (list != null && __instance.arrivalAction != null)
                 {
@@ -80,7 +89,7 @@ namespace RimTaxi.Patches
                 }
             }
 
-            return false; // skip vanilla Arrived
+            return false;
         }
     }
 }
