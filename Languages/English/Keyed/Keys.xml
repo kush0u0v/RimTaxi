@@ -115,6 +115,9 @@
   <RimTaxi_CaravanEnRouteDesc>Taxi is coming to this caravan. ETA {0}. You can change the destination while waiting.</RimTaxi_CaravanEnRouteDesc>
   <RimTaxi_CaravanSetDestWhileEnRouteDesc>Change the trip destination while the taxi is still en route.</RimTaxi_CaravanSetDestWhileEnRouteDesc>
   <RimTaxi_CaravanDepartSend>Depart / send ({0} aboard, {1} silver)</RimTaxi_CaravanDepartSend>
+  <RimTaxi_CaravanImmobileEnRoute>Caravan cannot move: taxi en route (ETA {0}). Wait or cancel by letting the wait expire after arrival without departing.</RimTaxi_CaravanImmobileEnRoute>
+  <RimTaxi_CaravanImmobileWaiting>Caravan cannot move: taxi is waiting here ({0} left). Set destination and Depart, or wait for the taxi to leave.</RimTaxi_CaravanImmobileWaiting>
+  <RimTaxi_CaravanImmobileGeneric>Caravan cannot move while waiting for RimTaxi.</RimTaxi_CaravanImmobileGeneric>
   <RimTaxi_TaxiArrivedAtCaravanReady>Taxi ready at caravan — destination booked. Press Depart to fly.</RimTaxi_TaxiArrivedAtCaravanReady>
   <RimTaxi_LetterArrivedCaravanReadyText>Your taxi is ready at the caravan.\n\nBooked trip: {0} tiles.\nPress Depart on the caravan to pay trip fare and fly.</RimTaxi_LetterArrivedCaravanReadyText>
   <RimTaxi_CallDispatchedCaravan>Paid {0} silver. Taxi en route to your caravan — ETA {1}. When it arrives, use Set destination then Depart on the caravan.</RimTaxi_CallDispatchedCaravan>

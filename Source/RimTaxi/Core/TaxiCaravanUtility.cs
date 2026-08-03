@@ -41,6 +41,81 @@ namespace RimTaxi
         }
 
         /// <summary>
+        /// True while a taxi is en route to this caravan, or waiting for board/depart (layover).
+        /// Caravan must stay put so the taxi can meet them.
+        /// </summary>
+        public static bool IsImmobilizedForTaxi(Caravan caravan)
+        {
+            if (caravan == null || caravan.Destroyed)
+            {
+                return false;
+            }
+
+            TaxiGameComponent gc = TaxiGameComponent.Get();
+            if (gc == null)
+            {
+                return false;
+            }
+
+            return gc.HasPendingDispatch(caravan) || gc.HasBoarding(caravan);
+        }
+
+        public static string ImmobilizedForTaxiReason(Caravan caravan)
+        {
+            if (caravan == null)
+            {
+                return null;
+            }
+
+            TaxiGameComponent gc = TaxiGameComponent.Get();
+            if (gc == null)
+            {
+                return null;
+            }
+
+            if (gc.HasPendingDispatch(caravan))
+            {
+                TaxiPendingDispatch p = gc.GetPendingDispatch(caravan);
+                string eta = p != null ? p.TicksRemaining.ToStringTicksToPeriod() : "";
+                return "RimTaxi_CaravanImmobileEnRoute".Translate(eta);
+            }
+
+            if (gc.HasBoarding(caravan))
+            {
+                TaxiCaravanBoarding b = gc.GetBoarding(caravan);
+                string left = b != null ? b.WaitTicksRemaining.ToStringTicksToPeriod() : "";
+                return "RimTaxi_CaravanImmobileWaiting".Translate(left);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Stop world path so the caravan holds position for the taxi.
+        /// </summary>
+        public static void StopMovementForTaxi(Caravan caravan)
+        {
+            if (caravan?.pather == null)
+            {
+                return;
+            }
+
+            // Always StopDead — clears path even if not currently moving
+            try
+            {
+                if (caravan.pather.Moving)
+                {
+                    caravan.pather.StopDead();
+                    Log.Message($"[RimTaxi] Caravan#{caravan.ID} stopped for taxi hold.");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Log.Warning("[RimTaxi] StopMovementForTaxi: " + e.Message);
+            }
+        }
+
+        /// <summary>
         /// Load entire caravan into TravellingTransporters (TravelingRimTaxi) and destroy the caravan.
         /// </summary>
         public static bool LaunchCaravanAsTaxi(Caravan caravan, PlanetTile destinationTile, TransportersArrivalAction arrivalAction)

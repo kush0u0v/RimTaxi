@@ -8,6 +8,7 @@
 - Comms call fee is taken from the **comms map**, even if pickup is a remote map or caravan.
 - **World caravans** can also call/board from the caravan top bar (fee from caravan silver).
 - **Pending dispatch** blocks another taxi to the **same** pickup map until it lands or fails.
+- Caravan **cannot move** while taxi is en route to it or waiting for board/depart (`CantMove` + `StartPath` block).
 
 ## Destination / depart
 

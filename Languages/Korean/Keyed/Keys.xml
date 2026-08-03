@@ -115,6 +115,9 @@
   <RimTaxi_CaravanEnRouteDesc>택시가 이 캐러밴으로 오는 중입니다. 예상 {0}. 대기 중에도 목적지를 바꿀 수 있습니다.</RimTaxi_CaravanEnRouteDesc>
   <RimTaxi_CaravanSetDestWhileEnRouteDesc>배차 대기 중 여행 목적지를 변경합니다.</RimTaxi_CaravanSetDestWhileEnRouteDesc>
   <RimTaxi_CaravanDepartSend>출발/보내기 ({0}명, {1}은)</RimTaxi_CaravanDepartSend>
+  <RimTaxi_CaravanImmobileEnRoute>캐러밴 이동 불가: 택시 배차 중 (예상 {0}). 도착 후 출발하거나, 대기 만료 후 택시가 떠나면 다시 이동할 수 있습니다.</RimTaxi_CaravanImmobileEnRoute>
+  <RimTaxi_CaravanImmobileWaiting>캐러밴 이동 불가: 택시가 여기서 대기 중 (남은 시간 {0}). 목적지 설정 후 출발하거나, 택시가 떠나길 기다리세요.</RimTaxi_CaravanImmobileWaiting>
+  <RimTaxi_CaravanImmobileGeneric>RimTaxi 대기 중에는 캐러밴이 이동할 수 없습니다.</RimTaxi_CaravanImmobileGeneric>
   <RimTaxi_TaxiArrivedAtCaravanReady>택시가 캐러밴에 준비됐습니다 — 목적지 예약됨. 「출발」로 비행하세요.</RimTaxi_TaxiArrivedAtCaravanReady>
   <RimTaxi_LetterArrivedCaravanReadyText>택시가 캐러밴에 준비됐습니다.\n\n예약 목적지: {0} 타일.\n캐러밴 상단 「출발」로 운행 요금을 내고 비행하세요.</RimTaxi_LetterArrivedCaravanReadyText>
   <RimTaxi_CallDispatchedCaravan>호출비 {0} 은. 캐러밴으로 택시 오는 중… 예상 도착 {1}. 도착 후 캐러밴에서 「목적지 설정」→「출발」하세요.</RimTaxi_CallDispatchedCaravan>

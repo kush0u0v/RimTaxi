@@ -211,6 +211,9 @@ namespace RimTaxi
                 callFeePaid = callFeePaid
             });
 
+            // Hold position so the taxi can meet the caravan
+            TaxiCaravanUtility.StopMovementForTaxi(caravan);
+
             Log.Message($"[RimTaxi] Caravan dispatch queued: caravan#{caravan.ID} ETA {delay} ticks dest={destination} dist={tripDistance}");
         }
 
@@ -293,6 +296,7 @@ namespace RimTaxi
             }
 
             caravanBoardings.Add(boarding);
+            TaxiCaravanUtility.StopMovementForTaxi(caravan);
         }
 
         public void ClearBoarding(Caravan caravan)
