@@ -17,7 +17,7 @@ Call a taxi from a **comms console**, wait for dispatch, board at a **pickup** (
 2. **Dispatch** — taxi is en route (**about 1–3 hours**).  
 3. **Arrive** — lands on map **or** ready at caravan (world only).  
 4. **Set destination** — taxi / caravan gizmo; shows estimated fare.  
-5. **Depart** — pay **kg × tiles × rate**, then fly (whole caravan boards if called from caravan). Lands on **your** maps when possible; **foreign settlements** always world caravan (no combat entry).
+5. **Depart** — pay **kg × tiles × rate**, then fly (whole caravan boards if called from caravan). Lands on **your** maps when possible (then **waits** so you can trade/reboard); **foreign settlements** world caravan on tile + layover wait (no combat entry).
 
 ## Features
 

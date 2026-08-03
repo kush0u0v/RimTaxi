@@ -100,9 +100,14 @@ namespace RimTaxi
             tmpPawns.Clear();
             tmpThings.Clear();
 
-            Messages.Message(arrivalMessageKey.Translate(), caravan, MessageTypeDefOf.TaskCompletion);
+            // Layover: taxi stays available on this caravan so they can set a new destination
+            // after trading (without re-paying call fee). If the caravan enters a map and is
+            // destroyed, call again from the reformed caravan.
+            TaxiGameComponent.Get()?.StartCaravanBoarding(caravan, callFeePaid: 0);
+
+            Messages.Message("RimTaxi_ArrivedCaravanWaiting".Translate(), caravan, MessageTypeDefOf.TaskCompletion);
             CameraJumper.TryJumpAndSelect(caravan);
-            Log.Message($"[RimTaxi] WorldDrop caravan formed at {dropTile} with {caravan.PawnsListForReading.Count} pawns.");
+            Log.Message($"[RimTaxi] WorldDrop caravan formed at {dropTile} with layover boarding ({caravan.PawnsListForReading.Count} pawns).");
         }
 
         /// <summary>

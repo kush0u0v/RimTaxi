@@ -98,6 +98,8 @@
   <RimTaxi_AutoDepartNeedSilver>자동 출발 연기: 운행 요금 {0} 은 필요 (보유 {1}). 은을 준비하거나 짐을 내리세요.</RimTaxi_AutoDepartNeedSilver>
   <RimTaxi_InspectBooked>예약 목적지: {0} 타일 (탑승/하역해도 유지)</RimTaxi_InspectBooked>
   <RimTaxi_ArrivedOnMap>RimTaxi 셔틀이 {0} 맵에 착륙했습니다.</RimTaxi_ArrivedOnMap>
+  <RimTaxi_ArrivedOnMapWaiting>RimTaxi가 {0}에 착륙했습니다. 하차 후 대기합니다. 거래·탐험 뒤 다시 타고 목적지 설정 → 출발하세요.</RimTaxi_ArrivedOnMapWaiting>
+  <RimTaxi_ArrivedCaravanWaiting>RimTaxi가 목적지 타일에 하차했고 대기 중입니다. 거래·정착지 진입 후 캐러밴에서 「목적지 설정」→「출발」하세요. (대기 만료·캐러밴 재편성 시에는 다시 호출)</RimTaxi_ArrivedCaravanWaiting>
   <RimTaxi_Settings_LandOnMaps>플레이어 맵에 택시 착륙</RimTaxi_Settings_LandOnMaps>
   <RimTaxi_Settings_LandOnMapsTip>켜면 내 정착지에는 맵 착륙합니다. 다른 세력 정착지는 항상 월드맵 카러밴으로만 하차(전투 진입 없음). 끄면 항상 월드 카러밴.</RimTaxi_Settings_LandOnMapsTip>
 

@@ -53,10 +53,12 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 ### Arrival at trip destination
 
-- Prefer **map land** only on **player-owned** settlements/maps (`TransportersArrivalAction_RimTaxiMapLand` / custom `DropRimTaxi`)
-- **Foreign faction settlements: always world caravan** beside the tile — never generate/enter their map (no auto-combat)
-- Else **world caravan** (`TransportersArrivalAction_RimTaxiWorldDrop`)
-- Setting: `landOnSettlementMaps` (default true) — affects player maps only; foreign bases always caravan
+- Prefer **map land** only on **player-owned** settlements/maps (`DropRimTaxi`)
+  - On land: **Unload all → Wait (waitTicks) with gizmos → empty FlyAway**
+  - Clear booking so next leg needs a new destination; player may reboard and depart again
+- **Foreign faction settlements: world caravan on that tile** + start caravan boarding layover (no map combat)
+- Else **world caravan** with same layover boarding
+- Setting: `landOnSettlementMaps` (default true) — player maps only; foreign always caravan
 - Harmony forces RimTaxi arrival path so vanilla `StillValid` fallback cannot wipe/banish pawns
 
 ---

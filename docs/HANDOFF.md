@@ -14,7 +14,7 @@ Civilian **call taxi** for RimWorld 1.6:
 - Taxi arrives after **1–3 hours** (not instant).
 - Board at **pickup** (maps, field maps, **or caravan on world map** — no camp required).
 - Choose **destination after taxi arrives**, then pay **mass × distance** and fly.
-- Trip end: land on **player** destination maps when possible; **foreign settlements always world caravan** (no combat map entry).
+- Trip end: land on **player** maps when possible (unload + **layover wait** — reboard, set new dest, depart); **foreign settlements** world caravan **on tile** + layover boarding (no combat map entry).
 
 Identity: **service / meter**, not player spaceship (not SRTS).
 

@@ -123,11 +123,11 @@ namespace RimTaxi
 
             Thing look = TransportersArrivalActionUtility.GetLookTarget(transporters);
             Messages.Message(
-                "RimTaxi_ArrivedOnMap".Translate(map.Parent?.LabelCap ?? map.ToString()),
+                "RimTaxi_ArrivedOnMapWaiting".Translate(map.Parent?.LabelCap ?? map.ToString()),
                 look,
                 MessageTypeDefOf.TaskCompletion);
             CameraJumper.TryJump(landing, map);
-            Log.Message($"[RimTaxi] MapLand OK at {landing} on {map}");
+            Log.Message($"[RimTaxi] MapLand OK at {landing} on {map} (layover wait)");
         }
 
         /// <summary>
@@ -218,10 +218,27 @@ namespace RimTaxi
             // Land via ship pipeline (skyfaller arrive)
             transportShip.ArriveAt(near, map.Parent);
 
-            // Drop off passengers then leave (taxi drop-off, not stay as player ship)
+            // Clear the leg just completed so re-boarding requires a new destination (no auto re-fly).
+            TaxiTripLookup.Clear(transportShip);
+            shuttle.TryGetComp<CompRimTaxiTrip>()?.Clear();
+
+            // Unload passengers for trade/explore, then WAIT so they can reboard and go elsewhere.
             ShipJob_Unload unload = (ShipJob_Unload)ShipJobMaker.MakeShipJob(ShipJobDefOf.Unload);
             unload.dropMode = TransportShipDropMode.All;
             transportShip.AddJob(unload);
+
+            int wait = RimTaxiMod.Settings?.waitTicks ?? 12500;
+            if (wait < 2500)
+            {
+                wait = 2500;
+            }
+
+            ShipJob_WaitTime waitJob = (ShipJob_WaitTime)ShipJobMaker.MakeShipJob(ShipJobDefOf.WaitTime);
+            waitJob.duration = wait;
+            waitJob.showGizmos = true;
+            transportShip.AddJob(waitJob);
+
+            // After wait: empty leave (billing patch); loaded without dest re-waits; loaded+dest charges and flies.
             transportShip.AddJob(ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway));
 
             return shuttle;
