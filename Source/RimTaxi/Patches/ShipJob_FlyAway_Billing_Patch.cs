@@ -31,6 +31,13 @@ namespace RimTaxi.Patches
             // No booking: dismiss / empty leave
             if (!hasTrip)
             {
+                if (__instance.destinationTile.Valid)
+                {
+                    __instance.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(__instance.destinationTile);
+                    __instance.dropMode = TransportShipDropMode.None;
+                    return true;
+                }
+
                 if (hasContents && mass > 0.01f)
                 {
                     Messages.Message(
