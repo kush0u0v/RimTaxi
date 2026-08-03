@@ -81,4 +81,17 @@
   <RimTaxi_Settings_LandOnMaps>플레이어 맵에 택시 착륙</RimTaxi_Settings_LandOnMaps>
   <RimTaxi_Settings_LandOnMapsTip>켜면 내 정착지에는 맵 착륙합니다. 다른 세력 정착지는 항상 월드맵 카러밴으로만 하차(전투 진입 없음). 끄면 항상 월드 카러밴.</RimTaxi_Settings_LandOnMapsTip>
 
+  <!-- 캐러반 탑승 -->
+  <RimTaxi_CaravanCall>택시 호출 ({0} 은)…</RimTaxi_CaravanCall>
+  <RimTaxi_CaravanCallDesc>이 캐러밴으로 택시를 부릅니다. 호출비 {0} 은은 캐러밴 인벤토리에서 결제. 도착 후 캐러밴 상단에서 목적지 설정·탑승. 운행 요금: 무게×거리×{1} 은.</RimTaxi_CaravanCallDesc>
+  <RimTaxi_CallDispatchedCaravan>호출비 {0} 은. 캐러밴으로 택시 오는 중… 예상 도착 {1}. 도착 후 캐러밴에서 「목적지 설정」→「출발」하세요.</RimTaxi_CallDispatchedCaravan>
+  <RimTaxi_LetterDispatchedCaravanText>호출비 {0} 은 결제.\n\n택시가 캐러밴으로 이동합니다. 예상 도착: {1}.\n\n도착하면 캐러밴을 선택하고:\n4. 목적지 설정\n5. 출발 (무게×거리 결제 후 캐러밴 전체가 탑승)</RimTaxi_LetterDispatchedCaravanText>
+  <RimTaxi_TaxiArrivedAtCaravan>택시가 캐러밴에 도착했습니다. 목적지를 설정한 뒤 출발로 탑승하세요.</RimTaxi_TaxiArrivedAtCaravan>
+  <RimTaxi_LetterArrivedCaravanText>택시가 캐러밴에 대기 중입니다 (월드맵 — 맵 진입 없음).\n\n캐러밴 명령:\n• 4. 목적지 설정\n• 5. 출발 (캐러밴 전체 탑승, 운행 요금 = 무게×거리)</RimTaxi_LetterArrivedCaravanText>
+  <RimTaxi_CaravanDepartDesc>캐러밴 은으로 무게×거리 요금을 내고, 캐러밴 전체가 탑승해 비행합니다.</RimTaxi_CaravanDepartDesc>
+  <RimTaxi_CaravanTaxiLeft>대기 시간이 끝나 택시가 캐러밴을 떠났습니다 (탑승 안 함).</RimTaxi_CaravanTaxiLeft>
+  <RimTaxi_CaravanTaxiReady>이미 택시가 이 캐러밴에서 대기 중입니다 — 목적지 설정 후 출발하세요.</RimTaxi_CaravanTaxiReady>
+  <RimTaxi_CaravanInvalid>유효하지 않은 캐러밴입니다.</RimTaxi_CaravanInvalid>
+  <RimTaxi_CaravanEmpty>캐러밴에 폰이 없습니다.</RimTaxi_CaravanEmpty>
+
 </LanguageData>

@@ -24,21 +24,25 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 ## Locked player flow (do not redesign unless asked)
 
 ```
-1. Call          → pay CALL FEE (default 200 silver) from comms map stockpile
-2. Dispatch      → ETA 1–3 in-game hours (no world map at call time)
-3. Arrive        → taxi lands at chosen PICKUP map/cell
+1. Call          → pay CALL FEE (default 200 silver) from map stockpile OR caravan inventory
+2. Dispatch      → ETA 1–3 in-game hours
+3. Arrive        → taxi at pickup map/cell OR “ready” at caravan (world only)
 4. Set destination → world map; show mass×distance fare estimate (no charge yet)
-5. Depart        → charge trip fare, then fly
+5. Depart        → charge trip fare, then fly (map ship or whole caravan boards)
 ```
 
 ### Pickup (step 1 UI)
 
-- Float menu: **where to send the taxi** (not “which faction to call”).
-- Options include:
-  - Current map
-  - Other **player** settlements (open or closed → open map)
-  - **Field maps** that already have free colonists (quest/raid/caravan maps) — **no camp required**
-- Call fee is paid from the **comms console map**, not necessarily the pickup map.
+**From comms** (float menu — where to send the taxi):
+
+- Current map / other **player** settlements / **field maps** with free colonists — **no camp required**
+- Call fee from the **comms console map**
+
+**From player caravan** (world map top-bar gizmo):
+
+- Pickup is the caravan itself (no landing cell, no map open)
+- Call fee from **caravan silver**
+- After ETA: same steps 4–5 on the caravan gizmos; **entire caravan** boards into `TravelingRimTaxi`
 
 ### After land (steps 4–5)
 
@@ -86,9 +90,11 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 | Type | Role |
 |------|------|
-| `TaxiCallService` | Call / pickup / dispatch / set dest / depart entry points |
+| `TaxiCallService` | Call / pickup / dispatch / set dest / depart (map + caravan) |
 | `TaxiPickupSite` | Lists pickup maps/settlements/field maps |
-| `TaxiPendingDispatch` + `TaxiGameComponent` | Dispatch ETA queue; trip dict backup; cooldown |
+| `TaxiPendingDispatch` + `TaxiGameComponent` | Dispatch ETA queue; caravan boarding sessions; cooldown |
+| `TaxiCaravanBoarding` / `TaxiCaravanUtility` | World caravan taxi ready + launch without map |
+| `Caravan_Gizmos_Patch` | Caravan top-bar Call / Set dest / Depart |
 | `CompRimTaxiTrip` | **Authoritative** destination+distance on shuttle Thing |
 | `TaxiTripLookup` | Comp + GameComponent resolve |
 | `TaxiPayment` | Map silver count/spend (not orbital-beacon-only) |
@@ -142,7 +148,7 @@ Defaults:
 
 - Vanilla `DropShuttle` NRE if `shipDef` missing — use `DropRimTaxi` + XML `shipDef`.
 - Destination is **not** set at call; only at step 4. Do not reintroduce world map at call without asking.
-- Caravan **without open map** still not a pickup target.
+- Caravan can call/board taxi from world map (no open map required).
 - Old in-world taxis before Comp booking may lack destination until re-called.
 
 ---

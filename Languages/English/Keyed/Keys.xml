@@ -81,4 +81,17 @@
   <RimTaxi_Settings_LandOnMaps>Land taxi on player maps</RimTaxi_Settings_LandOnMaps>
   <RimTaxi_Settings_LandOnMapsTip>When enabled, trips to your own colonies land the taxi on the map. Foreign settlements always drop as a world caravan (no combat entry). When disabled, always world caravan.</RimTaxi_Settings_LandOnMapsTip>
 
+  <!-- Caravan boarding -->
+  <RimTaxi_CaravanCall>Call taxi ({0} silver)…</RimTaxi_CaravanCall>
+  <RimTaxi_CaravanCallDesc>Call a taxi to this caravan. Dispatch fee {0} silver from caravan inventory. After it arrives, set a destination and board from the caravan bar. Trip fare: mass × distance × {1} silver.</RimTaxi_CaravanCallDesc>
+  <RimTaxi_CallDispatchedCaravan>Paid {0} silver. Taxi en route to your caravan — ETA {1}. When it arrives, use Set destination then Depart on the caravan.</RimTaxi_CallDispatchedCaravan>
+  <RimTaxi_LetterDispatchedCaravanText>Paid {0} silver dispatch.\n\nA taxi is coming to your caravan. ETA: {1}.\n\nWhen it arrives, open the caravan and use:\n4. Set destination\n5. Depart (pay mass×distance, whole caravan boards)</RimTaxi_LetterDispatchedCaravanText>
+  <RimTaxi_TaxiArrivedAtCaravan>Your taxi has arrived at the caravan. Set a destination, then Depart to board.</RimTaxi_TaxiArrivedAtCaravan>
+  <RimTaxi_LetterArrivedCaravanText>Your taxi is ready at the caravan (world map — no map entry).\n\nUse the caravan commands:\n• 4. Set destination\n• 5. Depart (whole caravan boards; trip fare = mass × distance)</RimTaxi_LetterArrivedCaravanText>
+  <RimTaxi_CaravanDepartDesc>Pay mass×distance from caravan silver, board the whole caravan, and fly.</RimTaxi_CaravanDepartDesc>
+  <RimTaxi_CaravanTaxiLeft>The taxi left the caravan without boarding (wait expired).</RimTaxi_CaravanTaxiLeft>
+  <RimTaxi_CaravanTaxiReady>A taxi is already waiting at this caravan — set destination and depart.</RimTaxi_CaravanTaxiReady>
+  <RimTaxi_CaravanInvalid>Invalid caravan.</RimTaxi_CaravanInvalid>
+  <RimTaxi_CaravanEmpty>Caravan has no pawns.</RimTaxi_CaravanEmpty>
+
 </LanguageData>

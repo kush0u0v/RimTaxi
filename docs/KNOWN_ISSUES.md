@@ -3,8 +3,9 @@
 ## Call / pickup
 
 - **Only one player settlement** → menu still shows, but only “here” options (expected).
-- **Field map pickup** requires the map **already open** with free colonists. Pure world caravans (no map) are **not** pickup targets yet — enter the tile first (no permanent camp required).
-- Call fee is always taken from the **comms map**, even if pickup is remote.
+- **Field map pickup** (from comms) requires the map **already open** with free colonists.
+- **World caravans** can call/board taxi from the caravan top bar (no map). Call fee + trip fare come from **caravan silver**.
+- Comms call fee is taken from the **comms map**, even if pickup is remote.
 - **Pending dispatch** blocks another taxi to the **same** pickup map until it lands or fails.
 
 ## Destination / depart

@@ -10,10 +10,10 @@
 
 Civilian **call taxi** for RimWorld 1.6:
 
-- Dispatch from **comms console** (gizmo / right-click).
+- Dispatch from **comms console** (gizmo / right-click) **or player caravan** (world map top bar).
 - Taxi arrives after **1–3 hours** (not instant).
-- Board at **pickup** (this map, other player settlements, or open field maps with colonists — **no camp required**).
-- Choose **destination after landing**, then pay **mass × distance** and fly.
+- Board at **pickup** (maps, field maps, **or caravan on world map** — no camp required).
+- Choose **destination after taxi arrives**, then pay **mass × distance** and fly.
 - Trip end: land on **player** destination maps when possible; **foreign settlements always world caravan** (no combat map entry).
 
 Identity: **service / meter**, not player spaceship (not SRTS).
@@ -24,13 +24,13 @@ Identity: **service / meter**, not player spaceship (not SRTS).
 
 | # | Step | Player action | Silver |
 |---|------|---------------|--------|
-| 1 | Call | Comms → call → pick **pickup site** → pick landing cell | **200** from **comms map** |
+| 1 | Call | Comms (pickup site + cell) **or caravan gizmo** | **200** from map stockpile **or caravan silver** |
 | 2 | Dispatch | Wait for ETA letter | — |
-| 3 | Arrive | Taxi lands at pickup | — |
-| 4 | Set destination | Taxi gizmo “목적지 설정” → world map | Preview only |
-| 5 | Depart | Taxi gizmo “출발” | **mass×dist×rate** from **taxi map** |
+| 3 | Arrive | Map land **or** caravan “taxi ready” (no map) | — |
+| 4 | Set destination | Taxi / caravan gizmo “목적지 설정” | Preview only |
+| 5 | Depart | Taxi / caravan gizmo “출발” | **mass×dist×rate** from map or caravan silver |
 
-No world map during step 1–3.
+Comms call: no world map during step 1–3. Caravan call: stays on world map throughout.
 
 ---
 
@@ -39,7 +39,8 @@ No world map during step 1–3.
 | Concern | Files |
 |---------|--------|
 | Call / pickup / dispatch | `TaxiCallService.cs`, `TaxiPickupSite.cs`, `TaxiPendingDispatch.cs`, `TaxiGameComponent.cs` |
-| Destination + depart | `TaxiCallService.BeginSetDestination` / `Depart`, `ShipJob_Wait_Gizmos_Patch.cs` |
+| Caravan board | `TaxiCaravanUtility.cs`, `TaxiCaravanBoarding.cs`, `Caravan_Gizmos_Patch.cs` |
+| Destination + depart | `TaxiCallService.BeginSetDestination` / `Depart` / caravan variants, `ShipJob_Wait_Gizmos_Patch.cs` |
 | Fare | `TaxiFareCalculator.cs`, `TaxiTripBilling.cs`, `TaxiPayment.cs`, `TaxiSettings.cs` |
 | Booking persistence | `CompRimTaxiTrip.cs`, `TaxiTripLookup.cs` |
 | Flight arrival | `TaxiArrivalUtility.cs`, `TransportersArrivalAction_RimTaxiMapLand.cs`, `…WorldDrop.cs`, `TravellingTransporters_Arrival_Patch.cs` |
@@ -71,7 +72,6 @@ Players with old settings may need **Reset to defaults** in mod options.
 ## Deliberately deferred
 
 - Full custom GUI panel (make the same 5 steps clearer later)
-- World caravan pickup without any open map
 - Hospitality
 - Taxi company / multi-company economy
 

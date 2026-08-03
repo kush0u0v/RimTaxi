@@ -13,15 +13,16 @@ Call a taxi from a **comms console**, wait for dispatch, board at a **pickup** (
 
 ## Play loop (baseline)
 
-1. **Call** — pay **200** silver (from the comms map). Choose **pickup** (this map / other colony / field map with colonists). Choose landing cell. **No world map yet.**  
+1. **Call** — pay **200** silver from **comms map** or **caravan inventory**. Comms: choose pickup + landing cell. Caravan: call from the world-map caravan bar.  
 2. **Dispatch** — taxi is en route (**about 1–3 hours**).  
-3. **Arrive** — taxi lands at the pickup.  
-4. **Set destination** — taxi gizmo; world map; shows estimated fare.  
-5. **Depart** — pay **kg × tiles × rate**, then fly. Lands on **your** maps when possible; **foreign settlements** always drop as a world caravan (no combat entry).
+3. **Arrive** — lands on map **or** ready at caravan (world only).  
+4. **Set destination** — taxi / caravan gizmo; shows estimated fare.  
+5. **Depart** — pay **kg × tiles × rate**, then fly (whole caravan boards if called from caravan). Lands on **your** maps when possible; **foreign settlements** always world caravan (no combat entry).
 
 ## Features
 
 - Comms **gizmo** + colonist **right-click** (no faction dialog)
+- **Caravan top-bar** call / set destination / depart (no map needed)
 - Remote pickup without founding a camp on field maps
 - Dual fare: call fee + trip fare at depart
 - Destination booking on the vehicle (`CompRimTaxiTrip`)

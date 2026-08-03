@@ -13,6 +13,7 @@ Canonical loop:
 Also delivered:
 
 - Remote pickup (other player settlements + open field maps; no camp)
+- **World caravan** call / set dest / board (top-bar gizmos; no map)
 - Dual billing (call vs trip)
 - Trip booking on vehicle Comp
 - Map landing without vanilla DropShuttle NRE
@@ -34,10 +35,9 @@ Until then: **bugfixes and small string/UX only**.
 ## Next candidates (after baseline)
 
 1. Call-fee refund / warning on empty no-show leave  
-2. World **caravan** pickup without open map  
-3. Trip fare always payable from home map (optional setting)  
-4. Graphics polish  
-5. **GUI overhaul**
+2. Trip fare always payable from home map (optional setting)  
+3. Graphics polish  
+4. **GUI overhaul**
 
 ## Explicit non-goals
 

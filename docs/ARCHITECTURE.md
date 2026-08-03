@@ -11,10 +11,16 @@ Comms (gizmo / right-click)
        └─ TaxiGameComponent.QueueDispatch (ETA 1–3h)
             └─ GameComponentTick → SpawnTaxi (step 3)
 
-Spawned TransportShip (Ship_RimTaxi)
+Player caravan (world top bar)
+  └─ Call taxi → pay CallFee from caravan silver → QueueCaravanDispatch
+       └─ tick → TaxiCaravanBoarding ready
+            ├─ Set destination (world targeter)
+            └─ Depart → pay trip → TaxiCaravanUtility.LaunchCaravanAsTaxi → TravelingRimTaxi
+
+Spawned TransportShip (Ship_RimTaxi) — map path
   ├─ WaitTime (boarding, gizmos)
-  │    ├─ Set destination → TaxiCallService.BeginSetDestination → CompRimTaxiTrip.Book
-  │    └─ Depart → TaxiCallService.Depart → charge trip → FlyAway
+  │    ├─ Set destination → CompRimTaxiTrip.Book
+  │    └─ Depart → charge trip → FlyAway
   └─ queued FlyAway (auto after wait; billing patch)
 
 TravellingTransporters (TravelingRimTaxi)
@@ -39,6 +45,7 @@ TravellingTransporters (TravelingRimTaxi)
 | Patch | Target | Intent |
 |-------|--------|--------|
 | `Building_CommsConsole_Patch` | `Thing.GetGizmos`, `Building_CommsConsole.GetFloatMenuOptions` | Call UI |
+| `Caravan_Gizmos_Patch` | `Caravan.GetGizmos` | Caravan Call / Set dest / Depart |
 | `ShipJob_Wait_Gizmos_Patch` | `ShipJob_Wait.GetJobGizmos` | Set dest / Depart / Dismiss |
 | `ShipJob_FlyAway_Billing_Patch` | `ShipJob_FlyAway.TryStart` | Auto fare / re-wait / empty leave |
 | `TravellingTransporters_Arrival_Patch` | `TravellingTransporters.Arrived` | Force our arrival chooser |
