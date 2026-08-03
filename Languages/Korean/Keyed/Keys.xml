@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <RimTaxi_SettingsTitle>RimTaxi</RimTaxi_SettingsTitle>
+  <RimTaxi_Settings_CallFee>호출 요금: {0} 은</RimTaxi_Settings_CallFee>
+  <RimTaxi_Settings_FarePerKgPerTile>운행 요금: kg당·타일당 {0} 은</RimTaxi_Settings_FarePerKgPerTile>
+  <RimTaxi_Settings_ExampleTripFare>운행 예시: 60kg×10타일 = {0} 은, 200kg×30타일 = {1} 은</RimTaxi_Settings_ExampleTripFare>
+  <RimTaxi_Settings_MaxPassengers>최대 승객: {0}</RimTaxi_Settings_MaxPassengers>
+  <RimTaxi_Settings_Cooldown>재사용 쿨다운: {0}시간</RimTaxi_Settings_Cooldown>
+  <RimTaxi_Settings_Wait>탑승 대기(자동 출발): {0}시간</RimTaxi_Settings_Wait>
+  <RimTaxi_Settings_MaxLaunch>최대 이동 거리: {0} 타일</RimTaxi_Settings_MaxLaunch>
+  <RimTaxi_Settings_TravelSpeed>월드 비행 속도 배율: {0} (낮을수록 느림)</RimTaxi_Settings_TravelSpeed>
+  <RimTaxi_Settings_Reset>기본값으로 재설정</RimTaxi_Settings_Reset>
+
+  <RimTaxi_CallOptionWithFee>택시 호출 ({0} 은)…</RimTaxi_CallOptionWithFee>
+  <RimTaxi_CallGizmoDesc>지금 호출비 {0} 은. 출발 시 화물 무게(kg) × 거리(타일) × {1} 은을 추가로 받습니다. 대기 중 탑승하거나 즉시 출발을 누르세요.</RimTaxi_CallGizmoDesc>
+  <RimTaxi_CallFeeOnly>호출비 {0} 은 (운행 요금은 출발 시 무게×거리로 청구)</RimTaxi_CallFeeOnly>
+  <RimTaxi_TripFareBreakdown>무게 {0}kg × {1}타일 × {2} = {3} 은</RimTaxi_TripFareBreakdown>
+  <RimTaxi_DestLabel>호출 {0}은 · {1}타일 · 운행요금 = 무게×거리×{2} (출발 시)</RimTaxi_DestLabel>
+  <RimTaxi_ChooseLanding>착륙 위치를 선택하세요. {0}</RimTaxi_ChooseLanding>
+  <RimTaxi_SameTile>정착지와 다른 월드 타일을 선택하세요.</RimTaxi_SameTile>
+  <RimTaxi_NotPlayerHome>정착지에서만 택시를 호출할 수 있습니다.</RimTaxi_NotPlayerHome>
+  <RimTaxi_MapUnreachable>이 맵에는 택시가 도착할 수 없습니다.</RimTaxi_MapUnreachable>
+  <RimTaxi_CommsUnavailable>지금 통신기를 사용할 수 없습니다.</RimTaxi_CommsUnavailable>
+  <RimTaxi_OnCooldown>택시 쿨다운 중 (남은 시간: {0}).</RimTaxi_OnCooldown>
+  <RimTaxi_NeedSilver>은 {0} 필요 (보유 {1}).</RimTaxi_NeedSilver>
+  <RimTaxi_DefsMissing>RimTaxi Def 로드에 실패했습니다.</RimTaxi_DefsMissing>
+  <RimTaxi_SpawnFailed>택시 도착에 실패했습니다. 가능하면 은을 환불했습니다.</RimTaxi_SpawnFailed>
+  <RimTaxi_CallSuccessTrip>택시 호출. 호출비 {0} 은 결제. 목적지 {1}타일 — 운행 요금(무게×거리)은 출발 시 청구. 탑승하거나 대기를 기다리세요.</RimTaxi_CallSuccessTrip>
+  <RimTaxi_Arrived>RimTaxi 셔틀이 도착했습니다.</RimTaxi_Arrived>
+  <RimTaxi_ArrivedCaravan>RimTaxi가 월드맵에 카러밴을 내려주었습니다. 준비되면 정착지에 직접 진입하세요.</RimTaxi_ArrivedCaravan>
+  <RimTaxi_ArrivedNoPawns>RimTaxi가 도착했지만 카러밴을 만들 승객이 없었습니다.</RimTaxi_ArrivedNoPawns>
+  <RimTaxi_DepartNow>즉시 출발 ({0}명 탑승)</RimTaxi_DepartNow>
+  <RimTaxi_DepartNowFare>즉시 출발 ({0}명, 운행 {1}은)</RimTaxi_DepartNowFare>
+  <RimTaxi_DepartNowDesc>대기 시간을 건너뛰고 예약 목적지로 출발합니다. 무게×거리 운행 요금을 받습니다. 월드맵을 다시 열지 않습니다.</RimTaxi_DepartNowDesc>
+  <RimTaxi_DepartNoDest>이 택시에 예약된 목적지가 없습니다.</RimTaxi_DepartNoDest>
+  <RimTaxi_DepartEmpty>즉시 출발은 승객/화물이 있을 때만 가능합니다. (빈 택시는 대기 후 자동 이륙)</RimTaxi_DepartEmpty>
+  <RimTaxi_Departing>예약 목적지로 택시를 출발시킵니다.</RimTaxi_Departing>
+  <RimTaxi_DepartingPaid>택시 출발. 운행 요금 {0} 은 (무게 {1} kg × {2} 타일).</RimTaxi_DepartingPaid>
+  <RimTaxi_AutoDepartNeedSilver>자동 출발 연기: 운행 요금 {0} 은 필요 (보유 {1}). 은을 준비하거나 짐을 내리세요.</RimTaxi_AutoDepartNeedSilver>
+  <RimTaxi_InspectBooked>예약 목적지: {0} 타일 (탑승/하역해도 유지)</RimTaxi_InspectBooked>
+
+</LanguageData>

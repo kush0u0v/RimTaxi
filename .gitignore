@@ -1,0 +1,19 @@
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+*.DotSettings.user
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Build intermediates
+Source/**/bin/
+Source/**/obj/
+
+# Keep Assemblies folder; ignore built DLL if you prefer source-only clones
+# Comment the next two lines if you want to commit RimTaxi.dll for players.
+Assemblies/*
+!Assemblies/.gitkeep

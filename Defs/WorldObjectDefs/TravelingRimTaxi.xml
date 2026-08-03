@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Core abstract base: ShuttleWorldObjectBase (TravellingTransporters) -->
+  <WorldObjectDef ParentName="ShuttleWorldObjectBase">
+    <defName>TravelingRimTaxi</defName>
+    <label>taxi shuttle</label>
+    <description>A civilian taxi shuttle in flight.</description>
+    <expandingIconColor>(80,160,220)</expandingIconColor>
+    <expandingIconDrawSize>1.2</expandingIconDrawSize>
+  </WorldObjectDef>
+
+</Defs>

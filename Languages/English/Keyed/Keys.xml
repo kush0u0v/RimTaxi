@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <RimTaxi_SettingsTitle>RimTaxi</RimTaxi_SettingsTitle>
+  <RimTaxi_Settings_CallFee>Call fee (dispatch): {0} silver</RimTaxi_Settings_CallFee>
+  <RimTaxi_Settings_FarePerKgPerTile>Trip rate: {0} silver per kg per tile</RimTaxi_Settings_FarePerKgPerTile>
+  <RimTaxi_Settings_ExampleTripFare>Trip examples: 60kg×10 tiles = {0} silver; 200kg×30 tiles = {1} silver</RimTaxi_Settings_ExampleTripFare>
+  <RimTaxi_Settings_MaxPassengers>Max passengers: {0}</RimTaxi_Settings_MaxPassengers>
+  <RimTaxi_Settings_Cooldown>Reuse cooldown: {0} hours</RimTaxi_Settings_Cooldown>
+  <RimTaxi_Settings_Wait>Boarding wait before auto-depart: {0} hours</RimTaxi_Settings_Wait>
+  <RimTaxi_Settings_MaxLaunch>Max trip distance: {0} tiles</RimTaxi_Settings_MaxLaunch>
+  <RimTaxi_Settings_TravelSpeed>World travel speed factor: {0} (lower = slower)</RimTaxi_Settings_TravelSpeed>
+  <RimTaxi_Settings_Reset>Reset to defaults</RimTaxi_Settings_Reset>
+
+  <RimTaxi_CallOptionWithFee>Call taxi ({0} silver)…</RimTaxi_CallOptionWithFee>
+  <RimTaxi_CallGizmoDesc>Dispatch fee {0} silver now. At departure you also pay cargo mass × distance × {1} silver. Board during the wait or press Depart now.</RimTaxi_CallGizmoDesc>
+  <RimTaxi_CallFeeOnly>Call fee {0} silver (trip fare charged at departure from mass × distance)</RimTaxi_CallFeeOnly>
+  <RimTaxi_TripFareBreakdown>Mass {0} kg × {1} tiles × {2} = {3} silver</RimTaxi_TripFareBreakdown>
+  <RimTaxi_DestLabel>Call {0} silver · {1} tiles · trip = mass × dist × {2} at depart</RimTaxi_DestLabel>
+  <RimTaxi_ChooseLanding>Choose landing spot. {0}</RimTaxi_ChooseLanding>
+  <RimTaxi_SameTile>Choose a different world tile than the colony.</RimTaxi_SameTile>
+  <RimTaxi_NotPlayerHome>Taxi only available at a colony.</RimTaxi_NotPlayerHome>
+  <RimTaxi_MapUnreachable>Taxi cannot reach this map.</RimTaxi_MapUnreachable>
+  <RimTaxi_CommsUnavailable>Comms console cannot be used right now.</RimTaxi_CommsUnavailable>
+  <RimTaxi_OnCooldown>Taxi on cooldown ({0} remaining).</RimTaxi_OnCooldown>
+  <RimTaxi_NeedSilver>Need {0} silver (have {1}).</RimTaxi_NeedSilver>
+  <RimTaxi_DefsMissing>RimTaxi defs failed to load.</RimTaxi_DefsMissing>
+  <RimTaxi_SpawnFailed>Taxi failed to arrive. Silver refunded if possible.</RimTaxi_SpawnFailed>
+  <RimTaxi_CallSuccessTrip>Taxi called. Paid {0} silver dispatch. Destination {1} tiles away — trip fare (mass × distance) is charged when it leaves. Board or wait for auto-depart.</RimTaxi_CallSuccessTrip>
+  <RimTaxi_Arrived>RimTaxi shuttle arrived.</RimTaxi_Arrived>
+  <RimTaxi_ArrivedCaravan>RimTaxi dropped off a caravan on the world map. Enter the settlement when you are ready.</RimTaxi_ArrivedCaravan>
+  <RimTaxi_ArrivedNoPawns>RimTaxi arrived but no passengers were found to form a caravan.</RimTaxi_ArrivedNoPawns>
+  <RimTaxi_DepartNow>Depart now ({0} aboard)</RimTaxi_DepartNow>
+  <RimTaxi_DepartNowFare>Depart now ({0} aboard, {1} silver)</RimTaxi_DepartNowFare>
+  <RimTaxi_DepartNowDesc>Skip remaining wait and fly to the booked destination. Charges mass × distance silver. Does not open the world map.</RimTaxi_DepartNowDesc>
+  <RimTaxi_DepartNoDest>No booked destination on this taxi.</RimTaxi_DepartNoDest>
+  <RimTaxi_DepartEmpty>Load at least one passenger or item before departing early. (Empty taxi auto-leaves after the wait.)</RimTaxi_DepartEmpty>
+  <RimTaxi_Departing>Taxi departing to booked destination.</RimTaxi_Departing>
+  <RimTaxi_DepartingPaid>Taxi departing. Trip fare {0} silver (mass {1} kg × {2} tiles).</RimTaxi_DepartingPaid>
+  <RimTaxi_AutoDepartNeedSilver>Auto-depart delayed: need {0} silver for trip fare (have {1}). Get silver or unload, or use Depart when ready.</RimTaxi_AutoDepartNeedSilver>
+  <RimTaxi_InspectBooked>Booked destination: {0} tiles (kept while loading/unloading)</RimTaxi_InspectBooked>
+
+</LanguageData>

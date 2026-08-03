@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <TransportShipDef>
+    <defName>Ship_RimTaxi</defName>
+    <label>taxi shuttle</label>
+    <shipThing>RimTaxiShuttle</shipThing>
+    <arrivingSkyfaller>RimTaxiIncoming</arrivingSkyfaller>
+    <leavingSkyfaller>RimTaxiLeaving</leavingSkyfaller>
+    <worldObject>TravelingRimTaxi</worldObject>
+    <maxLaunchDistance>70</maxLaunchDistance>
+  </TransportShipDef>
+
+</Defs>

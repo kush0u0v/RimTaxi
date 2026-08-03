@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Civilian taxi shuttle. Graphic scaled to cover the 5x3 footprint;
+  ground shadow kept small (not imperial shuttle slab).
+-->
+<Defs>
+
+  <ThingDef ParentName="ShuttleBase">
+    <defName>RimTaxiShuttle</defName>
+    <label>taxi shuttle</label>
+    <description>A civilian taxi shuttle. Call it from a comms console, load passengers and limited cargo, then fly to a world-map destination for a silver fee.</description>
+    <!-- Keep collision footprint; draw larger so the sprite fills the 5x3 box -->
+    <size>(5,3)</size>
+    <graphicData>
+      <texPath>Things/Building/Misc/RimTaxiShuttle</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <!-- Wider+taller than vanilla (6,3) so taxi covers selection box -->
+      <drawSize>(7.2, 5.8)</drawSize>
+      <color>(255,255,255)</color>
+      <!-- Small soft ground shadow (imperial used ~4.1 x 1.8 box) -->
+      <shadowData>
+        <volume>(2.0, 0.3, 1.3)</volume>
+        <offset>(0, 0, 0)</offset>
+      </shadowData>
+    </graphicData>
+    <highlightColor>(1.0, 0.85, 0.2)</highlightColor>
+    <uiIconScale>1.0</uiIconScale>
+    <comps Inherit="False">
+      <li Class="CompProperties_Shuttle" />
+      <li Class="CompProperties_Transporter">
+        <massCapacity>500</massCapacity>
+        <max1PerGroup>true</max1PerGroup>
+        <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
+        <showOverallStats>true</showOverallStats>
+        <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
+        <pawnExitSound>Shuttle_PawnExit</pawnExitSound>
+      </li>
+      <li Class="CompProperties_AmbientSound">
+        <sound>ShuttleIdle_Ambience</sound>
+      </li>
+      <!-- Booked destination lives on the vehicle so load/unload cannot lose it -->
+      <li Class="RimTaxi.CompProperties_RimTaxiTrip" />
+    </comps>
+  </ThingDef>
+
+</Defs>
