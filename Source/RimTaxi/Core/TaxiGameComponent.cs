@@ -178,6 +178,11 @@ namespace RimTaxi
 
         public void QueueCaravanDispatch(Caravan caravan, int callFeePaid)
         {
+            QueueCaravanDispatch(caravan, callFeePaid, PlanetTile.Invalid, 0);
+        }
+
+        public void QueueCaravanDispatch(Caravan caravan, int callFeePaid, PlanetTile destination, int tripDistance)
+        {
             if (caravan == null || caravan.Destroyed)
             {
                 return;
@@ -188,19 +193,37 @@ namespace RimTaxi
                 pendingDispatches = new List<TaxiPendingDispatch>();
             }
 
-            int delay = TaxiCallService.RollDispatchDelayTicks(0);
+            if (!destination.Valid)
+            {
+                destination = PlanetTile.Invalid;
+                tripDistance = 0;
+            }
+
+            int delay = TaxiCallService.RollDispatchDelayTicks(tripDistance);
             pendingDispatches.Add(new TaxiPendingDispatch
             {
                 mapId = -1,
                 landingCell = IntVec3.Invalid,
                 caravanId = caravan.ID,
-                destination = PlanetTile.Invalid,
-                tripDistance = 0,
+                destination = destination,
+                tripDistance = tripDistance < 0 ? 0 : tripDistance,
                 arriveGameTick = Find.TickManager.TicksGame + delay,
                 callFeePaid = callFeePaid
             });
 
-            Log.Message($"[RimTaxi] Caravan dispatch queued: caravan#{caravan.ID} ETA {delay} ticks");
+            Log.Message($"[RimTaxi] Caravan dispatch queued: caravan#{caravan.ID} ETA {delay} ticks dest={destination} dist={tripDistance}");
+        }
+
+        public void BookPendingCaravanDestination(Caravan caravan, PlanetTile destination, int tripDistance)
+        {
+            TaxiPendingDispatch p = GetPendingDispatch(caravan);
+            if (p == null)
+            {
+                return;
+            }
+
+            p.destination = destination;
+            p.tripDistance = tripDistance < 0 ? 0 : tripDistance;
         }
 
         public TaxiCaravanBoarding GetBoarding(Caravan caravan)
@@ -227,6 +250,11 @@ namespace RimTaxi
 
         public void StartCaravanBoarding(Caravan caravan, int callFeePaid)
         {
+            StartCaravanBoarding(caravan, callFeePaid, PlanetTile.Invalid, 0);
+        }
+
+        public void StartCaravanBoarding(Caravan caravan, int callFeePaid, PlanetTile destination, int tripDistance)
+        {
             if (caravan == null)
             {
                 return;
@@ -252,12 +280,19 @@ namespace RimTaxi
                 wait = 2500;
             }
 
-            caravanBoardings.Add(new TaxiCaravanBoarding
+            var boarding = new TaxiCaravanBoarding
             {
                 caravanId = caravan.ID,
                 leaveByTick = Find.TickManager.TicksGame + wait,
                 callFeePaid = callFeePaid
-            });
+            };
+
+            if (destination.Valid && tripDistance > 0)
+            {
+                boarding.Book(destination, tripDistance);
+            }
+
+            caravanBoardings.Add(boarding);
         }
 
         public void ClearBoarding(Caravan caravan)
@@ -377,20 +412,26 @@ namespace RimTaxi
                 return;
             }
 
-            StartCaravanBoarding(caravan, d.callFeePaid);
+            StartCaravanBoarding(caravan, d.callFeePaid, d.destination, d.tripDistance);
             pendingDispatches.RemoveAt(index);
 
+            string letterText = d.destination.Valid
+                ? "RimTaxi_LetterArrivedCaravanReadyText".Translate(d.tripDistance)
+                : "RimTaxi_LetterArrivedCaravanText".Translate();
+
             Messages.Message(
-                "RimTaxi_TaxiArrivedAtCaravan".Translate(),
+                d.destination.Valid
+                    ? "RimTaxi_TaxiArrivedAtCaravanReady".Translate()
+                    : "RimTaxi_TaxiArrivedAtCaravan".Translate(),
                 caravan,
                 MessageTypeDefOf.PositiveEvent);
             Find.LetterStack.ReceiveLetter(
                 "RimTaxi_LetterArrivedLabel".Translate(),
-                "RimTaxi_LetterArrivedCaravanText".Translate(),
+                letterText,
                 LetterDefOf.PositiveEvent,
                 caravan);
 
-            Log.Message($"[RimTaxi] Taxi ready at caravan#{caravan.ID} tile={caravan.Tile}");
+            Log.Message($"[RimTaxi] Taxi ready at caravan#{caravan.ID} tile={caravan.Tile} dest={d.destination}");
         }
 
         private void ProcessMapDispatchDue(TaxiPendingDispatch d, int index)

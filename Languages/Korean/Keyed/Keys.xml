@@ -106,6 +106,17 @@
   <!-- 캐러반 탑승 -->
   <RimTaxi_CaravanCall>택시 호출 ({0} 은)…</RimTaxi_CaravanCall>
   <RimTaxi_CaravanCallDesc>이 캐러밴으로 택시를 부릅니다. 호출비 {0} 은은 캐러밴 인벤토리에서 결제. 도착 후 캐러밴 상단에서 목적지 설정·탑승. 운행 요금: 무게×거리×{1} 은.</RimTaxi_CaravanCallDesc>
+  <RimTaxi_CaravanSend>택시 보내기 ({0} 은)…</RimTaxi_CaravanSend>
+  <RimTaxi_CaravanSendDesc>캐러밴에서 택시를 보냅니다. 호출비 {0} 은(정착지 무역송신기 범위 은 및/또는 캐러밴 소지 은) → 월드 목적지 선택 → 배차 대기 → 출발. 운행 요금은 출발 시 무게×거리×{1}.</RimTaxi_CaravanSendDesc>
+  <RimTaxi_CaravanPickDestToSend>택시를 보낼 목적지(월드 타일)를 선택하세요.</RimTaxi_CaravanPickDestToSend>
+  <RimTaxi_CaravanSendDispatched>호출비 {0} 은. 목적지 {1}타일(출발 시 운행 약 {2}은). 택시 오는 중… 예상 {3}. 도착하면 「출발」을 누르세요.</RimTaxi_CaravanSendDispatched>
+  <RimTaxi_LetterCaravanSendText>호출비 {0} 은 결제.\n\n목적지: {1} 타일\n출발 시 예상 운행 요금: {2} 은\n예상 도착: {3}\n\n택시가 캐러밴에 준비되면 상단 「출발」로 운행 요금을 내고 비행합니다 (정착지 송신기 은 + 캐러밴 소지 은).</RimTaxi_LetterCaravanSendText>
+  <RimTaxi_CaravanEnRoute>택시 배차 중 ({0})</RimTaxi_CaravanEnRoute>
+  <RimTaxi_CaravanEnRouteDesc>택시가 이 캐러밴으로 오는 중입니다. 예상 {0}. 대기 중에도 목적지를 바꿀 수 있습니다.</RimTaxi_CaravanEnRouteDesc>
+  <RimTaxi_CaravanSetDestWhileEnRouteDesc>배차 대기 중 여행 목적지를 변경합니다.</RimTaxi_CaravanSetDestWhileEnRouteDesc>
+  <RimTaxi_CaravanDepartSend>출발/보내기 ({0}명, {1}은)</RimTaxi_CaravanDepartSend>
+  <RimTaxi_TaxiArrivedAtCaravanReady>택시가 캐러밴에 준비됐습니다 — 목적지 예약됨. 「출발」로 비행하세요.</RimTaxi_TaxiArrivedAtCaravanReady>
+  <RimTaxi_LetterArrivedCaravanReadyText>택시가 캐러밴에 준비됐습니다.\n\n예약 목적지: {0} 타일.\n캐러밴 상단 「출발」로 운행 요금을 내고 비행하세요.</RimTaxi_LetterArrivedCaravanReadyText>
   <RimTaxi_CallDispatchedCaravan>호출비 {0} 은. 캐러밴으로 택시 오는 중… 예상 도착 {1}. 도착 후 캐러밴에서 「목적지 설정」→「출발」하세요.</RimTaxi_CallDispatchedCaravan>
   <RimTaxi_LetterDispatchedCaravanText>호출비 {0} 은 결제.\n\n택시가 캐러밴으로 이동합니다. 예상 도착: {1}.\n\n도착하면 캐러밴을 선택하고:\n4. 목적지 설정\n5. 출발 (무게×거리 결제 후 캐러밴 전체가 탑승)</RimTaxi_LetterDispatchedCaravanText>
   <RimTaxi_TaxiArrivedAtCaravan>택시가 캐러밴에 도착했습니다. 목적지를 설정한 뒤 출발로 탑승하세요.</RimTaxi_TaxiArrivedAtCaravan>

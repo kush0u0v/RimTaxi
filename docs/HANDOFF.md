@@ -10,7 +10,7 @@
 
 Civilian **call taxi** for RimWorld 1.6:
 
-- Dispatch from **comms console** like other radio contacts (**RimTaxi Dispatch** in the contact list + radio dialog), optional gizmo, **or player caravan** (world map top bar).
+- Dispatch from **comms console** (radio contact) or **player caravan** top bar (**택시 보내기**: pay call fee → pick world dest → ETA → Depart).
 - Taxi arrives after **1–3 hours** (not instant).
 - Board at **pickup** (maps, field maps, **or caravan on world map** — no camp required).
 - Choose **destination after taxi arrives**, then pay **mass × distance** and fly.

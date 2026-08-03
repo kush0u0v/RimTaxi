@@ -6,7 +6,7 @@ using Verse;
 namespace RimTaxi.Patches
 {
     /// <summary>
-    /// World caravan top bar: Call taxi, or Set destination / Depart when taxi is ready.
+    /// World caravan top bar: call/send taxi, set destination while en route, board/depart when ready.
     /// </summary>
     [HarmonyPatch(typeof(Caravan), nameof(Caravan.GetGizmos))]
     public static class Caravan_Gizmos_Patch
@@ -27,20 +27,10 @@ namespace RimTaxi.Patches
                 yield break;
             }
 
-            TaxiGameComponent comp = TaxiGameComponent.Get();
-            TaxiCaravanBoarding boarding = comp?.GetBoarding(__instance);
-            if (boarding != null)
+            foreach (Gizmo g in TaxiCallService.MakeAllCaravanTaxiGizmos(__instance))
             {
-                foreach (Gizmo g in TaxiCallService.MakeCaravanBoardingGizmos(__instance, boarding))
-                {
-                    yield return g;
-                }
-
-                yield break;
+                yield return g;
             }
-
-            // En route: show disabled call with ETA, still list the gizmo for clarity
-            yield return TaxiCallService.MakeCaravanCallGizmo(__instance);
         }
     }
 }

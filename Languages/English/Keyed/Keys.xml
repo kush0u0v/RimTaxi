@@ -106,6 +106,17 @@
   <!-- Caravan boarding -->
   <RimTaxi_CaravanCall>Call taxi ({0} silver)…</RimTaxi_CaravanCall>
   <RimTaxi_CaravanCallDesc>Call a taxi to this caravan. Dispatch fee {0} silver from caravan inventory. After it arrives, set a destination and board from the caravan bar. Trip fare: mass × distance × {1} silver.</RimTaxi_CaravanCallDesc>
+  <RimTaxi_CaravanSend>Send taxi ({0} silver)…</RimTaxi_CaravanSend>
+  <RimTaxi_CaravanSendDesc>From this caravan: pay call fee {0} silver (settlement trade-beacon silver and/or caravan silver), pick a world destination, wait for the taxi, then Depart. Trip fare at depart: mass × distance × {1}.</RimTaxi_CaravanSendDesc>
+  <RimTaxi_CaravanPickDestToSend>Choose where to send the taxi (world destination).</RimTaxi_CaravanPickDestToSend>
+  <RimTaxi_CaravanSendDispatched>Paid {0} silver. Destination {1} tiles (trip ~{2} silver at depart). Taxi en route — ETA {3}. When it arrives, press Depart.</RimTaxi_CaravanSendDispatched>
+  <RimTaxi_LetterCaravanSendText>Paid {0} silver dispatch.\n\nDestination: {1} tiles\nEstimated trip fare at depart: {2} silver\nETA: {3}\n\nWhen the taxi is ready at the caravan, use Depart on the caravan bar (trip fare from settlement beacons + caravan silver).</RimTaxi_LetterCaravanSendText>
+  <RimTaxi_CaravanEnRoute>Taxi en route ({0})</RimTaxi_CaravanEnRoute>
+  <RimTaxi_CaravanEnRouteDesc>Taxi is coming to this caravan. ETA {0}. You can change the destination while waiting.</RimTaxi_CaravanEnRouteDesc>
+  <RimTaxi_CaravanSetDestWhileEnRouteDesc>Change the trip destination while the taxi is still en route.</RimTaxi_CaravanSetDestWhileEnRouteDesc>
+  <RimTaxi_CaravanDepartSend>Depart / send ({0} aboard, {1} silver)</RimTaxi_CaravanDepartSend>
+  <RimTaxi_TaxiArrivedAtCaravanReady>Taxi ready at caravan — destination booked. Press Depart to fly.</RimTaxi_TaxiArrivedAtCaravanReady>
+  <RimTaxi_LetterArrivedCaravanReadyText>Your taxi is ready at the caravan.\n\nBooked trip: {0} tiles.\nPress Depart on the caravan to pay trip fare and fly.</RimTaxi_LetterArrivedCaravanReadyText>
   <RimTaxi_CallDispatchedCaravan>Paid {0} silver. Taxi en route to your caravan — ETA {1}. When it arrives, use Set destination then Depart on the caravan.</RimTaxi_CallDispatchedCaravan>
   <RimTaxi_LetterDispatchedCaravanText>Paid {0} silver dispatch.\n\nA taxi is coming to your caravan. ETA: {1}.\n\nWhen it arrives, open the caravan and use:\n4. Set destination\n5. Depart (pay mass×distance, whole caravan boards)</RimTaxi_LetterDispatchedCaravanText>
   <RimTaxi_TaxiArrivedAtCaravan>Your taxi has arrived at the caravan. Set a destination, then Depart to board.</RimTaxi_TaxiArrivedAtCaravan>

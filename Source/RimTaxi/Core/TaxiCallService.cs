@@ -810,15 +810,58 @@ namespace RimTaxi
             return null;
         }
 
-        public static Command_Action MakeCaravanCallGizmo(Caravan caravan)
+        /// <summary>
+        /// All caravan top-bar taxi gizmos: idle call/send, en-route status+dest, ready depart.
+        /// </summary>
+        public static IEnumerable<Gizmo> MakeAllCaravanTaxiGizmos(Caravan caravan)
+        {
+            if (caravan == null || caravan.Destroyed)
+            {
+                yield break;
+            }
+
+            TaxiGameComponent gc = Comp;
+            TaxiCaravanBoarding boarding = gc?.GetBoarding(caravan);
+            if (boarding != null)
+            {
+                foreach (Gizmo g in MakeCaravanBoardingGizmos(caravan, boarding))
+                {
+                    yield return g;
+                }
+
+                yield break;
+            }
+
+            TaxiPendingDispatch pending = gc?.GetPendingDispatch(caravan);
+            if (pending != null)
+            {
+                foreach (Gizmo g in MakeCaravanPendingGizmos(caravan, pending))
+                {
+                    yield return g;
+                }
+
+                yield break;
+            }
+
+            yield return MakeCaravanSendGizmo(caravan);
+        }
+
+        /// <summary>
+        /// Primary caravan action: pay call fee, pick destination, taxi en route then depart when ready.
+        /// </summary>
+        public static Command_Action MakeCaravanSendGizmo(Caravan caravan)
         {
             Command_Action cmd = new Command_Action
             {
-                defaultLabel = "RimTaxi_CaravanCall".Translate(CallFee),
-                defaultDesc = "RimTaxi_CaravanCallDesc".Translate(CallFee, TaxiFareCalculator.FarePerKgPerTile.ToString("0.00")),
+                defaultLabel = "RimTaxi_CaravanSend".Translate(CallFee),
+                defaultDesc = "RimTaxi_CaravanSendDesc".Translate(
+                    CallFee,
+                    TaxiFareCalculator.FarePerKgPerTile.ToString("0.00")),
                 icon = ContentFinder<Texture2D>.Get("UI/Commands/CallShuttle", reportFailure: false)
+                    ?? ContentFinder<Texture2D>.Get("UI/Commands/LaunchShip", reportFailure: false)
                     ?? TexCommand.Attack,
-                action = () => TryCallFromCaravan(caravan)
+                Order = -50f,
+                action = () => BeginSendTaxiFromCaravan(caravan)
             };
 
             string blocked = GetBlockedReasonCaravan(caravan);
@@ -828,6 +871,54 @@ namespace RimTaxi
             }
 
             return cmd;
+        }
+
+        // Back-compat alias
+        public static Command_Action MakeCaravanCallGizmo(Caravan caravan) => MakeCaravanSendGizmo(caravan);
+
+        public static IEnumerable<Gizmo> MakeCaravanPendingGizmos(Caravan caravan, TaxiPendingDispatch pending)
+        {
+            if (caravan == null || pending == null)
+            {
+                yield break;
+            }
+
+            string eta = pending.TicksRemaining.ToStringTicksToPeriod();
+            float mass = TaxiCaravanUtility.GetCaravanMass(caravan);
+            int estFare = pending.destination.Valid
+                ? TaxiFareCalculator.TripFare(mass, pending.tripDistance)
+                : 0;
+
+            Command_Action status = new Command_Action
+            {
+                defaultLabel = "RimTaxi_CaravanEnRoute".Translate(eta),
+                defaultDesc = "RimTaxi_CaravanEnRouteDesc".Translate(eta),
+                icon = ContentFinder<Texture2D>.Get("UI/Commands/CallShuttle", reportFailure: false)
+                    ?? TexCommand.Attack,
+                Order = -50f,
+                action = () =>
+                {
+                    Messages.Message(
+                        "RimTaxi_CaravanEnRouteDesc".Translate(eta),
+                        caravan,
+                        MessageTypeDefOf.NeutralEvent,
+                        historical: false);
+                }
+            };
+            yield return status;
+
+            Command_Action setDest = new Command_Action
+            {
+                defaultLabel = pending.destination.Valid
+                    ? "RimTaxi_SetDestinationChange".Translate(pending.tripDistance, estFare)
+                    : "RimTaxi_SetDestination".Translate(),
+                defaultDesc = "RimTaxi_CaravanSetDestWhileEnRouteDesc".Translate(),
+                icon = ContentFinder<Texture2D>.Get("UI/Commands/LaunchShip", reportFailure: false)
+                    ?? TexCommand.Install,
+                Order = -49f,
+                action = () => BeginSetDestinationPendingCaravan(caravan, pending)
+            };
+            yield return setDest;
         }
 
         public static IEnumerable<Gizmo> MakeCaravanBoardingGizmos(Caravan caravan, TaxiCaravanBoarding boarding)
@@ -850,6 +941,7 @@ namespace RimTaxi
                 defaultDesc = "RimTaxi_SetDestinationDesc".Translate(),
                 icon = ContentFinder<Texture2D>.Get("UI/Commands/LaunchShip", reportFailure: false)
                     ?? TexCommand.Install,
+                Order = -50f,
                 action = () => BeginSetDestinationCaravan(caravan, boarding)
             };
             yield return setDest;
@@ -857,10 +949,11 @@ namespace RimTaxi
             int passengers = TaxiCaravanUtility.PassengerCount(caravan);
             Command_Action depart = new Command_Action
             {
-                defaultLabel = "RimTaxi_DepartStep".Translate(passengers, estFare),
+                defaultLabel = "RimTaxi_CaravanDepartSend".Translate(passengers, estFare),
                 defaultDesc = "RimTaxi_CaravanDepartDesc".Translate(),
                 icon = ContentFinder<Texture2D>.Get("UI/Commands/LaunchShip", reportFailure: false)
                     ?? TexCommand.Attack,
+                Order = -49f,
                 action = () => TryDepartCaravan(caravan, boarding, auto: false)
             };
 
@@ -880,13 +973,40 @@ namespace RimTaxi
             yield return depart;
         }
 
-        public static void TryCallFromCaravan(Caravan caravan)
+        /// <summary>
+        /// Pay call fee then open world map to choose where to send the caravan by taxi.
+        /// </summary>
+        public static void BeginSendTaxiFromCaravan(Caravan caravan)
         {
             string blocked = GetBlockedReasonCaravan(caravan);
             if (blocked != null)
             {
                 Messages.Message(blocked, caravan, MessageTypeDefOf.RejectInput, historical: false);
                 return;
+            }
+
+            // Destination first (no charge yet). On confirm → pay call fee + queue dispatch.
+            BeginCaravanWorldTarget(
+                caravan,
+                (GlobalTargetInfo t, int dist) =>
+                {
+                    if (!FinishCaravanSendAfterDestination(caravan, t.Tile, dist))
+                    {
+                        return false;
+                    }
+
+                    return true;
+                },
+                "RimTaxi_CaravanPickDestToSend".Translate());
+        }
+
+        private static bool FinishCaravanSendAfterDestination(Caravan caravan, PlanetTile dest, int dist)
+        {
+            string blocked = GetBlockedReasonCaravan(caravan);
+            if (blocked != null)
+            {
+                Messages.Message(blocked, caravan, MessageTypeDefOf.RejectInput, historical: false);
+                return false;
             }
 
             TaxiGameComponent taxiComp = Comp;
@@ -898,36 +1018,70 @@ namespace RimTaxi
                     caravan,
                     MessageTypeDefOf.RejectInput,
                     historical: false);
-                return;
+                return false;
             }
 
             if (taxiComp == null)
             {
                 TaxiPayment.RefundToCaravan(caravan, callFee);
                 Messages.Message("RimTaxi_SpawnFailed".Translate(), MessageTypeDefOf.RejectInput, historical: false);
-                return;
+                return false;
             }
 
             taxiComp.NotifyCalled();
-            taxiComp.QueueCaravanDispatch(caravan, callFee);
+            taxiComp.QueueCaravanDispatch(caravan, callFee, dest, dist);
 
             TaxiPendingDispatch pending = taxiComp.GetPendingDispatch(caravan);
             string eta = pending != null
                 ? pending.TicksRemaining.ToStringTicksToPeriod()
                 : "—";
 
+            float mass = TaxiCaravanUtility.GetCaravanMass(caravan);
+            int tripFare = TaxiFareCalculator.TripFare(mass, dist);
+
             Messages.Message(
-                "RimTaxi_CallDispatchedCaravan".Translate(callFee, eta),
+                "RimTaxi_CaravanSendDispatched".Translate(callFee, dist, tripFare, eta),
                 caravan,
                 MessageTypeDefOf.PositiveEvent);
 
             Find.LetterStack.ReceiveLetter(
                 "RimTaxi_LetterDispatchedLabel".Translate(),
-                "RimTaxi_LetterDispatchedCaravanText".Translate(callFee, eta),
+                "RimTaxi_LetterCaravanSendText".Translate(callFee, dist, tripFare, eta),
                 LetterDefOf.PositiveEvent,
                 caravan);
 
-            Log.Message($"[RimTaxi] Caravan call caravan#{caravan.ID} fee={callFee} eta={eta}");
+            Log.Message($"[RimTaxi] Caravan SEND caravan#{caravan.ID} fee={callFee} dest={dest} dist={dist} eta={eta}");
+            return true;
+        }
+
+        public static void TryCallFromCaravan(Caravan caravan)
+        {
+            // Same entry as send (destination required)
+            BeginSendTaxiFromCaravan(caravan);
+        }
+
+        public static void BeginSetDestinationPendingCaravan(Caravan caravan, TaxiPendingDispatch pending)
+        {
+            if (caravan == null || pending == null)
+            {
+                return;
+            }
+
+            BeginCaravanWorldTarget(
+                caravan,
+                (GlobalTargetInfo t, int dist) =>
+                {
+                    Comp?.BookPendingCaravanDestination(caravan, t.Tile, dist);
+                    float mass = TaxiCaravanUtility.GetCaravanMass(caravan);
+                    int fare = TaxiFareCalculator.TripFare(mass, dist);
+                    Messages.Message(
+                        "RimTaxi_DestinationSet".Translate(dist, mass.ToString("0.0"), fare),
+                        caravan,
+                        MessageTypeDefOf.TaskCompletion,
+                        historical: false);
+                    return true;
+                },
+                "RimTaxi_CaravanPickDestToSend".Translate());
         }
 
         public static void BeginSetDestinationCaravan(Caravan caravan, TaxiCaravanBoarding boarding)
@@ -937,15 +1091,55 @@ namespace RimTaxi
                 return;
             }
 
+            BeginCaravanWorldTarget(
+                caravan,
+                (GlobalTargetInfo t, int dist) =>
+                {
+                    boarding.Book(t.Tile, dist);
+                    float mass = TaxiCaravanUtility.GetCaravanMass(caravan);
+                    int fare = TaxiFareCalculator.TripFare(mass, dist);
+                    Messages.Message(
+                        "RimTaxi_DestinationSet".Translate(dist, mass.ToString("0.0"), fare),
+                        caravan,
+                        MessageTypeDefOf.TaskCompletion,
+                        historical: false);
+                    Log.Message($"[RimTaxi] Caravan dest set caravan#{caravan.ID} → {t.Tile} dist={dist} estFare={fare}");
+                    return true;
+                },
+                "RimTaxi_CaravanPickDestToSend".Translate());
+        }
+
+        private delegate bool CaravanDestChosen(GlobalTargetInfo target, int distance);
+
+        private static void BeginCaravanWorldTarget(Caravan caravan, CaravanDestChosen onChosen, string prompt)
+        {
+            if (caravan == null || onChosen == null)
+            {
+                return;
+            }
+
             PlanetTile origin = caravan.Tile;
             int maxDist = MaxDistance;
+
+            if (!string.IsNullOrEmpty(prompt))
+            {
+                Messages.Message(prompt, caravan, MessageTypeDefOf.NeutralEvent, historical: false);
+            }
 
             CameraJumper.TryJump(CameraJumper.GetWorldTarget(new GlobalTargetInfo(origin)));
             Find.WorldSelector.ClearSelection();
             Find.WorldSelector.Select(caravan);
 
             Find.WorldTargeter.BeginTargeting(
-                (GlobalTargetInfo t) => ChoseSetDestinationCaravan(t, origin, maxDist, caravan, boarding),
+                (GlobalTargetInfo t) =>
+                {
+                    if (!TryValidateCaravanDest(t, origin, maxDist, out int dist))
+                    {
+                        return false;
+                    }
+
+                    return onChosen(t, dist);
+                },
                 canTargetTiles: true,
                 CompLaunchable.TargeterMouseAttachment,
                 closeWorldTabWhenFinished: false,
@@ -957,6 +1151,37 @@ namespace RimTaxi
                 null,
                 origin,
                 showCancelButton: true);
+        }
+
+        private static bool TryValidateCaravanDest(GlobalTargetInfo target, PlanetTile origin, int maxDist, out int dist)
+        {
+            dist = 0;
+            if (!target.IsValid)
+            {
+                Messages.Message("MessageTransportPodsDestinationIsInvalid".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return false;
+            }
+
+            if (target.HasWorldObject && !target.WorldObject.def.validLaunchTarget)
+            {
+                Messages.Message("MessageWorldObjectIsInvalid".Translate(target.WorldObject.Named("OBJECT")), MessageTypeDefOf.RejectInput, historical: false);
+                return false;
+            }
+
+            dist = Find.WorldGrid.TraversalDistanceBetween(origin, target.Tile, passImpassable: true, maxDist + 1, canTraverseLayers: true);
+            if (dist < 0 || dist > maxDist)
+            {
+                Messages.Message("TransportPodDestinationBeyondMaximumRange".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return false;
+            }
+
+            if (dist == 0)
+            {
+                Messages.Message("RimTaxi_SameTile".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                return false;
+            }
+
+            return true;
         }
 
         private static string SetDestinationLabelCaravan(GlobalTargetInfo target, PlanetTile origin, int maxDist, Caravan caravan)
@@ -977,52 +1202,6 @@ namespace RimTaxi
             int fare = TaxiFareCalculator.TripFare(mass, dist);
             GUI.color = Color.white;
             return "RimTaxi_SetDestLabel".Translate(dist, mass.ToString("0.0"), fare);
-        }
-
-        private static bool ChoseSetDestinationCaravan(
-            GlobalTargetInfo target,
-            PlanetTile origin,
-            int maxDist,
-            Caravan caravan,
-            TaxiCaravanBoarding boarding)
-        {
-            if (!target.IsValid)
-            {
-                Messages.Message("MessageTransportPodsDestinationIsInvalid".Translate(), MessageTypeDefOf.RejectInput, historical: false);
-                return false;
-            }
-
-            if (target.HasWorldObject && !target.WorldObject.def.validLaunchTarget)
-            {
-                Messages.Message("MessageWorldObjectIsInvalid".Translate(target.WorldObject.Named("OBJECT")), MessageTypeDefOf.RejectInput, historical: false);
-                return false;
-            }
-
-            int dist = Find.WorldGrid.TraversalDistanceBetween(origin, target.Tile, passImpassable: true, maxDist + 1, canTraverseLayers: true);
-            if (dist < 0 || dist > maxDist)
-            {
-                Messages.Message("TransportPodDestinationBeyondMaximumRange".Translate(), MessageTypeDefOf.RejectInput, historical: false);
-                return false;
-            }
-
-            if (dist == 0)
-            {
-                Messages.Message("RimTaxi_SameTile".Translate(), MessageTypeDefOf.RejectInput, historical: false);
-                return false;
-            }
-
-            boarding.Book(target.Tile, dist);
-            float mass = TaxiCaravanUtility.GetCaravanMass(caravan);
-            int fare = TaxiFareCalculator.TripFare(mass, dist);
-
-            Messages.Message(
-                "RimTaxi_DestinationSet".Translate(dist, mass.ToString("0.0"), fare),
-                caravan,
-                MessageTypeDefOf.TaskCompletion,
-                historical: false);
-
-            Log.Message($"[RimTaxi] Caravan dest set caravan#{caravan.ID} → {target.Tile} dist={dist} estFare={fare}");
-            return true;
         }
 
         /// <summary>
