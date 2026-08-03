@@ -14,6 +14,20 @@
 
   <RimTaxi_CallOptionWithFee>택시 호출 ({0} 은)…</RimTaxi_CallOptionWithFee>
   <RimTaxi_CallGizmoDesc>호출비 {0} 은. 픽업 위치만 고르면 배차됩니다(월드맵 없음). 도착 후 탑승하고 출발할 때 목적지를 고릅니다. 출발 시 무게×거리×{1} 은.</RimTaxi_CallGizmoDesc>
+  <RimTaxi_CommsGizmoDesc>RimTaxi 무전 연결 (통신기 사용과 동일). 호출비 {0} 은, 운행 요금은 출발 시 무게×거리×{1}.</RimTaxi_CommsGizmoDesc>
+  <RimTaxi_CommsCallLabel>RimTaxi 배차센터</RimTaxi_CommsCallLabel>
+  <RimTaxi_CommsInfoText>민간 택시 서비스. 호출비 {0} 은. 운행 요금: 출발 시 무게×거리×{1} 은.</RimTaxi_CommsInfoText>
+  <RimTaxi_DialogGreeting>RimTaxi 배차센터입니다.\n\n호출비: {0} 은 (픽업 예약 시 결제)\n운행 요금: 무게×거리×{1} 은 (출발 시 결제)\n\n택시를 어디로 보낼까요?</RimTaxi_DialogGreeting>
+  <RimTaxi_DialogRequestTaxi>택시 요청 ({0} 은)…</RimTaxi_DialogRequestTaxi>
+  <RimTaxi_DialogStatus>진행 중인 배차 확인…</RimTaxi_DialogStatus>
+  <RimTaxi_DialogHangUp>통신 종료</RimTaxi_DialogHangUp>
+  <RimTaxi_DialogStatusHeader>현재 RimTaxi 작업:</RimTaxi_DialogStatusHeader>
+  <RimTaxi_DialogStatusNone>진행 중인 택시 작업이 없습니다. (쿨다운이 있으면 아래에 표시)</RimTaxi_DialogStatusNone>
+  <RimTaxi_DialogStatusEnRouteMap>{0}(으)로 이동 중 (예상 {1})</RimTaxi_DialogStatusEnRouteMap>
+  <RimTaxi_DialogStatusEnRouteCaravan>캐러밴 {0}(으)로 이동 중 (예상 {1})</RimTaxi_DialogStatusEnRouteCaravan>
+  <RimTaxi_DialogStatusReadyCaravan>캐러밴 {0}에서 대기 중 — {1} ({2} 후 이탈)</RimTaxi_DialogStatusReadyCaravan>
+  <RimTaxi_DialogStatusBoardedDest>목적지 예약됨 ({0}타일)</RimTaxi_DialogStatusBoardedDest>
+  <RimTaxi_DialogStatusBoardedNoDest>목적지 미설정</RimTaxi_DialogStatusBoardedNoDest>
   <RimTaxi_CallDispatchedSimple>호출비 {0} 은. 픽업: {1}. 택시 오는 중… 예상 도착 {2}. 목적지는 착륙 후 출발 때 선택합니다.</RimTaxi_CallDispatchedSimple>
   <RimTaxi_LetterDispatchedSimpleText>호출비 {0} 은 결제.\n\n픽업: {1}\n예상 도착: {2}\n\n택시가 착륙하면 승객을 태운 뒤 「출발」로 목적지를 고르세요. 운행 요금은 출발 시 무게×거리로 청구됩니다.</RimTaxi_LetterDispatchedSimpleText>
   <RimTaxi_LetterArrivedTextNoDest>택시가 착륙했습니다.\n\n승객·화물을 태운 뒤 「출발(목적지 선택)」을 누르세요. 대기 시간이 끝나도 목적지가 없으면 출발하지 않고 다시 기다립니다(빈 차는 떠날 수 있음).</RimTaxi_LetterArrivedTextNoDest>

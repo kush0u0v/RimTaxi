@@ -14,6 +14,20 @@
 
   <RimTaxi_CallOptionWithFee>Call taxi ({0} silver)…</RimTaxi_CallOptionWithFee>
   <RimTaxi_CallGizmoDesc>Dispatch fee {0} silver. Choose pickup only (no world map at call). After the taxi lands, board and pick the destination when departing. At depart: mass × distance × {1} silver.</RimTaxi_CallGizmoDesc>
+  <RimTaxi_CommsGizmoDesc>Open RimTaxi radio (same as using the console). Call fee {0} silver; trip fare mass × distance × {1} at depart.</RimTaxi_CommsGizmoDesc>
+  <RimTaxi_CommsCallLabel>RimTaxi Dispatch</RimTaxi_CommsCallLabel>
+  <RimTaxi_CommsInfoText>Civilian taxi service. Call fee {0} silver. Trip fare: mass × distance × {1} silver at depart.</RimTaxi_CommsInfoText>
+  <RimTaxi_DialogGreeting>RimTaxi dispatch speaking.\n\nCall fee: {0} silver (paid when you book a pickup).\nTrip fare: mass × distance × {1} silver, charged when you depart.\n\nWhere should we send a taxi?</RimTaxi_DialogGreeting>
+  <RimTaxi_DialogRequestTaxi>Request a taxi ({0} silver)…</RimTaxi_DialogRequestTaxi>
+  <RimTaxi_DialogStatus>Ask about current jobs…</RimTaxi_DialogStatus>
+  <RimTaxi_DialogHangUp>Hang up</RimTaxi_DialogHangUp>
+  <RimTaxi_DialogStatusHeader>Current RimTaxi jobs:</RimTaxi_DialogStatusHeader>
+  <RimTaxi_DialogStatusNone>No active taxi jobs. Cooldown is clear unless noted below.</RimTaxi_DialogStatusNone>
+  <RimTaxi_DialogStatusEnRouteMap>En route to {0} (ETA {1})</RimTaxi_DialogStatusEnRouteMap>
+  <RimTaxi_DialogStatusEnRouteCaravan>En route to caravan {0} (ETA {1})</RimTaxi_DialogStatusEnRouteCaravan>
+  <RimTaxi_DialogStatusReadyCaravan>Waiting at caravan {0} — {1} (leaves in {2})</RimTaxi_DialogStatusReadyCaravan>
+  <RimTaxi_DialogStatusBoardedDest>destination booked ({0} tiles)</RimTaxi_DialogStatusBoardedDest>
+  <RimTaxi_DialogStatusBoardedNoDest>no destination yet</RimTaxi_DialogStatusBoardedNoDest>
   <RimTaxi_CallDispatchedSimple>Paid {0} silver. Pickup: {1}. Taxi en route — ETA {2}. Choose destination when you depart after landing.</RimTaxi_CallDispatchedSimple>
   <RimTaxi_LetterDispatchedSimpleText>Paid {0} silver.\n\nPickup: {1}\nETA: {2}\n\nWhen the taxi lands, load passengers and press Depart to choose a destination. Trip fare is mass × distance at depart.</RimTaxi_LetterDispatchedSimpleText>
   <RimTaxi_LetterArrivedTextNoDest>Your taxi has landed.\n\nLoad passengers/cargo, then press Depart to choose a destination. If the wait ends with no destination, boarded taxis wait again; empty taxis may leave.</RimTaxi_LetterArrivedTextNoDest>

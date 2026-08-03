@@ -21,7 +21,7 @@ Call a taxi from a **comms console**, wait for dispatch, board at a **pickup** (
 
 ## Features
 
-- Comms **gizmo** + colonist **right-click** (no faction dialog)
+- Comms **radio contact** (like talking to a faction) + optional gizmo
 - **Caravan top-bar** call / set destination / depart (no map needed)
 - Remote pickup without founding a camp on field maps
 - Dual fare: call fee + trip fare at depart

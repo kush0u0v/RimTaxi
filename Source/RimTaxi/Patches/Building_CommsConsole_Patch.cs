@@ -6,12 +6,35 @@ using Verse;
 namespace RimTaxi.Patches
 {
     /// <summary>
-    /// Direct taxi call from the comms console (gizmo + right-click float menu).
+    /// RimTaxi appears as a radio contact (like factions), plus optional console gizmo shortcut.
     /// </summary>
     public static class Building_CommsConsole_Patch
     {
         /// <summary>
-        /// Thing.GetGizmos is not overridden on Building_CommsConsole; filter by runtime type.
+        /// Add taxi company to the same contact list used when a colonist uses the comms console.
+        /// </summary>
+        [HarmonyPatch(typeof(Building_CommsConsole), nameof(Building_CommsConsole.GetCommTargets))]
+        public static class GetCommTargets
+        {
+            [HarmonyPostfix]
+            public static IEnumerable<ICommunicable> Postfix(IEnumerable<ICommunicable> __result)
+            {
+                // Taxi first so it is easy to find among factions
+                yield return TaxiCommsContact.Instance;
+
+                if (__result != null)
+                {
+                    foreach (ICommunicable c in __result)
+                    {
+                        yield return c;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Optional gizmo: open the same radio dialog without walking to the console
+        /// (still requires power/comms usable when starting a paid call).
         /// </summary>
         [HarmonyPatch(typeof(Thing), nameof(Thing.GetGizmos))]
         public static class Thing_GetGizmos
@@ -31,33 +54,56 @@ namespace RimTaxi.Patches
                     && console.Spawned
                     && console.Faction == Faction.OfPlayer)
                 {
-                    yield return TaxiCallService.MakeCallGizmo(console);
+                    yield return MakeOpenCommsGizmo(console);
                 }
             }
         }
 
-        [HarmonyPatch(typeof(Building_CommsConsole), nameof(Building_CommsConsole.GetFloatMenuOptions))]
-        public static class GetFloatMenuOptions
+        private static Command_Action MakeOpenCommsGizmo(Building_CommsConsole console)
         {
-            [HarmonyPostfix]
-            public static IEnumerable<FloatMenuOption> Postfix(
-                IEnumerable<FloatMenuOption> __result,
-                Building_CommsConsole __instance,
-                Pawn myPawn)
+            Command_Action cmd = new Command_Action
             {
-                if (__instance != null && __instance.Spawned && myPawn != null && myPawn.IsColonistPlayerControlled)
+                defaultLabel = "RimTaxi_CallOptionWithFee".Translate(TaxiCallService.CallFee),
+                defaultDesc = "RimTaxi_CommsGizmoDesc".Translate(
+                    TaxiCallService.CallFee,
+                    TaxiFareCalculator.FarePerKgPerTile.ToString("0.00")),
+                icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/CallShuttle", reportFailure: false)
+                    ?? TexCommand.Attack,
+                action = () =>
                 {
-                    yield return TaxiCallService.MakeCallFloatMenuOption(myPawn, __instance);
-                }
-
-                if (__result != null)
-                {
-                    foreach (FloatMenuOption option in __result)
+                    // Prefer a free colonist on the map as "negotiator" for the radio UI
+                    Pawn negotiator = console.Map?.mapPawns?.FreeColonistsSpawned?.FirstOrFallback();
+                    if (negotiator == null)
                     {
-                        yield return option;
+                        negotiator = console.Map?.mapPawns?.FreeColonists?.FirstOrFallback();
                     }
+
+                    if (negotiator == null)
+                    {
+                        // Still allow pickup flow without dialog if no colonist exists
+                        string blocked = TaxiCallService.GetBlockedReason(console.Map, console);
+                        if (blocked != null)
+                        {
+                            Messages.Message(blocked, console, MessageTypeDefOf.RejectInput, historical: false);
+                            return;
+                        }
+
+                        TaxiCallService.ShowPickupSiteMenu(console.Map, null);
+                        return;
+                    }
+
+                    TaxiCommsContact.Instance.TryOpenComms(negotiator);
                 }
+            };
+
+            if (!console.CanUseCommsNow)
+            {
+                string reason = TaxiCallService.GetBlockedReason(console.Map, console)
+                    ?? "RimTaxi_CommsUnavailable".Translate();
+                cmd.Disable(reason);
             }
+
+            return cmd;
         }
     }
 }

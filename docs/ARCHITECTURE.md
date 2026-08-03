@@ -3,13 +3,14 @@
 ## High-level flow
 
 ```
-Comms (gizmo / right-click)
-  └─ TaxiCallService.BeginCallFromConsole
-       ├─ TaxiPickupSite.GetAll  → float menu (pickup)
-       ├─ landing cell targeter on pickup map
-       ├─ pay CallFee from call map
-       └─ TaxiGameComponent.QueueDispatch (ETA 1–3h)
-            └─ GameComponentTick → SpawnTaxi (step 3)
+Comms (ICommunicable "RimTaxi Dispatch" + radio DiaNode dialog; optional gizmo)
+  └─ GetCommTargets → TaxiCommsContact → Dialog_Negotiation
+       └─ Request taxi → ShowPickupSiteMenu
+            ├─ TaxiPickupSite.GetAll / world pick / caravans
+            ├─ landing cell (maps) or caravan dispatch
+            ├─ pay CallFee from call map
+            └─ TaxiGameComponent.QueueDispatch (ETA 1–3h)
+                 └─ GameComponentTick → SpawnTaxi / caravan boarding
 
 Player caravan (world top bar)
   └─ Call taxi → pay CallFee from caravan silver → QueueCaravanDispatch
@@ -44,7 +45,8 @@ TravellingTransporters (TravelingRimTaxi)
 
 | Patch | Target | Intent |
 |-------|--------|--------|
-| `Building_CommsConsole_Patch` | `Thing.GetGizmos`, `Building_CommsConsole.GetFloatMenuOptions` | Call UI |
+| `Building_CommsConsole_Patch` | `GetCommTargets`, `Thing.GetGizmos` | Taxi radio contact + gizmo |
+| `TaxiCommsContact` / `TaxiDialogMaker` | `ICommunicable` + DiaNode | Faction-style radio UI |
 | `Caravan_Gizmos_Patch` | `Caravan.GetGizmos` | Caravan Call / Set dest / Depart |
 | `ShipJob_Wait_Gizmos_Patch` | `ShipJob_Wait.GetJobGizmos` | Set dest / Depart / Dismiss |
 | `ShipJob_FlyAway_Billing_Patch` | `ShipJob_FlyAway.TryStart` | Auto fare / re-wait / empty leave |

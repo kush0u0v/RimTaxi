@@ -103,7 +103,8 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 | `TaxiArrivalUtility` | Map land vs world drop chooser |
 | `TransportersArrivalAction_RimTaxiMapLand` | Safe map drop (`DropRimTaxi`, not vanilla DropShuttle NRE) |
 | `TransportersArrivalAction_RimTaxiWorldDrop` | World caravan drop-off |
-| `Building_CommsConsole_Patch` | Call gizmo + right-click |
+| `TaxiCommsContact` / `TaxiDialogMaker` | Comms radio contact (ICommunicable) + negotiation dialog |
+| `Building_CommsConsole_Patch` | GetCommTargets + optional gizmo |
 | `ShipJob_Wait_Gizmos_Patch` | Set destination / Depart / Dismiss |
 | `ShipJob_FlyAway_Billing_Patch` | Auto path after wait (fare / re-wait / empty leave) |
 | `TravellingTransporters_Arrival_Patch` | Force our arrival for `TravelingRimTaxi` |
