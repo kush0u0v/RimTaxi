@@ -2,9 +2,15 @@
 
 This repository is **RimTaxi**, a RimWorld 1.6 mod. Read this file before changing code.
 
-## Project goal
+## Project goal / identity
 
-Civilian taxi shuttle: call from comms console, pay silver, board colonists/cargo, fly to a world-map destination, drop as a **caravan** (do not force settlement map entry / combat).
+**RimTaxi is a civilian on-demand taxi service**, not a player-owned spaceship fleet.
+
+- Fantasy: call a ride, pay a meter, get dropped off.
+- **Not** SRTS, not Odyssey shuttle ownership, not “build your ship”.
+- Do not frame features as “SRTS-like” in UI, docs, or commit messages.
+
+Core loop: call from comms → pay dispatch fee → board → pay trip (mass×distance) → fly → land on destination map or world drop-off.
 
 ## Hard rules
 

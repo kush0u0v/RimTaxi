@@ -40,7 +40,7 @@
   <RimTaxi_AutoDepartNeedSilver>Auto-depart delayed: need {0} silver for trip fare (have {1}). Get silver or unload, or use Depart when ready.</RimTaxi_AutoDepartNeedSilver>
   <RimTaxi_InspectBooked>Booked destination: {0} tiles (kept while loading/unloading)</RimTaxi_InspectBooked>
   <RimTaxi_ArrivedOnMap>RimTaxi shuttle landed on map: {0}.</RimTaxi_ArrivedOnMap>
-  <RimTaxi_Settings_LandOnMaps>Land on settlement/maps (SRTS-style)</RimTaxi_Settings_LandOnMaps>
-  <RimTaxi_Settings_LandOnMapsTip>When enabled, flights to settlements or map parents drop the shuttle onto the map. When disabled, always form a world caravan.</RimTaxi_Settings_LandOnMapsTip>
+  <RimTaxi_Settings_LandOnMaps>Land taxi on settlement/destination maps</RimTaxi_Settings_LandOnMaps>
+  <RimTaxi_Settings_LandOnMapsTip>When enabled, trips to settlements or map tiles land the taxi on that map. When disabled, always drop a world caravan only.</RimTaxi_Settings_LandOnMapsTip>
 
 </LanguageData>

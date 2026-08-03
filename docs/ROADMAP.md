@@ -22,5 +22,6 @@
 ## Explicit non-goals
 
 - Hospitality
-- Player taxi company / multi-company
+- Player-owned spaceship fleet / SRTS-style ship progression (wrong fantasy)
+- Player taxi company / multi-company (later maybe; not required for identity)
 - Odyssey required integration

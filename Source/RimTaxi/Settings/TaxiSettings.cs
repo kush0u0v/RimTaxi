@@ -24,7 +24,7 @@ namespace RimTaxi
         public float travelSpeedFactor = 0.6f;
 
         /// <summary>
-        /// If true (default), land the shuttle on settlement/map tiles (SRTS-like).
+        /// If true (default), land the taxi on settlement/map tiles.
         /// If false, always form a world caravan beside the tile.
         /// </summary>
         public bool landOnSettlementMaps = true;

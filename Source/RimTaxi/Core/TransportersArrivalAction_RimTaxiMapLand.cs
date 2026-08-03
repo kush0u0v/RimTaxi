@@ -7,7 +7,7 @@ using Verse;
 namespace RimTaxi
 {
     /// <summary>
-    /// SRTS-style: open/generate the destination map and drop the taxi shuttle on it.
+    /// Open/generate the destination map and land the taxi vehicle on it (door-to-door drop-off).
     /// StillValid always stays true so vanilla cannot replace this with a bad fallback.
     /// </summary>
     public class TransportersArrivalAction_RimTaxiMapLand : TransportersArrivalAction

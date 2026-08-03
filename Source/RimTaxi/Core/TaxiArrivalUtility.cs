@@ -5,7 +5,7 @@ using Verse;
 namespace RimTaxi
 {
     /// <summary>
-    /// Picks arrival style: map land (SRTS-like) on settlements/maps, else world caravan.
+    /// Picks arrival style: taxi map landing on settlements/maps, else world caravan drop-off.
     /// </summary>
     public static class TaxiArrivalUtility
     {
