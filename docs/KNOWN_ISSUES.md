@@ -19,9 +19,9 @@
 ## Arrival
 
 - Map land uses **custom DropRimTaxi** (vanilla DropShuttle NRE if `shipDef` missing).
-- **Player colonies only** for map land. **Foreign faction settlements never open the map** — always world caravan beside the tile (avoids instant combat).
+- **Player colonies only** for map land. **Foreign faction settlements never open the map** — world caravan **on that settlement tile** (enter/trade manually; avoids auto combat).
 - If map land fails, fallback is **world caravan** drop-off.
-- World drop may place caravan on a **neighbor tile** beside a settlement.
+- World drop only moves to a neighbor if the destination tile is **impassable**.
 
 ## Economy
 

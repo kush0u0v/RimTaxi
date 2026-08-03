@@ -23,10 +23,11 @@ namespace RimTaxi
                 Settlement settlement = Find.WorldObjects.SettlementAt(tile);
                 if (settlement != null && settlement.Spawned)
                 {
-                    // Other factions: never open the base map (instant raid/combat). Caravan beside tile.
+                    // Other factions: never open the base map (instant raid/combat).
+                    // Caravan drops ON the settlement tile (world map) so player can enter/trade from there.
                     if (!IsPlayerOwned(settlement))
                     {
-                        Log.Message($"[RimTaxi] Arrival action: WorldDrop beside foreign settlement {settlement.Label} ({settlement.Faction?.Name})");
+                        Log.Message($"[RimTaxi] Arrival action: WorldDrop on foreign settlement tile {settlement.Label} ({settlement.Faction?.Name})");
                         return new TransportersArrivalAction_RimTaxiWorldDrop("RimTaxi_ArrivedCaravan");
                     }
 

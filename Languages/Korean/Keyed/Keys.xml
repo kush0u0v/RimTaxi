@@ -86,7 +86,7 @@
   <RimTaxi_Settings_DispatchVariance>배차 추가 랜덤: 최대 {0}시간</RimTaxi_Settings_DispatchVariance>
   <RimTaxi_Settings_DispatchPerTile>목적지 타일당 배차 지연(틱): {0}</RimTaxi_Settings_DispatchPerTile>
   <RimTaxi_Arrived>RimTaxi 셔틀이 도착했습니다.</RimTaxi_Arrived>
-  <RimTaxi_ArrivedCaravan>RimTaxi가 월드맵에 카러밴을 내려주었습니다. 준비되면 정착지에 직접 진입하세요.</RimTaxi_ArrivedCaravan>
+  <RimTaxi_ArrivedCaravan>RimTaxi가 목적지 타일에 카러밴을 내려주었습니다. 준비되면 이 칸에서 정착지 진입·거래할 수 있습니다.</RimTaxi_ArrivedCaravan>
   <RimTaxi_ArrivedNoPawns>RimTaxi가 도착했지만 카러밴을 만들 승객이 없었습니다.</RimTaxi_ArrivedNoPawns>
   <RimTaxi_DepartNow>즉시 출발 ({0}명 탑승)</RimTaxi_DepartNow>
   <RimTaxi_DepartNowFare>즉시 출발 ({0}명, 운행 {1}은)</RimTaxi_DepartNowFare>

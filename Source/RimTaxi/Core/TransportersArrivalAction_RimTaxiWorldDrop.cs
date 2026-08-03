@@ -190,27 +190,32 @@ namespace RimTaxi
         }
 
         /// <summary>
-        /// Drop beside settlements when possible so the caravan is not forced onto a base tile.
+        /// Drop on the destination tile (including foreign settlements) so the caravan sits
+        /// on the settlement icon and can enter/trade. Only leave the tile if impassable.
+        /// Does not open the settlement map — that stays a separate player action.
         /// </summary>
         public static PlanetTile ResolveDropTile(PlanetTile preferred)
         {
             if (preferred.Valid)
             {
-                Settlement settlement = Find.WorldObjects.SettlementAt(preferred);
-                MapParent mapParent = Find.WorldObjects.MapParentAt(preferred);
-                if (settlement != null || mapParent != null)
-                {
-                    PlanetTile neighbor = FindAdjacentDropTile(preferred);
-                    if (neighbor.Valid)
-                    {
-                        Log.Message($"[RimTaxi] Dropping beside settlement/map at {preferred} → {neighbor}");
-                        return neighbor;
-                    }
-                }
-
+                // Stay on the exact destination tile when passable (settlement tile is OK for caravans).
                 if (!Find.World.Impassable(preferred))
                 {
+                    Settlement settlement = Find.WorldObjects.SettlementAt(preferred);
+                    if (settlement != null)
+                    {
+                        Log.Message($"[RimTaxi] WorldDrop on settlement tile {preferred} ({settlement.Label})");
+                    }
+
                     return preferred;
+                }
+
+                // Impassable destination: nearest walkable neighbor, else closest passable tile
+                PlanetTile neighbor = FindAdjacentPassableTile(preferred);
+                if (neighbor.Valid)
+                {
+                    Log.Message($"[RimTaxi] Destination impassable; drop neighbor {preferred} → {neighbor}");
+                    return neighbor;
                 }
             }
 
@@ -222,29 +227,17 @@ namespace RimTaxi
             return preferred;
         }
 
-        private static PlanetTile FindAdjacentDropTile(PlanetTile center)
+        private static PlanetTile FindAdjacentPassableTile(PlanetTile center)
         {
             List<PlanetTile> neighbors = new List<PlanetTile>();
             Find.WorldGrid.GetTileNeighbors(center, neighbors);
             for (int i = 0; i < neighbors.Count; i++)
             {
                 PlanetTile n = neighbors[i];
-                if (!n.Valid || Find.World.Impassable(n))
+                if (n.Valid && !Find.World.Impassable(n))
                 {
-                    continue;
+                    return n;
                 }
-
-                if (Find.WorldObjects.SettlementAt(n) != null)
-                {
-                    continue;
-                }
-
-                if (Find.WorldObjects.MapParentAt(n) != null)
-                {
-                    continue;
-                }
-
-                return n;
             }
 
             return PlanetTile.Invalid;

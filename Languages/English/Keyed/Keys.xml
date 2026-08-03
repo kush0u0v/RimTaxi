@@ -86,7 +86,7 @@
   <RimTaxi_Settings_DispatchVariance>Dispatch random extra: up to {0} hours</RimTaxi_Settings_DispatchVariance>
   <RimTaxi_Settings_DispatchPerTile>Extra dispatch ticks per trip tile: {0}</RimTaxi_Settings_DispatchPerTile>
   <RimTaxi_Arrived>RimTaxi shuttle arrived.</RimTaxi_Arrived>
-  <RimTaxi_ArrivedCaravan>RimTaxi dropped off a caravan on the world map. Enter the settlement when you are ready.</RimTaxi_ArrivedCaravan>
+  <RimTaxi_ArrivedCaravan>RimTaxi dropped off a caravan on the destination tile. You can enter or trade with the settlement from here when ready.</RimTaxi_ArrivedCaravan>
   <RimTaxi_ArrivedNoPawns>RimTaxi arrived but no passengers were found to form a caravan.</RimTaxi_ArrivedNoPawns>
   <RimTaxi_DepartNow>Depart now ({0} aboard)</RimTaxi_DepartNow>
   <RimTaxi_DepartNowFare>Depart now ({0} aboard, {1} silver)</RimTaxi_DepartNowFare>
