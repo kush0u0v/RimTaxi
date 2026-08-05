@@ -962,8 +962,9 @@ namespace RimTaxi
             fly.dropMode = TransportShipDropMode.None;
             fly.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(dest);
 
-            ship.ForceJob(fly);
+            // Clear booking before ForceJob so FlyAway billing patch does not charge a second time.
             TaxiTripLookup.Clear(ship);
+            ship.ForceJob(fly);
 
             if (charged > 0)
             {

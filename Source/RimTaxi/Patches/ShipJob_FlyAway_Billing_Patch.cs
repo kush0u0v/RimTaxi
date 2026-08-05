@@ -28,9 +28,19 @@ namespace RimTaxi.Patches
             float mass = TaxiTripBilling.GetCargoMass(ship);
             Map map = ship.shipThing?.Map;
 
-            // No booking: dismiss / empty leave
+            // No booking: either already paid manual Depart, empty leave, or need destination
             if (!hasTrip)
             {
+                // Manual Depart already charged and cleared booking, but set destinationTile on FlyAway.
+                // Fly through without re-billing / re-waiting.
+                if (__instance.destinationTile.Valid)
+                {
+                    __instance.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(__instance.destinationTile);
+                    __instance.dropMode = TransportShipDropMode.None;
+                    Log.Message($"[RimTaxi] FlyAway without booking (already billed or pre-set dest) → {__instance.destinationTile}");
+                    return true;
+                }
+
                 if (hasContents && mass > 0.01f)
                 {
                     Messages.Message(

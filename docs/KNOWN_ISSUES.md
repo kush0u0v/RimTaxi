@@ -15,6 +15,7 @@
 ## Destination / depart
 
 - **Map call:** destination after land (design). **Caravan send:** destination chosen at call, changeable while en route / boarding.
+- Manual **Depart** clears trip booking **before** `ForceJob(FlyAway)` so billing patch does not double-charge trip fare.
 - Loaded taxi + wait expired + **no destination** → re-wait + message (does not fly loaded blind).
 - Empty taxi after wait may leave with no trip fare.
 - **Old taxis** from before `CompRimTaxiTrip` may lack booking; re-call.
