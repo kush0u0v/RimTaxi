@@ -34,10 +34,12 @@ Until then: **bugfixes and small string/UX only**.
 
 ## Next candidates (after baseline)
 
-1. Explicit **cancel** UX while en route (still **no call-fee refund by default** — call fee stays the default cost)  
-2. Trip fare always payable from home map (optional setting)  
-3. Graphics polish  
+1. Explicit **cancel** UX while en route (still **no call-fee refund by default**)  
+2. Settlement enter/exit without losing taxi layover session  
+3. Trip fare always payable from home map (optional setting)  
 4. **GUI overhaul**  
+
+**Done recently:** caravan taxi world icon while waiting; map landing Q/E + reposition gizmo.  
 
 **Locked economy:** call fee (`baseFare` default 200) is prepaid default; no-show/disembark does not refund call fee unless a future optional setting is requested.
 

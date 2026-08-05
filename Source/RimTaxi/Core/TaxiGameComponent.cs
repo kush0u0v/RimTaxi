@@ -151,6 +151,11 @@ namespace RimTaxi
 
         public void QueueDispatch(Map map, IntVec3 landingCell, PlanetTile destination, int tripDistance, int callFeePaid)
         {
+            QueueDispatch(map, landingCell, Rot4.North, destination, tripDistance, callFeePaid);
+        }
+
+        public void QueueDispatch(Map map, IntVec3 landingCell, Rot4 landingRot, PlanetTile destination, int tripDistance, int callFeePaid)
+        {
             if (map == null || !landingCell.IsValid)
             {
                 return;
@@ -166,6 +171,7 @@ namespace RimTaxi
             {
                 mapId = map.uniqueID,
                 landingCell = landingCell,
+                LandingRot = landingRot,
                 caravanId = -1,
                 destination = destination,
                 tripDistance = tripDistance < 0 ? 0 : tripDistance,
@@ -173,7 +179,7 @@ namespace RimTaxi
                 callFeePaid = callFeePaid
             });
 
-            Log.Message($"[RimTaxi] Map dispatch queued: ETA {delay} ticks, land={landingCell}");
+            Log.Message($"[RimTaxi] Map dispatch queued: ETA {delay} ticks, land={landingCell} rot={landingRot}");
         }
 
         public void QueueCaravanDispatch(Caravan caravan, int callFeePaid)
@@ -448,22 +454,23 @@ namespace RimTaxi
                 return;
             }
 
+            Rot4 rot = d.LandingRot;
             IntVec3 cell = d.landingCell;
-            if (!TaxiLandingUtility.CanLandHere(cell, map).Accepted)
+            if (!TaxiLandingUtility.CanLandHere(cell, map, rot).Accepted)
             {
                 bool found = CellFinder.TryFindRandomCellNear(
                     d.landingCell,
                     map,
                     12,
-                    c => TaxiLandingUtility.CanLandHere(c, map).Accepted,
+                    c => TaxiLandingUtility.CanLandHere(c, map, rot).Accepted,
                     out cell);
                 if (!found)
                 {
-                    CellFinder.TryFindRandomCell(map, c => TaxiLandingUtility.CanLandHere(c, map).Accepted, out cell);
+                    CellFinder.TryFindRandomCell(map, c => TaxiLandingUtility.CanLandHere(c, map, rot).Accepted, out cell);
                 }
             }
 
-            if (!cell.IsValid || !TaxiLandingUtility.CanLandHere(cell, map).Accepted)
+            if (!cell.IsValid || !TaxiLandingUtility.CanLandHere(cell, map, rot).Accepted)
             {
                 Messages.Message(
                     "RimTaxi_DispatchLandingFailed".Translate(),
@@ -479,7 +486,7 @@ namespace RimTaxi
                 return;
             }
 
-            if (TaxiCallService.SpawnTaxi(map, cell, d.destination, d.tripDistance))
+            if (TaxiCallService.SpawnTaxi(map, cell, rot, d.destination, d.tripDistance))
             {
                 Messages.Message(
                     "RimTaxi_TaxiArrivedAtColony".Translate(),
@@ -490,7 +497,7 @@ namespace RimTaxi
                     "RimTaxi_LetterArrivedTextNoDest".Translate(),
                     LetterDefOf.PositiveEvent,
                     new LookTargets(cell, map));
-                Log.Message($"[RimTaxi] Dispatch arrived at {cell} on map {map}");
+                Log.Message($"[RimTaxi] Dispatch arrived at {cell} rot={rot} on map {map}");
             }
             else
             {

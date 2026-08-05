@@ -5,12 +5,13 @@ namespace RimTaxi
 {
     /// <summary>
     /// A paid call waiting for the taxi to arrive (dispatch ETA).
-    /// Either map landing (mapId + cell) or world caravan pickup (caravanId).
+    /// Either map landing (mapId + cell + rot) or world caravan pickup (caravanId).
     /// </summary>
     public class TaxiPendingDispatch : IExposable
     {
         public int mapId = -1;
         public IntVec3 landingCell = IntVec3.Invalid;
+        public int landingRotAsInt = 0; // Rot4.AsInt
         public int caravanId = -1;
         public PlanetTile destination = PlanetTile.Invalid;
         public int tripDistance;
@@ -18,6 +19,12 @@ namespace RimTaxi
         public int callFeePaid;
 
         public bool IsCaravanPickup => caravanId >= 0;
+
+        public Rot4 LandingRot
+        {
+            get => new Rot4(landingRotAsInt);
+            set => landingRotAsInt = value.AsInt;
+        }
 
         public bool IsDue => Find.TickManager.TicksGame >= arriveGameTick;
 
@@ -57,6 +64,7 @@ namespace RimTaxi
         {
             Scribe_Values.Look(ref mapId, "mapId", -1);
             Scribe_Values.Look(ref landingCell, "landingCell", IntVec3.Invalid);
+            Scribe_Values.Look(ref landingRotAsInt, "landingRotAsInt", 0);
             Scribe_Values.Look(ref caravanId, "caravanId", -1);
             Scribe_Values.Look(ref destination, "destination");
             Scribe_Values.Look(ref tripDistance, "tripDistance", 0);

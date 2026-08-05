@@ -51,6 +51,11 @@
   <RimTaxi_PickupSiteCaravan>Pickup caravan: {0} ({1} pawns)</RimTaxi_PickupSiteCaravan>
   <RimTaxi_NoListedPickupsHint>(No other listed sites — use world map pick, or open a map with colonists)</RimTaxi_NoListedPickupsHint>
   <RimTaxi_ChoosePickupLanding>Click a landing cell on {0}.</RimTaxi_ChoosePickupLanding>
+  <RimTaxi_ChoosePickupLandingQE>Click a landing cell on {0}. Rotate with Q / E.</RimTaxi_ChoosePickupLandingQE>
+  <RimTaxi_ChooseLandingQE>Choose taxi landing position. Rotate with Q / E.</RimTaxi_ChooseLandingQE>
+  <RimTaxi_RepositionLanding>Set landing position</RimTaxi_RepositionLanding>
+  <RimTaxi_RepositionLandingDesc>Move the waiting taxi pad on this map. Q / E rotate while targeting.</RimTaxi_RepositionLandingDesc>
+  <RimTaxi_LandingRepositioned>Taxi landing position updated.</RimTaxi_LandingRepositioned>
   <RimTaxi_PickupSiteHere>Pickup here: {0} (current map)</RimTaxi_PickupSiteHere>
   <RimTaxi_PickupSiteOtherOpen>Pickup at other settlement: {0}</RimTaxi_PickupSiteOtherOpen>
   <RimTaxi_PickupSiteOtherClosed>Pickup at other settlement: {0} (open map)</RimTaxi_PickupSiteOtherClosed>

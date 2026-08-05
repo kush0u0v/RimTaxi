@@ -437,12 +437,13 @@ namespace RimTaxi
             }
 
             Messages.Message(
-                "RimTaxi_ChoosePickupLanding".Translate(pickupMap.Parent?.LabelCap ?? pickupMap.ToString()),
+                "RimTaxi_ChoosePickupLandingQE".Translate(pickupMap.Parent?.LabelCap ?? pickupMap.ToString()),
                 MessageTypeDefOf.NeutralEvent,
                 historical: false);
 
             CameraJumper.TryJump(pickupMap.Center, pickupMap);
             Current.Game.CurrentMap = pickupMap;
+            TaxiLandingUtility.ResetPlacementRot();
 
             TargetingParameters parms = new TargetingParameters
             {
@@ -459,13 +460,13 @@ namespace RimTaxi
                         return false;
                     }
 
-                    return TaxiLandingUtility.CanLandHere(t.Cell, pickupMap).Accepted;
+                    return TaxiLandingUtility.CanLandHere(t.Cell, pickupMap, TaxiLandingUtility.PlacementRot).Accepted;
                 }
             };
 
             Find.Targeter.BeginTargeting(
                 parms,
-                (LocalTargetInfo target) => TryCompleteCall(caller, callMap, pickupMap, target.Cell),
+                (LocalTargetInfo target) => TryCompleteCall(caller, callMap, pickupMap, target.Cell, TaxiLandingUtility.PlacementRot),
                 (LocalTargetInfo target) => TaxiLandingUtility.DrawGhost(target, pickupMap),
                 null,
                 null);
@@ -475,12 +476,17 @@ namespace RimTaxi
 
         public static void TryCompleteCall(Pawn negotiator, Map callMap, Map pickupMap, IntVec3 pickupCell)
         {
+            TryCompleteCall(negotiator, callMap, pickupMap, pickupCell, Rot4.North);
+        }
+
+        public static void TryCompleteCall(Pawn negotiator, Map callMap, Map pickupMap, IntVec3 pickupCell, Rot4 landingRot)
+        {
             if (pickupMap == null)
             {
                 return;
             }
 
-            AcceptanceReport landReport = TaxiLandingUtility.CanLandHere(pickupCell, pickupMap);
+            AcceptanceReport landReport = TaxiLandingUtility.CanLandHere(pickupCell, pickupMap, landingRot);
             if (!landReport.Accepted)
             {
                 Messages.Message(landReport.Reason, new LookTargets(pickupCell, pickupMap), MessageTypeDefOf.RejectInput, historical: false);
@@ -523,7 +529,7 @@ namespace RimTaxi
 
             // Step 2: dispatch — destination not chosen yet
             taxiComp.NotifyCalled();
-            taxiComp.QueueDispatch(pickupMap, pickupCell, PlanetTile.Invalid, 0, callFee);
+            taxiComp.QueueDispatch(pickupMap, pickupCell, landingRot, PlanetTile.Invalid, 0, callFee);
 
             TaxiPendingDispatch pending = taxiComp.GetPendingDispatch(pickupMap);
             string eta = pending != null
@@ -550,6 +556,11 @@ namespace RimTaxi
 
         public static bool SpawnTaxi(Map map, IntVec3 cell, PlanetTile destTile, int distance)
         {
+            return SpawnTaxi(map, cell, Rot4.North, destTile, distance);
+        }
+
+        public static bool SpawnTaxi(Map map, IntVec3 cell, Rot4 rot, PlanetTile destTile, int distance)
+        {
             try
             {
                 ThingDef shuttleDef = RimTaxiDefOf.RimTaxiShuttle;
@@ -561,6 +572,7 @@ namespace RimTaxi
                 }
 
                 Thing shuttle = ThingMaker.MakeThing(shuttleDef);
+                shuttle.Rotation = rot;
                 CompShuttle compShuttle = shuttle.TryGetComp<CompShuttle>();
                 if (compShuttle != null)
                 {
@@ -600,12 +612,103 @@ namespace RimTaxi
 
                 transportShip.AddJob(flyJob);
                 transportShip.ArriveAt(cell, map.Parent);
+                if (transportShip.shipThing != null)
+                {
+                    transportShip.shipThing.Rotation = rot;
+                }
+
                 return true;
             }
             catch (Exception e)
             {
                 Log.Error("[RimTaxi] SpawnTaxi failed: " + e);
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// While taxi waits on a settlement/camp map: choose a new pad cell (Q/E rotate).
+        /// </summary>
+        public static void BeginRepositionTaxiOnMap(TransportShip ship)
+        {
+            Thing shuttle = ship?.shipThing;
+            Map map = shuttle?.Map;
+            if (shuttle == null || map == null || !shuttle.Spawned)
+            {
+                return;
+            }
+
+            TaxiLandingUtility.PlacementRot = shuttle.Rotation;
+            Messages.Message(
+                "RimTaxi_ChooseLandingQE".Translate(),
+                MessageTypeDefOf.NeutralEvent,
+                historical: false);
+
+            TargetingParameters parms = new TargetingParameters
+            {
+                canTargetLocations = true,
+                canTargetSelf = false,
+                canTargetPawns = false,
+                canTargetFires = false,
+                canTargetBuildings = true,
+                canTargetItems = true,
+                validator = (TargetInfo t) =>
+                {
+                    if (!t.IsValid || t.Map != map)
+                    {
+                        return false;
+                    }
+
+                    return TaxiLandingUtility.CanLandHere(t.Cell, map, TaxiLandingUtility.PlacementRot).Accepted;
+                }
+            };
+
+            Find.Targeter.BeginTargeting(
+                parms,
+                (LocalTargetInfo target) => TryRepositionTaxi(ship, target.Cell, TaxiLandingUtility.PlacementRot),
+                (LocalTargetInfo target) => TaxiLandingUtility.DrawGhost(target, map),
+                null,
+                null);
+        }
+
+        public static void TryRepositionTaxi(TransportShip ship, IntVec3 cell, Rot4 rot)
+        {
+            Thing shuttle = ship?.shipThing;
+            Map map = shuttle?.Map;
+            if (shuttle == null || map == null || !shuttle.Spawned)
+            {
+                return;
+            }
+
+            AcceptanceReport ok = TaxiLandingUtility.CanLandHere(cell, map, rot);
+            if (!ok.Accepted)
+            {
+                Messages.Message(ok.Reason, new LookTargets(cell, map), MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            try
+            {
+                if (cell == shuttle.Position && rot == shuttle.Rotation)
+                {
+                    return;
+                }
+
+                // Keep the same Thing instance so TransportShip comps stay valid
+                shuttle.DeSpawn(DestroyMode.Vanish);
+                GenSpawn.Spawn(shuttle, cell, map, rot, WipeMode.VanishOrMoveAside);
+                shuttle.Rotation = rot;
+                Messages.Message(
+                    "RimTaxi_LandingRepositioned".Translate(),
+                    shuttle,
+                    MessageTypeDefOf.TaskCompletion,
+                    historical: false);
+                Log.Message($"[RimTaxi] Taxi repositioned to {cell} rot={rot}");
+            }
+            catch (Exception e)
+            {
+                Log.Error("[RimTaxi] TryRepositionTaxi failed: " + e);
+                Messages.Message("RimTaxi_SpawnFailed".Translate(), MessageTypeDefOf.RejectInput, historical: false);
             }
         }
 

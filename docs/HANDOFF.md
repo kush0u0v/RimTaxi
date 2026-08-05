@@ -12,7 +12,8 @@ Civilian **call taxi** for RimWorld 1.6:
 
 - Dispatch from **comms console** (radio contact) or **player caravan** top bar (**택시 보내기**: pay call fee → pick world dest → ETA → Depart).
 - Taxi arrives after **1–3 hours** (not instant).
-- Board at **pickup** (maps, field maps, **or caravan on world map** — no camp required).
+- Board at **pickup** (maps, field maps, **or caravan on world map** — no camp required). Map landing: **Q/E rotate** + cell pick; waiting taxi can **reposition**.
+- Caravan with taxi waiting: **world icon = taxi** (not yellow circle) until disembark/depart.
 - Choose **destination after taxi arrives**, then pay **mass × distance** and fly.
 - Trip end: land on **player** maps when possible (unload + **layover wait** — reboard, set new dest, depart); **foreign settlements** world caravan **on tile** + layover boarding (no combat map entry).
 

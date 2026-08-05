@@ -51,6 +51,11 @@
   <RimTaxi_PickupSiteCaravan>캐러밴에서 픽업: {0} ({1}명)</RimTaxi_PickupSiteCaravan>
   <RimTaxi_NoListedPickupsHint>(목록에 다른 곳 없음 — 월드맵 선택을 쓰거나, 정착민이 있는 맵을 여세요)</RimTaxi_NoListedPickupsHint>
   <RimTaxi_ChoosePickupLanding>{0} 맵에서 택시가 내려앉을 칸을 클릭하세요.</RimTaxi_ChoosePickupLanding>
+  <RimTaxi_ChoosePickupLandingQE>{0} 맵에서 착륙 칸을 클릭하세요. Q / E 로 회전.</RimTaxi_ChoosePickupLandingQE>
+  <RimTaxi_ChooseLandingQE>택시 착륙(하차) 위치를 선택하세요. Q / E 로 회전.</RimTaxi_ChooseLandingQE>
+  <RimTaxi_RepositionLanding>착륙 위치 변경</RimTaxi_RepositionLanding>
+  <RimTaxi_RepositionLandingDesc>대기 중인 택시 착륙 위치를 이 맵에서 다시 고릅니다. 타깃팅 중 Q / E 로 회전.</RimTaxi_RepositionLandingDesc>
+  <RimTaxi_LandingRepositioned>택시 착륙 위치를 변경했습니다.</RimTaxi_LandingRepositioned>
   <RimTaxi_PickupSiteHere>여기서 픽업: {0} (지금 맵)</RimTaxi_PickupSiteHere>
   <RimTaxi_PickupSiteOtherOpen>다른 정착지에서 픽업: {0}</RimTaxi_PickupSiteOtherOpen>
   <RimTaxi_PickupSiteOtherClosed>다른 정착지에서 픽업: {0} (맵 열기)</RimTaxi_PickupSiteOtherClosed>

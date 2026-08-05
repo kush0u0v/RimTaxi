@@ -83,7 +83,23 @@ namespace RimTaxi.Patches
 
             yield return depart;
 
-            // Dismiss
+            // Reposition landing pad (settlement / camp maps) — Q/E rotate while targeting
+            if (map != null && ship.shipThing != null && ship.shipThing.Spawned)
+            {
+                Command_Action reposition = new Command_Action
+                {
+                    defaultLabel = "RimTaxi_RepositionLanding".Translate(),
+                    defaultDesc = "RimTaxi_RepositionLandingDesc".Translate(),
+                    icon = ContentFinder<Texture2D>.Get("UI/Commands/RimTaxiDisembark", reportFailure: false)
+                        ?? WorldTex,
+                    alsoClickIfOtherInGroupClicked = false,
+                    Order = -19.5f,
+                    action = () => TaxiCallService.BeginRepositionTaxiOnMap(ship)
+                };
+                yield return reposition;
+            }
+
+            // Dismiss / leave without trip
             Command_Action dismiss = new Command_Action
             {
                 defaultLabel = "CommandShuttleDismiss".Translate(),

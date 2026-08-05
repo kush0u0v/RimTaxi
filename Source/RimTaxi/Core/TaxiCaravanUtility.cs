@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using RimWorld;
 using RimWorld.Planet;
+using UnityEngine;
 using Verse;
 
 namespace RimTaxi
@@ -10,6 +11,56 @@ namespace RimTaxi
     /// </summary>
     public static class TaxiCaravanUtility
     {
+        private static Texture2D cachedTaxiWorldIcon;
+        private static Material cachedTaxiWorldMat;
+
+        /// <summary>
+        /// Show taxi world icon while boarding layover (until disembark/depart).
+        /// </summary>
+        public static bool ShouldShowTaxiWorldIcon(Caravan caravan)
+        {
+            if (caravan == null || caravan.Destroyed)
+            {
+                return false;
+            }
+
+            // Ground taxi with caravan: boarding wait. Also pending en-route for visibility.
+            TaxiGameComponent gc = TaxiGameComponent.Get();
+            return gc != null && (gc.HasBoarding(caravan) || gc.HasPendingDispatch(caravan));
+        }
+
+        public static Texture2D TaxiWorldIcon
+        {
+            get
+            {
+                if (cachedTaxiWorldIcon == null)
+                {
+                    cachedTaxiWorldIcon = ContentFinder<Texture2D>.Get("World/WorldObjects/Expanding/RimTaxi", reportFailure: false)
+                        ?? ContentFinder<Texture2D>.Get("World/WorldObjects/RimTaxi", reportFailure: false)
+                        ?? ContentFinder<Texture2D>.Get("UI/Commands/RimTaxiDisembark", reportFailure: false);
+                }
+
+                return cachedTaxiWorldIcon;
+            }
+        }
+
+        public static Material TaxiWorldMaterial
+        {
+            get
+            {
+                if (cachedTaxiWorldMat == null && TaxiWorldIcon != null)
+                {
+                    cachedTaxiWorldMat = MaterialPool.MatFrom(
+                        TaxiWorldIcon,
+                        ShaderDatabase.WorldOverlayTransparent,
+                        Color.white,
+                        3600);
+                }
+
+                return cachedTaxiWorldMat;
+            }
+        }
+
         public static Caravan FindCaravanById(int caravanId)
         {
             if (caravanId < 0 || Find.WorldObjects == null)
