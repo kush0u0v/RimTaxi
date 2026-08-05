@@ -12,10 +12,11 @@
 |---|------|----------|---|
 | A1 | Comms use → contact list has **RimTaxi 배차센터** | Same style as faction radio | |
 | A2 | Radio → **택시 요청** → pickup menu | Header + world pick + sites | |
-| A3 | Pickup **here** → landing cell → pay **200** | Letter + ETA **1–3h** (not instant) | |
+| A3 | Pickup **here** → landing cell **(Q/E rotate)** → pay **200** | Letter + ETA **1–3h** (not instant) | |
 | A4 | After ETA, taxi lands | No NRE; message/letter | |
 | A5 | Load pawn → **4. 목적지** → **5. 출발** | Fare charged; flies | |
 | A6 | Arrive player base | Map land; unload; **waits** (not instant leave) | |
+| A6b | Waiting: **착륙 위치 변경** + Q/E | Pad moves / rotates | |
 | A7 | Reboard → new dest → depart | Second leg works | |
 
 ---
@@ -48,6 +49,11 @@
 ## D. Caravan taxi
 
 | # | Test | Expected | ☐ |
+|---|------|----------|---|
+| D0 | **택시 보내기** → pick dest | Call fee; ETA; caravan **immobile**; **taxi world icon** | |
+| D0b | En route: try move caravan | Blocked + message | |
+| D0c | Arrive ready → **하차** | Taxi dismissed; can move; yellow circle returns | |
+| D0d | Arrive ready → **출발** | Flight; trip fare | |
 |---|------|----------|---|
 | D1 | Select caravan → **택시 호출** | Fee from caravan inv; ETA letter | |
 | D2 | After ETA | Set dest + Depart on caravan bar | |
@@ -105,9 +111,10 @@
 
 | # | Test | Expected | ☐ |
 |---|------|----------|---|
-| H1 | Landing approach | Craft from angle; **shadow under craft** (not pad-only vertical) | |
-| H2 | In-flight world map | Marker is **taxi image**, not yellow caravan circle | |
-| H3 | Landed shuttle size | Covers 5×3 footprint reasonably | |
+| H1 | Landing approach | Craft from angle; **shadow under craft** | |
+| H2 | In-flight world map | Marker is **taxi image** | |
+| H3 | Caravan taxi waiting | **Taxi icon** (not yellow circle) until 하차/출발 | |
+| H4 | Landed shuttle size | Covers 5×3 footprint reasonably | |
 
 ---
 

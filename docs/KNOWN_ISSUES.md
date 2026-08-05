@@ -8,11 +8,13 @@
 - Comms call fee is taken from the **comms map**, even if pickup is a remote map or caravan.
 - **World caravans** can also call/board from the caravan top bar (fee from caravan silver).
 - **Pending dispatch** blocks another taxi to the **same** pickup map until it lands or fails.
-- Caravan **cannot move** while taxi is en route to it or waiting for board/depart (`CantMove` + `StartPath` block).
+- Caravan **cannot move** while taxi is en route or waiting (`CantMove` + `StartPath`).
+- Caravan + taxi (pending/boarding): **world icon is taxi**, not yellow circle, until **하차** or **출발**.
+- Map call landing: choose cell + **Q/E**; waiting map taxi: gizmo **착륙 위치 변경** (Q/E).
 
 ## Destination / depart
 
-- Destination is **not** chosen at call (by design). Use gizmo **Set destination** after land.
+- **Map call:** destination after land (design). **Caravan send:** destination chosen at call, changeable while en route / boarding.
 - Loaded taxi + wait expired + **no destination** → re-wait + message (does not fly loaded blind).
 - Empty taxi after wait may leave with no trip fare.
 - **Old taxis** from before `CompRimTaxiTrip` may lack booking; re-call.
@@ -36,7 +38,9 @@
 
 - `drawSize (7.2, 5.8)` vs collision `size (5,3)`.
 - Skyfaller shadow tracks craft XZ (`RimTaxiIncoming` / `RimTaxiLeaving`) so angled approach does not look like a vertical drop pad-only blob.
-- World flight marker: `Textures/World/WorldObjects(/Expanding)/RimTaxi.png` (not yellow caravan circle).
+- In-flight WO: `Textures/World/WorldObjects(/Expanding)/RimTaxi.png`.
+- Caravan-hold taxi icon uses same expanding texture via `Caravan_WorldIcon_Patch`.
+- 하차 gizmo icon: `Textures/UI/Commands/RimTaxiDisembark.png`.
 - Shadow intentionally small; replace PNGs under `Textures/` if art updates.
 
 ## Compatibility

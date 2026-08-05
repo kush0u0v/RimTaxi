@@ -24,42 +24,38 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 ## Locked player flow (do not redesign unless asked)
 
 ```
-1. Call          → pay CALL FEE (default 200 silver) from map stockpile OR caravan inventory
+1. Call          → pay CALL FEE (default 200) — prepaid default cost
 2. Dispatch      → ETA 1–3 in-game hours
-3. Arrive        → taxi at pickup map/cell OR “ready” at caravan (world only)
-4. Set destination → world map; show mass×distance fare estimate (no charge yet)
-5. Depart        → charge trip fare, then fly (map ship or whole caravan boards)
+3. Arrive        → map land (cell+Q/E) OR caravan “taxi ready” (world icon = taxi)
+4. Set destination → world map; mass×distance preview (no charge yet)
+5. Depart        → trip fare, then fly
 ```
 
 ### Pickup (step 1 UI)
 
-**From comms** (float menu — where to send the taxi):
+**From comms:**
 
-- Current map / other **player** settlements / **field maps** with free colonists / **player caravans**
-- **「월드맵에서 픽업 위치 선택…」** world targeter (caravan / colony / open map)
-- Call fee from the **comms console map** (including when sending to a caravan)
+- Sites: this map / other player settlements / field maps with colonists / caravans / **world pick**
+- Map landing: **cell + Q/E rotate** (`TaxiLandingUtility.PlacementRot`)
+- Call fee from **comms map** (even if remote pickup)
 
-**From player caravan** (world map top-bar gizmo):
+**From player caravan (top bar):**
 
-- Pickup is the caravan itself (no landing cell, no map open)
-- Call fee from **caravan silver**
-- After ETA: same steps 4–5 on the caravan gizmos; **entire caravan** boards into `TravelingRimTaxi`
+- **택시 보내기** → pick world dest → pay call fee → ETA → **출발** / **하차**
+- While en route or boarding: caravan **cannot move**; **world icon = taxi** (not yellow circle)
+- Silver: open settlements’ **trade-beacon** silver + caravan inventory
+- **하차**: dismiss taxi layover, free movement; call fee not refunded
 
-### After land (steps 4–5)
+### After land on map (steps 4–5 + pad)
 
-- Gizmo **「4. 목적지 설정」** — world map, `CompRimTaxiTrip.Book`
-- Gizmo **「5. 출발」** — needs boarded cargo + destination; `TaxiTripBilling` then `FlyAway`
-- Boarding wait default **5h**; empty taxi may leave after wait; loaded without destination re-waits
+- Gizmos: set dest / depart / **착륙 위치 변경 (Q/E)** / dismiss
+- Wait default **5h**; empty leave free; loaded no dest → re-wait
 
 ### Arrival at trip destination
 
-- Prefer **map land** only on **player-owned** settlements/maps (`DropRimTaxi`)
-  - On land: **Unload all → Wait (waitTicks) with gizmos → empty FlyAway**
-  - Clear booking so next leg needs a new destination; player may reboard and depart again
-- **Foreign faction settlements: world caravan on that tile** + start caravan boarding layover (no map combat)
-- Else **world caravan** with same layover boarding
-- Setting: `landOnSettlementMaps` (default true) — player maps only; foreign always caravan
-- Harmony forces RimTaxi arrival path so vanilla `StillValid` fallback cannot wipe/banish pawns
+- **Player maps:** MapLand → unload → wait layover (reboard / reposition / depart)
+- **Foreign settlements:** WorldDrop **on settlement tile** + caravan boarding (no map combat)
+- `landOnSettlementMaps` (default true) affects player maps only
 
 ---
 

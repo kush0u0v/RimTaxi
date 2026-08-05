@@ -3,83 +3,88 @@
 ## High-level flow
 
 ```
-Comms (ICommunicable "RimTaxi Dispatch" + radio DiaNode dialog; optional gizmo)
-  └─ GetCommTargets → TaxiCommsContact → Dialog_Negotiation
-       └─ Request taxi → ShowPickupSiteMenu
-            ├─ TaxiPickupSite.GetAll / world pick / caravans
-            ├─ landing cell (maps) or caravan dispatch
-            ├─ pay CallFee from call map
-            └─ TaxiGameComponent.QueueDispatch (ETA 1–3h)
-                 └─ GameComponentTick → SpawnTaxi / caravan boarding
+Comms (ICommunicable "RimTaxi Dispatch" + DiaNode; optional gizmo)
+  └─ ShowPickupSiteMenu
+       ├─ maps / settlements / field / caravans / world pick
+       ├─ map landing: cell + Q/E rot → QueueDispatch
+       └─ caravan pickup: QueueCaravanDispatch
+            └─ tick → SpawnTaxi (map) or TaxiCaravanBoarding (caravan)
 
-Player caravan (world top bar)
-  └─ Call taxi → pay CallFee from caravan silver → QueueCaravanDispatch
-       └─ tick → TaxiCaravanBoarding ready
-            ├─ Set destination (world targeter)
-            └─ Depart → pay trip → TaxiCaravanUtility.LaunchCaravanAsTaxi → TravelingRimTaxi
+Player caravan top bar
+  ├─ idle: 택시 보내기 → dest → pay call fee → QueueCaravanDispatch
+  ├─ en route: ETA + change dest (CantMove; taxi world icon)
+  └─ boarding: dest / 출발 / 하차 (CantMove; taxi world icon)
+       └─ 출발 → LaunchCaravanAsTaxi → TravelingRimTaxi
 
-Spawned TransportShip (Ship_RimTaxi) — map path
-  ├─ WaitTime (boarding, gizmos)
-  │    ├─ Set destination → CompRimTaxiTrip.Book
-  │    └─ Depart → charge trip → FlyAway
-  └─ queued FlyAway (auto after wait; billing patch)
+Map TransportShip (Ship_RimTaxi)
+  ├─ WaitTime gizmos: dest / depart / reposition landing (Q/E) / dismiss
+  └─ FlyAway (billing patch)
 
-TravellingTransporters (TravelingRimTaxi)
-  └─ Arrival patch → TaxiArrivalUtility.CreateArrivalAction
-       ├─ MapLand (player settlement / player map only) → DropRimTaxi
-       └─ WorldDrop → caravan (always for foreign settlements; never enter their map)
+TravellingTransporters (TravelingRimTaxi) — taxi world texture
+  └─ Arrival patch → TaxiArrivalUtility
+       ├─ MapLand (player only) → DropRimTaxi → unload + wait layover
+       └─ WorldDrop → caravan on tile + boarding layover
 ```
 
 ## Layers
 
 | Layer | Responsibility |
 |-------|----------------|
-| UI entry | Comms Harmony; wait-job gizmos; letters/messages |
-| Dispatch | `TaxiPendingDispatch` list on `TaxiGameComponent` |
-| Billing | Call fee vs mass×distance at depart |
-| Booking | `CompRimTaxiTrip` primary; GC dict backup |
-| Ship | Vanilla TransportShip + ShipJob Wait/FlyAway |
-| Arrival | Custom actions + Harmony force for our WorldObject def |
+| UI entry | Comms radio; caravan gizmos; wait-job gizmos |
+| Dispatch | `TaxiPendingDispatch` (+ landingRot for maps) |
+| Caravan hold | Immobile + taxi world icon while pending/boarding |
+| Billing | Call fee at call; trip fare at depart (`TaxiPayment` rules) |
+| Booking | `CompRimTaxiTrip` + GC backup |
+| Ship | TransportShip Wait / Unload / FlyAway |
+| Arrival | MapLand / WorldDrop + force patch |
 
 ## Harmony patches
 
 | Patch | Target | Intent |
 |-------|--------|--------|
-| `Building_CommsConsole_Patch` | `GetCommTargets`, `Thing.GetGizmos` | Taxi radio contact + gizmo |
-| `TaxiCommsContact` / `TaxiDialogMaker` | `ICommunicable` + DiaNode | Faction-style radio UI |
-| `Caravan_Gizmos_Patch` | `Caravan.GetGizmos` | Caravan Call / Set dest / Depart |
-| `ShipJob_Wait_Gizmos_Patch` | `ShipJob_Wait.GetJobGizmos` | Set dest / Depart / Dismiss |
-| `ShipJob_FlyAway_Billing_Patch` | `ShipJob_FlyAway.TryStart` | Auto fare / re-wait / empty leave |
-| `TravellingTransporters_Arrival_Patch` | `TravellingTransporters.Arrived` | Force our arrival chooser |
-| `TravellingTransporters_Speed_Patch` | `get_TraveledPctStepPerTick` | Slower RimTaxi flights |
+| `Building_CommsConsole_Patch` | `GetCommTargets`, `Thing.GetGizmos` | Radio contact + gizmo |
+| `Caravan_Gizmos_Patch` | `Caravan.GetGizmos` | Send / en route / board / 하차 |
+| `Caravan_Movement_Patch` | `CantMove`, `StartPath` | Immobilize for taxi |
+| `Caravan_WorldIcon_Patch` | `ExpandingIcon`, `Material`, color | Taxi icon vs yellow circle |
+| `ShipJob_Wait_Gizmos_Patch` | `GetJobGizmos` | Dest / depart / reposition / dismiss |
+| `ShipJob_FlyAway_Billing_Patch` | `TryStart` | Fare / re-wait / empty leave |
+| `TravellingTransporters_Arrival_Patch` | `Arrived` | Force our arrival |
+| `TravellingTransporters_Speed_Patch` | speed getter | Slower flights |
 
-## Defs
+## Key types (short)
 
-| Def | Purpose |
-|-----|---------|
+| Type | Role |
+|------|------|
+| `TaxiLandingUtility` | Land checks, ghost, **Q/E** `PlacementRot` |
+| `TaxiPayment` | Settlement beacon/stockpile/carried; caravan = beacons + inv |
+| `TaxiCaravanUtility` | Launch, immobilize, taxi world icon textures |
+| `TaxiCommsContact` / `TaxiDialogMaker` | Faction-style radio |
+
+## Defs / textures
+
+| Asset | Purpose |
+|-------|---------|
 | `Ship_RimTaxi` | TransportShipDef |
-| `TravelingRimTaxi` | In-flight world object |
-| `RimTaxiShuttle` | Vehicle; **CompProperties_Shuttle.shipDef = Ship_RimTaxi** (required) |
-| `RimTaxiIncoming` / `RimTaxiLeaving` | Skyfallers + `RimTaxiShadow` |
+| `TravelingRimTaxi` | In-flight WO; taxi expanding icon |
+| `RimTaxiShuttle` | Vehicle; `shipDef = Ship_RimTaxi` required |
+| `Textures/World/WorldObjects(/Expanding)/RimTaxi.png` | Flight + caravan-hold icon |
+| `Textures/UI/Commands/RimTaxiDisembark.png` | 하차 gizmo |
 
 ## Settings defaults
 
 | Field | Default | Notes |
 |-------|---------|--------|
-| baseFare | 200 | Call |
+| baseFare | **200** | Call fee (default prepaid cost) |
 | farePerKgPerTile | 0.1 | Trip |
 | dispatchBaseTicks | 2500 | 1h |
-| dispatchVarianceTicks | 5000 | 0–2h → **1–3h ETA** |
-| dispatchTicksPerTripTile | 0 | Off by default |
-| waitTicks | 12500 | 5h board window |
+| dispatchVarianceTicks | 5000 | → **1–3h ETA** |
+| waitTicks | 12500 | 5h board/layover |
 | cooldownTicks | 2500 | 1h |
+| landOnSettlementMaps | true | Player map land |
+| travelSpeedFactor | 0.6 | Slower flight |
 | maxLaunchDistance | 70 | |
-| travelSpeedFactor | 0.6 | |
-| landOnSettlementMaps | true | |
 
-## Build paths
+## Build
 
-`Source/RimTaxi/RimTaxi.csproj`:
-
-- `RimWorldDir` → `...\RimWorldWin64_Data\Managed`
-- `HarmonyDll` → Workshop Harmony `Current\Assemblies\0Harmony.dll`
+`Source/RimTaxi/RimTaxi.csproj` → `Assemblies/RimTaxi.dll`  
+`.\build.ps1` or `dotnet build -c Release`
