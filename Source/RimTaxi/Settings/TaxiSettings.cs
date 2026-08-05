@@ -63,7 +63,7 @@ namespace RimTaxi
             farePerKgPerTile = 0.1f;
             maxPassengers = 4;
             cooldownTicks = 2500;
-            waitTicks = 12500;
+            waitTicks = 5000;
             dispatchBaseTicks = 2500;
             dispatchVarianceTicks = 5000;
             dispatchTicksPerTripTile = 0;
