@@ -27,7 +27,7 @@
 
 ## Economy
 
-- Call fee spent even if player never boards (dispatch no-show cost).
+- **Call fee is the default cost:** prepaid at call (`baseFare` default 200). No refund on no-board, disembark, or empty leave after wait. Trip fare only on Depart.
 - Silver rules: **settlement + trade beacon** = beacon radius + carried; **settlement no beacon** = stockpile + carried; **field** = carried only; **caravan taxi** = all open settlements’ beacon silver + caravan inventory.
 - Trip fare from taxi’s current map / caravan — remote depart needs silver under those rules there.
 - Large mass × long distance can dwarf the 200 call fee.

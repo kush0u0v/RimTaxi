@@ -34,10 +34,12 @@ Until then: **bugfixes and small string/UX only**.
 
 ## Next candidates (after baseline)
 
-1. Call-fee refund / warning on empty no-show leave  
+1. Explicit **cancel** UX while en route (still **no call-fee refund by default** — call fee stays the default cost)  
 2. Trip fare always payable from home map (optional setting)  
 3. Graphics polish  
-4. **GUI overhaul**
+4. **GUI overhaul**  
+
+**Locked economy:** call fee (`baseFare` default 200) is prepaid default; no-show/disembark does not refund call fee unless a future optional setting is requested.
 
 ## Explicit non-goals
 

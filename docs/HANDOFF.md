@@ -56,7 +56,7 @@ Comms call: no world map during step 1–3. Caravan call: stays on world map thr
 
 | Key | Default | Meaning |
 |-----|---------|---------|
-| baseFare | 200 | Call fee |
+| baseFare | **200 (default)** | Call fee — prepaid; **no refund** on no-board/disembark (default rule) |
 | farePerKgPerTile | 0.1 | Trip fare rate |
 | dispatchBaseTicks | 2500 | 1h |
 | dispatchVarianceTicks | 5000 | +0–2h → **1–3h total ETA** |

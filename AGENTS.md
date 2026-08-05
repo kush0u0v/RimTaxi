@@ -127,9 +127,17 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 | When | Silver | Taken from |
 |------|--------|------------|
-| **1. Call** | `baseFare` (200) | Call map via `TaxiPayment` rules |
+| **1. Call** | `baseFare` (**default 200**) | Call map / caravan via `TaxiPayment` |
 | **5. Depart** | `ceil(massKg × tiles × farePerKgPerTile)` | Taxi map / caravan via `TaxiPayment` |
-| Empty leave | Trip fare 0 | — |
+| Empty leave / no-board / disembark / wait expire | **Trip fare 0** | — |
+
+### Call fee is the default cost (locked)
+
+- **`baseFare` default = 200 silver** — settings may change amount, but the *model* is fixed: **dispatch is prepaid**.
+- Call fee is charged when the call is accepted (comms or caravan send).
+- **No refund by default** if the player never boards, cancels by waiting out, disembarks on world map, or the taxi leaves empty after wait.
+- **Only exception-style refunds** already in code for hard failures (e.g. spawn/landing failed) — not for player no-show.
+- Trip fare is separate and only at **Depart**.
 
 **Silver sources (`TaxiPayment`) — trade beacon = player settlement orbital trade beacon:**
 
