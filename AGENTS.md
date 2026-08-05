@@ -33,10 +33,11 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 ### Pickup (step 1 UI)
 
-**From comms:**
+**From comms (radio Dialog_Negotiation GUI):**
 
-- Sites: this map / other player settlements / field maps with colonists / caravans / **world pick**
-- Map landing at call: **cell + Q/E** (`TaxiLandingUtility.PlacementRot`)
+1. Request taxi  
+2. **In the same radio dialog:** choose where to send (pickup sites + world map pick)  
+3. Map landing: **cell + Q/E**  
 - Call fee from **comms map** (even if remote pickup)
 
 **From player caravan (top bar):**

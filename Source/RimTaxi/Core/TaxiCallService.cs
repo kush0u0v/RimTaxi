@@ -160,7 +160,18 @@ namespace RimTaxi
                 return;
             }
 
-            ShowPickupSiteMenu(callMap, caller);
+            // Prefer radio dialog (comms GUI) for pickup location pick
+            Pawn negotiator = caller
+                ?? callMap?.mapPawns?.FreeColonistsSpawned?.FirstOrFallback()
+                ?? callMap?.mapPawns?.FreeColonists?.FirstOrFallback();
+            if (negotiator != null)
+            {
+                TaxiCommsContact.Instance.TryOpenComms(negotiator);
+            }
+            else
+            {
+                ShowPickupSiteMenu(callMap, caller);
+            }
         }
 
         public static void ShowPickupSiteMenu(Map callMap, Pawn caller)
@@ -206,7 +217,7 @@ namespace RimTaxi
             Messages.Message("RimTaxi_ChoosePickup".Translate(), MessageTypeDefOf.NeutralEvent, historical: false);
         }
 
-        private static string GetPickupSiteBlockedReason(TaxiPickupSite site, TaxiGameComponent gc)
+        public static string GetPickupSiteBlockedReason(TaxiPickupSite site, TaxiGameComponent gc)
         {
             if (site == null || gc == null)
             {

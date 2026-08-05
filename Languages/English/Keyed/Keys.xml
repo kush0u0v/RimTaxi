@@ -17,8 +17,9 @@
   <RimTaxi_CommsGizmoDesc>Open RimTaxi radio (same as using the console). Call fee {0} silver; trip fare mass × distance × {1} at depart.</RimTaxi_CommsGizmoDesc>
   <RimTaxi_CommsCallLabel>RimTaxi Dispatch</RimTaxi_CommsCallLabel>
   <RimTaxi_CommsInfoText>Civilian taxi service. Call fee {0} silver. Trip fare: mass × distance × {1} silver at depart.</RimTaxi_CommsInfoText>
-  <RimTaxi_DialogGreeting>RimTaxi dispatch speaking.\n\nCall fee: {0} silver (paid when you book a pickup).\nTrip fare: mass × distance × {1} silver, charged when you depart.\n\nWhere should we send a taxi?</RimTaxi_DialogGreeting>
+  <RimTaxi_DialogGreeting>RimTaxi dispatch speaking.\n\nCall fee: {0} silver (paid when you confirm where to send the taxi).\nTrip fare: mass × distance × {1} silver, charged when you depart.\n\nRequest a taxi, then choose the pickup location in this radio menu.</RimTaxi_DialogGreeting>
   <RimTaxi_DialogRequestTaxi>Request a taxi ({0} silver)…</RimTaxi_DialogRequestTaxi>
+  <RimTaxi_DialogPickPickup>Where should we send the taxi? (call fee {0} silver is charged when you confirm landing / caravan pickup)\n\nPick a pickup site:</RimTaxi_DialogPickPickup>
   <RimTaxi_DialogStatus>Ask about current jobs…</RimTaxi_DialogStatus>
   <RimTaxi_DialogHangUp>Hang up</RimTaxi_DialogHangUp>
   <RimTaxi_DialogStatusHeader>Current RimTaxi jobs:</RimTaxi_DialogStatusHeader>

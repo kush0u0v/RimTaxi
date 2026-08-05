@@ -17,8 +17,9 @@
   <RimTaxi_CommsGizmoDesc>RimTaxi 무전 연결 (통신기 사용과 동일). 호출비 {0} 은, 운행 요금은 출발 시 무게×거리×{1}.</RimTaxi_CommsGizmoDesc>
   <RimTaxi_CommsCallLabel>RimTaxi 배차센터</RimTaxi_CommsCallLabel>
   <RimTaxi_CommsInfoText>민간 택시 서비스. 호출비 {0} 은. 운행 요금: 출발 시 무게×거리×{1} 은.</RimTaxi_CommsInfoText>
-  <RimTaxi_DialogGreeting>RimTaxi 배차센터입니다.\n\n호출비: {0} 은 (픽업 예약 시 결제)\n운행 요금: 무게×거리×{1} 은 (출발 시 결제)\n\n택시를 어디로 보낼까요?</RimTaxi_DialogGreeting>
+  <RimTaxi_DialogGreeting>RimTaxi 배차센터입니다.\n\n호출비: {0} 은 (보낼 위치 확정 시 결제)\n운행 요금: 무게×거리×{1} 은 (출발 시 결제)\n\n택시 요청 후, 이 통신 화면에서 보낼 위치(픽업)를 고르세요.</RimTaxi_DialogGreeting>
   <RimTaxi_DialogRequestTaxi>택시 요청 ({0} 은)…</RimTaxi_DialogRequestTaxi>
+  <RimTaxi_DialogPickPickup>택시를 어디로 보낼까요? (착륙 칸/캐러밴 확정 시 호출비 {0} 은 결제)\n\n픽업 위치를 선택하세요:</RimTaxi_DialogPickPickup>
   <RimTaxi_DialogStatus>진행 중인 배차 확인…</RimTaxi_DialogStatus>
   <RimTaxi_DialogHangUp>통신 종료</RimTaxi_DialogHangUp>
   <RimTaxi_DialogStatusHeader>현재 RimTaxi 작업:</RimTaxi_DialogStatusHeader>

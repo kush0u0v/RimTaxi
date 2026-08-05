@@ -7,7 +7,8 @@ using Verse;
 namespace RimTaxi
 {
     /// <summary>
-    /// Radio-style negotiation tree for RimTaxi (mirror of FactionDialogMaker, service only).
+    /// Radio-style negotiation tree for RimTaxi (comms GUI).
+    /// After request: pick where to send the taxi (pickup) inside the dialog.
     /// </summary>
     public static class TaxiDialogMaker
     {
@@ -20,7 +21,7 @@ namespace RimTaxi
             string greeting = "RimTaxi_DialogGreeting".Translate(fee, rate);
             DiaNode root = new DiaNode(greeting);
 
-            // Request a taxi → pickup menu (existing 5-step flow)
+            // Request taxi → stay in radio GUI to pick where to send it
             DiaOption call = new DiaOption("RimTaxi_DialogRequestTaxi".Translate(fee));
             string blocked = TaxiCallService.GetBlockedReason(map, console: FindConsole(map));
             if (blocked != null)
@@ -29,27 +30,84 @@ namespace RimTaxi
             }
             else
             {
-                call.action = () =>
-                {
-                    Building_CommsConsole console = FindConsole(map);
-                    TaxiCallService.ShowPickupSiteMenu(map, negotiator);
-                };
-                call.resolveTree = true;
+                call.linkLateBind = () => PickupLocationNode(negotiator, map);
             }
 
             root.options.Add(call);
 
-            // Status: pending dispatches / boardings
             DiaOption status = new DiaOption("RimTaxi_DialogStatus".Translate());
             status.link = StatusNode(negotiator);
             root.options.Add(status);
 
-            // Hang up
             DiaOption bye = new DiaOption("RimTaxi_DialogHangUp".Translate());
             bye.resolveTree = true;
             root.options.Add(bye);
 
             return root;
+        }
+
+        /// <summary>
+        /// Comms GUI step: choose where to send the taxi (pickup site).
+        /// </summary>
+        public static DiaNode PickupLocationNode(Pawn negotiator, Map callMap)
+        {
+            int fee = TaxiFareCalculator.CallFee;
+            DiaNode node = new DiaNode("RimTaxi_DialogPickPickup".Translate(fee));
+
+            List<TaxiPickupSite> sites = TaxiPickupSite.GetAll(callMap);
+            TaxiGameComponent gc = TaxiGameComponent.Get();
+
+            // World map pick
+            DiaOption worldPick = new DiaOption("RimTaxi_PickupFromWorldMap".Translate());
+            worldPick.action = () =>
+            {
+                TaxiCallService.BeginPickupWorldTargeting(callMap, negotiator);
+            };
+            worldPick.resolveTree = true;
+            node.options.Add(worldPick);
+
+            int listed = 0;
+            for (int i = 0; i < sites.Count; i++)
+            {
+                TaxiPickupSite site = sites[i];
+                string siteBlocked = TaxiCallService.GetPickupSiteBlockedReason(site, gc);
+                string label = site.label;
+                if (siteBlocked != null)
+                {
+                    DiaOption disabled = new DiaOption(label + " — " + siteBlocked);
+                    disabled.Disable(siteBlocked);
+                    node.options.Add(disabled);
+                    listed++;
+                    continue;
+                }
+
+                TaxiPickupSite captured = site;
+                DiaOption opt = new DiaOption(label);
+                opt.action = () =>
+                {
+                    TaxiCallService.BeginPickupFlow(callMap, negotiator, captured);
+                };
+                opt.resolveTree = true;
+                node.options.Add(opt);
+                listed++;
+            }
+
+            if (listed == 0)
+            {
+                DiaOption none = new DiaOption("RimTaxi_NoListedPickupsHint".Translate());
+                none.Disable("RimTaxi_NoListedPickupsHint".Translate());
+                node.options.Add(none);
+            }
+
+            DiaOption back = new DiaOption("GoBack".Translate());
+            back.linkLateBind = () => RootNode(negotiator);
+            node.options.Add(back);
+
+            DiaOption hang = new DiaOption("RimTaxi_DialogHangUp".Translate());
+            hang.resolveTree = true;
+            node.options.Add(hang);
+
+            return node;
         }
 
         private static DiaNode StatusNode(Pawn negotiator)
@@ -62,7 +120,6 @@ namespace RimTaxi
 
             if (gc != null)
             {
-                // Pending map/caravan dispatches — introspect via public APIs on known objects
                 List<Map> maps = Find.Maps;
                 for (int i = 0; i < maps.Count; i++)
                 {
