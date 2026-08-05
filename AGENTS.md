@@ -42,7 +42,6 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 **From player caravan (top bar):**
 
 - **택시 보내기** → dest → call fee → ETA → **출발** / **하차**
-- **바로 보내기** → dest → call fee **+ trip fare now** → fly immediately (no dispatch wait)
 - While en route or boarding: caravan **cannot move**; **world icon = taxi** (not yellow circle)
 - Silver: open settlements’ **trade-beacon** silver + caravan inventory
 - **하차**: dismiss taxi layover, free movement; call fee not refunded

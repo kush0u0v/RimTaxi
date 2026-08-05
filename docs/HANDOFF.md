@@ -51,7 +51,7 @@ Identity: **service / meter**, not player spaceship (not SRTS).
 
 | State | UI | Movement | World icon |
 |-------|-----|----------|------------|
-| Idle | **택시 보내기** (ETA) / **바로 보내기** (즉시) | Free | Yellow caravan |
+| Idle | **택시 보내기** (call fee → dest → ETA → depart) | Free | Yellow caravan |
 | En route | ETA + change dest | **Immobile** | **Taxi** |
 | Waiting (boarding) | Dest / **출발** / **하차** | **Immobile** | **Taxi** |
 | After 하차 or 출발 | — | Free | Normal / in-flight taxi |

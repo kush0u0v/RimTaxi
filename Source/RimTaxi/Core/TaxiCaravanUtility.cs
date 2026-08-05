@@ -38,7 +38,6 @@ namespace RimTaxi
                     // Prefer world icons; fall back to command / building art
                     cachedTaxiWorldIcon = ContentFinder<Texture2D>.Get("World/WorldObjects/Expanding/RimTaxi", reportFailure: false)
                         ?? ContentFinder<Texture2D>.Get("World/WorldObjects/RimTaxi", reportFailure: false)
-                        ?? ContentFinder<Texture2D>.Get("UI/Commands/RimTaxiInstantSend", reportFailure: false)
                         ?? ContentFinder<Texture2D>.Get("UI/Commands/RimTaxiDisembark", reportFailure: false)
                         ?? ContentFinder<Texture2D>.Get("Things/Building/Misc/RimTaxiShuttle", reportFailure: false);
                     if (cachedTaxiWorldIcon == null)

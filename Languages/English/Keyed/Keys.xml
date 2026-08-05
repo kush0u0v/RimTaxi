@@ -112,10 +112,6 @@
   <RimTaxi_CaravanCall>Call taxi ({0} silver)…</RimTaxi_CaravanCall>
   <RimTaxi_CaravanCallDesc>Call a taxi to this caravan. Dispatch fee {0} silver from caravan inventory. After it arrives, set a destination and board from the caravan bar. Trip fare: mass × distance × {1} silver.</RimTaxi_CaravanCallDesc>
   <RimTaxi_CaravanSend>Send taxi ({0} silver)…</RimTaxi_CaravanSend>
-  <RimTaxi_CaravanInstantSend>Send now ({0}+trip)…</RimTaxi_CaravanInstantSend>
-  <RimTaxi_CaravanInstantSendDesc>Immediate taxi: pick destination, pay call fee {0} silver + trip fare (mass × distance × {1}) now, and fly with no dispatch wait.</RimTaxi_CaravanInstantSendDesc>
-  <RimTaxi_CaravanPickDestInstant>Choose destination for immediate send (call + trip fee charged now).</RimTaxi_CaravanPickDestInstant>
-  <RimTaxi_CaravanInstantDeparted>Taxi sent now. Call {0} + trip {1} silver (mass {2} kg × {3} tiles).</RimTaxi_CaravanInstantDeparted>
   <RimTaxi_CaravanSendDesc>From this caravan: pay call fee {0} silver (settlement trade-beacon silver and/or caravan silver), pick a world destination, wait for the taxi, then Depart. Trip fare at depart: mass × distance × {1}.</RimTaxi_CaravanSendDesc>
   <RimTaxi_CaravanPickDestToSend>Choose where to send the taxi (world destination).</RimTaxi_CaravanPickDestToSend>
   <RimTaxi_CaravanSendDispatched>Paid {0} silver. Destination {1} tiles (trip ~{2} silver at depart). Taxi en route — ETA {3}. When it arrives, press Depart.</RimTaxi_CaravanSendDispatched>
