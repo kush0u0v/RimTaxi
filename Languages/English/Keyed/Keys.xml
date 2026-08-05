@@ -115,6 +115,10 @@
   <RimTaxi_CaravanEnRouteDesc>Taxi is coming to this caravan. ETA {0}. You can change the destination while waiting.</RimTaxi_CaravanEnRouteDesc>
   <RimTaxi_CaravanSetDestWhileEnRouteDesc>Change the trip destination while the taxi is still en route.</RimTaxi_CaravanSetDestWhileEnRouteDesc>
   <RimTaxi_CaravanDepartSend>Depart / send ({0} aboard, {1} silver)</RimTaxi_CaravanDepartSend>
+  <RimTaxi_CaravanDisembark>Disembark / release taxi</RimTaxi_CaravanDisembark>
+  <RimTaxi_CaravanDisembarkDesc>Get off and dismiss the waiting taxi on the world map. No trip fare. Call fee is not refunded. Caravan can move again.</RimTaxi_CaravanDisembarkDesc>
+  <RimTaxi_CaravanDisembarked>You disembarked. The taxi left. Caravan can move again.</RimTaxi_CaravanDisembarked>
+  <RimTaxi_CaravanDisembarkNone>No taxi is waiting at this caravan.</RimTaxi_CaravanDisembarkNone>
   <RimTaxi_CaravanImmobileEnRoute>Caravan cannot move: taxi en route (ETA {0}). Wait or cancel by letting the wait expire after arrival without departing.</RimTaxi_CaravanImmobileEnRoute>
   <RimTaxi_CaravanImmobileWaiting>Caravan cannot move: taxi is waiting here ({0} left). Set destination and Depart, or wait for the taxi to leave.</RimTaxi_CaravanImmobileWaiting>
   <RimTaxi_CaravanImmobileGeneric>Caravan cannot move while waiting for RimTaxi.</RimTaxi_CaravanImmobileGeneric>

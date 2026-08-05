@@ -971,6 +971,46 @@ namespace RimTaxi
             }
 
             yield return depart;
+
+            // 하차: dismiss waiting taxi, free caravan movement (no trip fare)
+            Command_Action disembark = new Command_Action
+            {
+                defaultLabel = "RimTaxi_CaravanDisembark".Translate(),
+                defaultDesc = "RimTaxi_CaravanDisembarkDesc".Translate(),
+                icon = ContentFinder<Texture2D>.Get("UI/Commands/RimTaxiDisembark", reportFailure: false)
+                    ?? ContentFinder<Texture2D>.Get("UI/Commands/DismissShuttle", reportFailure: false)
+                    ?? TexCommand.ClearPrioritizedWork,
+                Order = -48f,
+                action = () => DisembarkCaravanTaxi(caravan)
+            };
+            yield return disembark;
+        }
+
+        /// <summary>
+        /// Leave the waiting taxi on the world map: clear boarding, free caravan to move again.
+        /// Call fee already paid is not refunded.
+        /// </summary>
+        public static void DisembarkCaravanTaxi(Caravan caravan)
+        {
+            if (caravan == null || caravan.Destroyed)
+            {
+                return;
+            }
+
+            TaxiGameComponent gc = Comp;
+            if (gc == null || !gc.HasBoarding(caravan))
+            {
+                Messages.Message("RimTaxi_CaravanDisembarkNone".Translate(), caravan, MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            gc.ClearBoarding(caravan);
+            Messages.Message(
+                "RimTaxi_CaravanDisembarked".Translate(),
+                caravan,
+                MessageTypeDefOf.NeutralEvent,
+                historical: false);
+            Log.Message($"[RimTaxi] Caravan#{caravan.ID} disembarked taxi (world layover dismissed).");
         }
 
         /// <summary>

@@ -115,6 +115,10 @@
   <RimTaxi_CaravanEnRouteDesc>택시가 이 캐러밴으로 오는 중입니다. 예상 {0}. 대기 중에도 목적지를 바꿀 수 있습니다.</RimTaxi_CaravanEnRouteDesc>
   <RimTaxi_CaravanSetDestWhileEnRouteDesc>배차 대기 중 여행 목적지를 변경합니다.</RimTaxi_CaravanSetDestWhileEnRouteDesc>
   <RimTaxi_CaravanDepartSend>출발/보내기 ({0}명, {1}은)</RimTaxi_CaravanDepartSend>
+  <RimTaxi_CaravanDisembark>하차 (택시 보내기)</RimTaxi_CaravanDisembark>
+  <RimTaxi_CaravanDisembarkDesc>월드맵에서 대기 중인 택시에서 하차합니다. 운행 요금 없음. 호출비는 환불되지 않습니다. 캐러밴이 다시 이동할 수 있습니다.</RimTaxi_CaravanDisembarkDesc>
+  <RimTaxi_CaravanDisembarked>하차했습니다. 택시가 떠났습니다. 캐러밴이 다시 이동할 수 있습니다.</RimTaxi_CaravanDisembarked>
+  <RimTaxi_CaravanDisembarkNone>이 캐러밴에 대기 중인 택시가 없습니다.</RimTaxi_CaravanDisembarkNone>
   <RimTaxi_CaravanImmobileEnRoute>캐러밴 이동 불가: 택시 배차 중 (예상 {0}). 도착 후 출발하거나, 대기 만료 후 택시가 떠나면 다시 이동할 수 있습니다.</RimTaxi_CaravanImmobileEnRoute>
   <RimTaxi_CaravanImmobileWaiting>캐러밴 이동 불가: 택시가 여기서 대기 중 (남은 시간 {0}). 목적지 설정 후 출발하거나, 택시가 떠나길 기다리세요.</RimTaxi_CaravanImmobileWaiting>
   <RimTaxi_CaravanImmobileGeneric>RimTaxi 대기 중에는 캐러밴이 이동할 수 없습니다.</RimTaxi_CaravanImmobileGeneric>
