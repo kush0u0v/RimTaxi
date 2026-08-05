@@ -27,6 +27,9 @@ namespace RimTaxi
         private List<TaxiPendingDispatch> pendingDispatches = new List<TaxiPendingDispatch>();
         private List<TaxiCaravanBoarding> caravanBoardings = new List<TaxiCaravanBoarding>();
 
+        /// <summary>In-memory only: player is picking landing cell after flight (map visible).</summary>
+        public TaxiPendingMapLanding pendingMapLanding;
+
         public TaxiGameComponent(Game game)
         {
         }
@@ -582,6 +585,12 @@ namespace RimTaxi
 
         public override void ExposeData()
         {
+            // Never serialize mid-landing pick — auto-drop so pawns are not lost on save
+            if (Scribe.mode == LoadSaveMode.Saving && pendingMapLanding != null)
+            {
+                TaxiCallService.FinishPendingMapLandingAuto();
+            }
+
             Scribe_Values.Look(ref lastCallTick, "rimTaxiLastCallTick", -999999);
             Scribe_Collections.Look(ref trips, "rimTaxiTrips", LookMode.Value, LookMode.Deep);
             Scribe_Collections.Look(ref pendingDispatches, "rimTaxiPendingDispatches", LookMode.Deep);
@@ -602,6 +611,8 @@ namespace RimTaxi
                 {
                     caravanBoardings = new List<TaxiCaravanBoarding>();
                 }
+
+                pendingMapLanding = null;
             }
 
             base.ExposeData();

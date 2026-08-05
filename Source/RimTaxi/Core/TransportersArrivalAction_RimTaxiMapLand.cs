@@ -74,60 +74,14 @@ namespace RimTaxi
                 return;
             }
 
-            ThingDef shuttleDef = RimTaxiDefOf.RimTaxiShuttle ?? ThingDefOf.Shuttle;
-            TransportShipDef shipDef = RimTaxiDefOf.Ship_RimTaxi;
-            Rot4 rot = shuttleDef != null ? shuttleDef.defaultPlacingRot : Rot4.North;
-
-            IntVec3 landing = DropCellFinder.GetBestShuttleLandingSpot(map, Faction.OfPlayer);
-            if (shuttleDef != null
-                && !RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(landing, map, shuttleDef, rot).Accepted)
+            // Map is open/visible: player picks landing cell + Q/E (same as call-time placement).
+            // Hold transporters and open targeter after this frame.
+            var held = new List<ActiveTransporterInfo>(transporters);
+            LongEventHandler.ExecuteWhenFinished(delegate
             {
-                if (!CellFinder.TryFindRandomCell(map,
-                        c => RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(c, map, shuttleDef, rot).Accepted,
-                        out landing))
-                {
-                    landing = DropCellFinder.TradeDropSpot(map);
-                }
-            }
-
-            if (!landing.IsValid)
-            {
-                landing = DropCellFinder.TradeDropSpot(map);
-            }
-
-            try
-            {
-                DropRimTaxi(transporters[0], map, landing, rot, shipDef, shuttleDef);
-            }
-            catch (System.Exception e)
-            {
-                Log.Error("[RimTaxi] MapLand drop failed: " + e + " — world caravan fallback.");
-                new TransportersArrivalAction_RimTaxiWorldDrop("RimTaxi_ArrivedCaravan").Arrived(transporters, tile);
-                return;
-            }
-
-            for (int i = 1; i < transporters.Count; i++)
-            {
-                try
-                {
-                    TransportersArrivalActionUtility.DropTravellingDropPods(
-                        new List<ActiveTransporterInfo> { transporters[i] },
-                        landing,
-                        map);
-                }
-                catch (System.Exception e)
-                {
-                    Log.Warning("[RimTaxi] Extra pod drop failed: " + e);
-                }
-            }
-
-            Thing look = TransportersArrivalActionUtility.GetLookTarget(transporters);
-            Messages.Message(
-                "RimTaxi_ArrivedOnMapWaiting".Translate(map.Parent?.LabelCap ?? map.ToString()),
-                look,
-                MessageTypeDefOf.TaskCompletion);
-            CameraJumper.TryJump(landing, map);
-            Log.Message($"[RimTaxi] MapLand OK at {landing} on {map} (layover wait)");
+                TaxiCallService.BeginMapLandingPick(map, held);
+            });
+            Log.Message($"[RimTaxi] MapLand: waiting for player landing pick on {map}");
         }
 
         /// <summary>

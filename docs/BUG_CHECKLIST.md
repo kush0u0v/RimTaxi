@@ -16,7 +16,7 @@
 | A4 | After ETA, taxi lands | No NRE; message/letter | |
 | A5 | Load pawn → **4. 목적지** → **5. 출발** | Fare charged; flies | |
 | A6 | Arrive player base | Map land; unload; **waits** (not instant leave) | |
-| A6b | Waiting: **착륙 위치 변경** + Q/E | Pad moves / rotates | |
+| A6b | After flight to own map: pick landing + Q/E | Lands where chosen, then waits | |
 | A7 | Reboard → new dest → depart | Second leg works | |
 
 ---

@@ -10,7 +10,7 @@
 - **Pending dispatch** blocks another taxi to the **same** pickup map until it lands or fails.
 - Caravan **cannot move** while taxi is en route or waiting (`CantMove` + `StartPath`).
 - Caravan + taxi (pending/boarding): **world icon is taxi**, not yellow circle, until **하차** or **출발**.
-- Map call landing: choose cell + **Q/E**; waiting map taxi: gizmo **착륙 위치 변경** (Q/E).
+- Landing cell + **Q/E** only at **call** or when **map is visible for arrival landing** (not mid-wait reposition).
 
 ## Destination / depart
 

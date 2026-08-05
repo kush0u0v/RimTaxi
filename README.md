@@ -17,13 +17,13 @@ Call a taxi from a **comms console**, wait for dispatch, board at a **pickup** (
 2. **Dispatch** — en route (**about 1–3 hours**). Caravan cannot move while waiting for taxi.  
 3. **Arrive** — map land **or** caravan taxi ready (world **taxi icon**, not yellow circle).  
 4. **Set destination** — gizmo; fare preview.  
-5. **Depart** — **trip fare** (mass × tiles × rate), then fly. Player maps: land + wait (reboard / **reposition pad**). Foreign settlements: caravan on tile + layover (no combat entry). **하차** dismisses waiting taxi without trip fare (call fee kept).
+5. **Depart** — **trip fare** (mass × tiles × rate), then fly. Player maps: **pick landing (Q/E)** then wait/reboard. Foreign settlements: caravan on tile + layover (no combat entry). **하차** dismisses waiting taxi without trip fare (call fee kept).
 
 ## Features
 
 - Comms **radio contact** (like factions) + gizmo
 - **Caravan:** send / immobilize / taxi world icon / depart / disembark
-- Map landing **Q/E** + **착륙 위치 변경** while waiting
+- Map landing **Q/E** at **call** and when **map is visible on arrival**
 - Remote pickup (other colonies, field maps, caravans)
 - Dual fare: **prepaid call fee** + trip fare at depart
 - Settlement trade-beacon / stockpile / carried silver rules

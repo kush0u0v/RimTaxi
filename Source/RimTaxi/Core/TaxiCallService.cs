@@ -627,18 +627,34 @@ namespace RimTaxi
         }
 
         /// <summary>
-        /// While taxi waits on a settlement/camp map: choose a new pad cell (Q/E rotate).
+        /// After flight to a player map: map is visible — pick landing cell + Q/E, then drop.
+        /// (Landing is only chosen at call-time or when the map is shown for landing.)
         /// </summary>
-        public static void BeginRepositionTaxiOnMap(TransportShip ship)
+        public static void BeginMapLandingPick(Map map, List<ActiveTransporterInfo> transporters)
         {
-            Thing shuttle = ship?.shipThing;
-            Map map = shuttle?.Map;
-            if (shuttle == null || map == null || !shuttle.Spawned)
+            if (map == null || transporters == null || transporters.Count == 0)
             {
                 return;
             }
 
-            TaxiLandingUtility.PlacementRot = shuttle.Rotation;
+            TaxiGameComponent gc = Comp;
+            if (gc == null)
+            {
+                FinishMapLandingDrop(map, transporters, FindAutoLandingCell(map), Rot4.North);
+                return;
+            }
+
+            gc.pendingMapLanding = new TaxiPendingMapLanding
+            {
+                mapId = map.uniqueID,
+                transporters = new List<ActiveTransporterInfo>(transporters),
+                createdTick = Find.TickManager.TicksGame
+            };
+
+            CameraJumper.TryJump(map.Center, map);
+            Current.Game.CurrentMap = map;
+            TaxiLandingUtility.ResetPlacementRot();
+
             Messages.Message(
                 "RimTaxi_ChooseLandingQE".Translate(),
                 MessageTypeDefOf.NeutralEvent,
@@ -665,51 +681,135 @@ namespace RimTaxi
 
             Find.Targeter.BeginTargeting(
                 parms,
-                (LocalTargetInfo target) => TryRepositionTaxi(ship, target.Cell, TaxiLandingUtility.PlacementRot),
+                (LocalTargetInfo target) =>
+                {
+                    FinishPendingMapLanding(target.Cell, TaxiLandingUtility.PlacementRot);
+                },
                 (LocalTargetInfo target) => TaxiLandingUtility.DrawGhost(target, map),
                 null,
                 null);
         }
 
-        public static void TryRepositionTaxi(TransportShip ship, IntVec3 cell, Rot4 rot)
+        public static void FinishPendingMapLanding(IntVec3 cell, Rot4 rot)
         {
-            Thing shuttle = ship?.shipThing;
-            Map map = shuttle?.Map;
-            if (shuttle == null || map == null || !shuttle.Spawned)
+            TaxiGameComponent gc = Comp;
+            TaxiPendingMapLanding pending = gc?.pendingMapLanding;
+            if (pending == null)
             {
                 return;
             }
 
-            AcceptanceReport ok = TaxiLandingUtility.CanLandHere(cell, map, rot);
-            if (!ok.Accepted)
+            Map map = pending.ResolveMap();
+            List<ActiveTransporterInfo> transporters = pending.transporters;
+            gc.pendingMapLanding = null;
+
+            if (map == null || transporters == null || transporters.Count == 0)
             {
-                Messages.Message(ok.Reason, new LookTargets(cell, map), MessageTypeDefOf.RejectInput, historical: false);
                 return;
             }
+
+            if (!TaxiLandingUtility.CanLandHere(cell, map, rot).Accepted)
+            {
+                cell = FindAutoLandingCell(map, rot);
+                rot = TaxiLandingUtility.PlacementRot;
+            }
+
+            FinishMapLandingDrop(map, transporters, cell, rot);
+        }
+
+        /// <summary>Auto-drop if save/cancel would strand contents.</summary>
+        public static void FinishPendingMapLandingAuto()
+        {
+            TaxiGameComponent gc = Comp;
+            TaxiPendingMapLanding pending = gc?.pendingMapLanding;
+            if (pending == null)
+            {
+                return;
+            }
+
+            Map map = pending.ResolveMap();
+            List<ActiveTransporterInfo> transporters = pending.transporters;
+            gc.pendingMapLanding = null;
+            if (map == null || transporters == null || transporters.Count == 0)
+            {
+                return;
+            }
+
+            Rot4 rot = RimTaxiDefOf.RimTaxiShuttle?.defaultPlacingRot ?? Rot4.North;
+            IntVec3 cell = FindAutoLandingCell(map, rot);
+            FinishMapLandingDrop(map, transporters, cell, rot);
+        }
+
+        private static IntVec3 FindAutoLandingCell(Map map, Rot4 rot = default)
+        {
+            if (rot == default)
+            {
+                rot = RimTaxiDefOf.RimTaxiShuttle?.defaultPlacingRot ?? Rot4.North;
+            }
+
+            ThingDef shuttleDef = RimTaxiDefOf.RimTaxiShuttle ?? ThingDefOf.Shuttle;
+            IntVec3 landing = DropCellFinder.GetBestShuttleLandingSpot(map, Faction.OfPlayer);
+            if (shuttleDef != null
+                && !RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(landing, map, shuttleDef, rot).Accepted)
+            {
+                if (!CellFinder.TryFindRandomCell(map,
+                        c => RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(c, map, shuttleDef, rot).Accepted,
+                        out landing))
+                {
+                    landing = DropCellFinder.TradeDropSpot(map);
+                }
+            }
+
+            if (!landing.IsValid)
+            {
+                landing = DropCellFinder.TradeDropSpot(map);
+            }
+
+            return landing;
+        }
+
+        private static void FinishMapLandingDrop(
+            Map map,
+            List<ActiveTransporterInfo> transporters,
+            IntVec3 landing,
+            Rot4 rot)
+        {
+            ThingDef shuttleDef = RimTaxiDefOf.RimTaxiShuttle ?? ThingDefOf.Shuttle;
+            TransportShipDef shipDef = RimTaxiDefOf.Ship_RimTaxi;
 
             try
             {
-                if (cell == shuttle.Position && rot == shuttle.Rotation)
-                {
-                    return;
-                }
-
-                // Keep the same Thing instance so TransportShip comps stay valid
-                shuttle.DeSpawn(DestroyMode.Vanish);
-                GenSpawn.Spawn(shuttle, cell, map, rot, WipeMode.VanishOrMoveAside);
-                shuttle.Rotation = rot;
-                Messages.Message(
-                    "RimTaxi_LandingRepositioned".Translate(),
-                    shuttle,
-                    MessageTypeDefOf.TaskCompletion,
-                    historical: false);
-                Log.Message($"[RimTaxi] Taxi repositioned to {cell} rot={rot}");
+                TransportersArrivalAction_RimTaxiMapLand.DropRimTaxi(
+                    transporters[0], map, landing, rot, shipDef, shuttleDef);
             }
             catch (Exception e)
             {
-                Log.Error("[RimTaxi] TryRepositionTaxi failed: " + e);
-                Messages.Message("RimTaxi_SpawnFailed".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+                Log.Error("[RimTaxi] Map landing drop failed: " + e + " — world caravan fallback.");
+                new TransportersArrivalAction_RimTaxiWorldDrop("RimTaxi_ArrivedCaravan").Arrived(transporters, map.Tile);
+                return;
             }
+
+            for (int i = 1; i < transporters.Count; i++)
+            {
+                try
+                {
+                    TransportersArrivalActionUtility.DropTravellingDropPods(
+                        new List<ActiveTransporterInfo> { transporters[i] },
+                        landing,
+                        map);
+                }
+                catch (Exception e)
+                {
+                    Log.Warning("[RimTaxi] Extra pod drop failed: " + e);
+                }
+            }
+
+            Messages.Message(
+                "RimTaxi_ArrivedOnMapWaiting".Translate(map.Parent?.LabelCap ?? map.ToString()),
+                new LookTargets(landing, map),
+                MessageTypeDefOf.TaskCompletion);
+            CameraJumper.TryJump(landing, map);
+            Log.Message($"[RimTaxi] MapLand OK at {landing} rot={rot} on {map}");
         }
 
         // ─── 4) Set destination only (no payment, no depart) ─────
