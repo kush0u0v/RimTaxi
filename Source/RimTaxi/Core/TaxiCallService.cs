@@ -962,8 +962,8 @@ namespace RimTaxi
             fly.dropMode = TransportShipDropMode.None;
             fly.arrivalAction = TaxiArrivalUtility.CreateArrivalAction(dest);
 
-            ship.ForceJob(fly);
             TaxiTripLookup.Clear(ship);
+            ship.ForceJob(fly);
 
             if (charged > 0)
             {
