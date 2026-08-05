@@ -89,24 +89,22 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 | Type | Role |
 |------|------|
-| `TaxiCallService` | Call / pickup / dispatch / set dest / depart (map + caravan) |
-| `TaxiPickupSite` | Lists pickup maps/settlements/field maps |
-| `TaxiPendingDispatch` + `TaxiGameComponent` | Dispatch ETA queue; caravan boarding sessions; cooldown |
-| `TaxiCaravanBoarding` / `TaxiCaravanUtility` | World caravan taxi ready + launch without map |
-| `Caravan_Gizmos_Patch` | Caravan top-bar Call / Set dest / Depart |
-| `CompRimTaxiTrip` | **Authoritative** destination+distance on shuttle Thing |
-| `TaxiTripLookup` | Comp + GameComponent resolve |
-| `TaxiPayment` | Map silver count/spend (not orbital-beacon-only) |
-| `TaxiFareCalculator` / `TaxiTripBilling` | Call fee vs mass×distance trip fare |
-| `TaxiArrivalUtility` | Map land vs world drop chooser |
-| `TransportersArrivalAction_RimTaxiMapLand` | Safe map drop (`DropRimTaxi`, not vanilla DropShuttle NRE) |
-| `TransportersArrivalAction_RimTaxiWorldDrop` | World caravan drop-off |
-| `TaxiCommsContact` / `TaxiDialogMaker` | Comms radio contact (ICommunicable) + negotiation dialog |
-| `Building_CommsConsole_Patch` | GetCommTargets + optional gizmo |
-| `ShipJob_Wait_Gizmos_Patch` | Set destination / Depart / Dismiss |
-| `ShipJob_FlyAway_Billing_Patch` | Auto path after wait (fare / re-wait / empty leave) |
-| `TravellingTransporters_Arrival_Patch` | Force our arrival for `TravelingRimTaxi` |
-| `TravellingTransporters_Speed_Patch` | `travelSpeedFactor` on RimTaxi world flights |
+| `TaxiCallService` | Call / pickup / dispatch / caravan send / reposition / depart |
+| `TaxiLandingUtility` | Land checks, ghost, **Q/E** placement rotation |
+| `TaxiPickupSite` | Pickup maps / settlements / field / caravans |
+| `TaxiPendingDispatch` + `TaxiGameComponent` | ETA queue (+ `landingRot`); caravan boarding; cooldown |
+| `TaxiCaravanBoarding` / `TaxiCaravanUtility` | Layover, launch, immobilize, **taxi world icon** |
+| `Caravan_Gizmos_Patch` | Send / en route / board / **하차** |
+| `Caravan_Movement_Patch` | Immobilize while taxi en route or waiting |
+| `Caravan_WorldIcon_Patch` | Taxi icon instead of yellow caravan circle |
+| `CompRimTaxiTrip` / `TaxiTripLookup` | Booked destination on shuttle |
+| `TaxiPayment` | Beacon / stockpile / carried / caravan dual pool |
+| `TaxiFareCalculator` / `TaxiTripBilling` | Call vs trip fare |
+| `TaxiArrivalUtility` + MapLand / WorldDrop | Arrival chooser |
+| `TaxiCommsContact` / `TaxiDialogMaker` | Radio UI |
+| `ShipJob_Wait_Gizmos_Patch` | Dest / depart / **reposition** / dismiss |
+| `ShipJob_FlyAway_Billing_Patch` | Auto fare / re-wait / empty leave |
+| Arrival / speed patches | Force arrival; slower flight |
 
 ### Defs
 
