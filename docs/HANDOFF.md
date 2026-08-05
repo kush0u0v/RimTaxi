@@ -51,7 +51,7 @@ Identity: **service / meter**, not player spaceship (not SRTS).
 
 | State | UI | Movement | World icon |
 |-------|-----|----------|------------|
-| Idle | **택시 보내기** (fee → pick dest) | Free | Yellow caravan |
+| Idle | **택시 보내기** (ETA) / **바로 보내기** (즉시) | Free | Yellow caravan |
 | En route | ETA + change dest | **Immobile** | **Taxi** |
 | Waiting (boarding) | Dest / **출발** / **하차** | **Immobile** | **Taxi** |
 | After 하차 or 출발 | — | Free | Normal / in-flight taxi |
@@ -95,7 +95,7 @@ Identity: **service / meter**, not player spaceship (not SRTS).
 | dispatchBaseTicks | 2500 | 1h |
 | dispatchVarianceTicks | 5000 | +0–2h → **1–3h ETA** |
 | dispatchTicksPerTripTile | 0 | Off |
-| waitTicks | 12500 | 5h board/layover window |
+| waitTicks | **5000 (2h)** | Board/layover after land (incl. after a ride) |
 | cooldownTicks | 2500 | 1h between calls |
 | landOnSettlementMaps | true | Player map land vs always caravan |
 

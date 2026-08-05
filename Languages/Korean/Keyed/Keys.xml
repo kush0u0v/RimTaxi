@@ -112,6 +112,10 @@
   <RimTaxi_CaravanCall>택시 호출 ({0} 은)…</RimTaxi_CaravanCall>
   <RimTaxi_CaravanCallDesc>이 캐러밴으로 택시를 부릅니다. 호출비 {0} 은은 캐러밴 인벤토리에서 결제. 도착 후 캐러밴 상단에서 목적지 설정·탑승. 운행 요금: 무게×거리×{1} 은.</RimTaxi_CaravanCallDesc>
   <RimTaxi_CaravanSend>택시 보내기 ({0} 은)…</RimTaxi_CaravanSend>
+  <RimTaxi_CaravanInstantSend>바로 보내기 ({0}+운행)…</RimTaxi_CaravanInstantSend>
+  <RimTaxi_CaravanInstantSendDesc>즉시 출발: 목적지 선택 → 호출비 {0} 은 + 운행 요금(무게×거리×{1}) 지금 결제 → 배차 대기 없이 바로 비행.</RimTaxi_CaravanInstantSendDesc>
+  <RimTaxi_CaravanPickDestInstant>바로 보낼 목적지를 선택하세요 (호출비+운행 요금 즉시 결제).</RimTaxi_CaravanPickDestInstant>
+  <RimTaxi_CaravanInstantDeparted>바로 보냈습니다. 호출 {0} + 운행 {1} 은 (무게 {2} kg × {3} 타일).</RimTaxi_CaravanInstantDeparted>
   <RimTaxi_CaravanSendDesc>캐러밴에서 택시를 보냅니다. 호출비 {0} 은(정착지 무역송신기 범위 은 및/또는 캐러밴 소지 은) → 월드 목적지 선택 → 배차 대기 → 출발. 운행 요금은 출발 시 무게×거리×{1}.</RimTaxi_CaravanSendDesc>
   <RimTaxi_CaravanPickDestToSend>택시를 보낼 목적지(월드 타일)를 선택하세요.</RimTaxi_CaravanPickDestToSend>
   <RimTaxi_CaravanSendDispatched>호출비 {0} 은. 목적지 {1}타일(출발 시 운행 약 {2}은). 택시 오는 중… 예상 {3}. 도착하면 「출발」을 누르세요.</RimTaxi_CaravanSendDispatched>

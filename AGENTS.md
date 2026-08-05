@@ -41,7 +41,8 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 **From player caravan (top bar):**
 
-- **택시 보내기** → pick world dest → pay call fee → ETA → **출발** / **하차**
+- **택시 보내기** → dest → call fee → ETA → **출발** / **하차**
+- **바로 보내기** → dest → call fee **+ trip fare now** → fly immediately (no dispatch wait)
 - While en route or boarding: caravan **cannot move**; **world icon = taxi** (not yellow circle)
 - Silver: open settlements’ **trade-beacon** silver + caravan inventory
 - **하차**: dismiss taxi layover, free movement; call fee not refunded
@@ -49,7 +50,7 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 ### After land on map (steps 4–5 + pad)
 
 - Gizmos: set dest / depart / **착륙 위치 변경 (Q/E)** / dismiss
-- Wait default **5h**; empty leave free; loaded no dest → re-wait
+- Wait default **2h** (`waitTicks` 5000) after land / layover after a ride; empty leave free; loaded no dest → re-wait
 
 ### Arrival at trip destination
 
@@ -150,7 +151,7 @@ Defaults:
 | `dispatchBaseTicks` | 2500 | 1h base ETA |
 | `dispatchVarianceTicks` | 5000 | +0–2h → **call arrival 1–3h** |
 | `dispatchTicksPerTripTile` | 0 | Keep ETA in 1–3h band |
-| `waitTicks` | 12500 | 5h boarding window after land |
+| `waitTicks` | **5000** | **2h** boarding/layover after land (after a ride) |
 | `cooldownTicks` | 2500 | 1h between calls |
 | `maxLaunchDistance` | 70 | Trip range |
 | `travelSpeedFactor` | 0.6 | Slower world flight |

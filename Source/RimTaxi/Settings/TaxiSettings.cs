@@ -16,8 +16,8 @@ namespace RimTaxi
         /// <summary>Reuse cooldown. Default 1 in-game hour.</summary>
         public int cooldownTicks = 2500;
 
-        /// <summary>Boarding wait after taxi lands. Default 5 in-game hours.</summary>
-        public int waitTicks = 12500;
+        /// <summary>Boarding/layover wait after taxi lands (incl. after a ride). Default 2 in-game hours.</summary>
+        public int waitTicks = 5000;
 
         /// <summary>Base time until taxi arrives after call. Default 1 hour.</summary>
         public int dispatchBaseTicks = 2500;
@@ -47,7 +47,7 @@ namespace RimTaxi
 
             Scribe_Values.Look(ref maxPassengers, "maxPassengers", 4);
             Scribe_Values.Look(ref cooldownTicks, "cooldownTicks", 2500);
-            Scribe_Values.Look(ref waitTicks, "waitTicks", 12500);
+            Scribe_Values.Look(ref waitTicks, "waitTicks", 5000);
             Scribe_Values.Look(ref dispatchBaseTicks, "dispatchBaseTicks", 2500);
             Scribe_Values.Look(ref dispatchVarianceTicks, "dispatchVarianceTicks", 5000);
             Scribe_Values.Look(ref dispatchTicksPerTripTile, "dispatchTicksPerTripTile", 0);
@@ -109,9 +109,10 @@ namespace RimTaxi
 
             listing.Label("RimTaxi_Settings_Wait".Translate((waitTicks / 2500f).ToString("0.0")));
             waitTicks = (int)listing.Slider(waitTicks, 2500f, 180000f);
-            if (waitTicks > 11000 && waitTicks < 14000)
+            // Snap near 2h default
+            if (waitTicks > 4000 && waitTicks < 6000)
             {
-                waitTicks = 12500;
+                waitTicks = 5000;
             }
 
             listing.Label("RimTaxi_Settings_MaxLaunch".Translate(maxLaunchDistance));

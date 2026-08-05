@@ -947,10 +947,11 @@ namespace RimTaxi
             }
 
             yield return MakeCaravanSendGizmo(caravan);
+            yield return MakeCaravanInstantSendGizmo(caravan);
         }
 
         /// <summary>
-        /// Primary caravan action: pay call fee, pick destination, taxi en route then depart when ready.
+        /// Pay call fee, pick destination, wait ETA, then Depart when ready.
         /// </summary>
         public static Command_Action MakeCaravanSendGizmo(Caravan caravan)
         {
@@ -967,6 +968,37 @@ namespace RimTaxi
                 action = () => BeginSendTaxiFromCaravan(caravan)
             };
 
+            string blocked = GetBlockedReasonCaravan(caravan);
+            if (blocked != null)
+            {
+                cmd.Disable(blocked);
+            }
+
+            return cmd;
+        }
+
+        /// <summary>
+        /// Instant send: pick dest → pay call + trip → fly now (no dispatch wait).
+        /// </summary>
+        public static Command_Action MakeCaravanInstantSendGizmo(Caravan caravan)
+        {
+            float mass = TaxiCaravanUtility.GetCaravanMass(caravan);
+            // Icon-only estimate label uses call fee; real trip fare after dest pick
+            Command_Action cmd = new Command_Action
+            {
+                defaultLabel = "RimTaxi_CaravanInstantSend".Translate(CallFee),
+                defaultDesc = "RimTaxi_CaravanInstantSendDesc".Translate(
+                    CallFee,
+                    TaxiFareCalculator.FarePerKgPerTile.ToString("0.00")),
+                icon = ContentFinder<Texture2D>.Get("UI/Commands/RimTaxiInstantSend", reportFailure: false)
+                    ?? ContentFinder<Texture2D>.Get("UI/Commands/LaunchShip", reportFailure: false)
+                    ?? CompLaunchable.LaunchCommandTex
+                    ?? TexCommand.Attack,
+                Order = -49f,
+                action = () => BeginInstantSendFromCaravan(caravan)
+            };
+
+            // Need at least call fee; full affordability checked after dest chosen
             string blocked = GetBlockedReasonCaravan(caravan);
             if (blocked != null)
             {
@@ -1117,7 +1149,7 @@ namespace RimTaxi
         }
 
         /// <summary>
-        /// Pay call fee then open world map to choose where to send the caravan by taxi.
+        /// Pay call fee then open world map to choose where to send the caravan by taxi (with dispatch ETA).
         /// </summary>
         public static void BeginSendTaxiFromCaravan(Caravan caravan)
         {
@@ -1141,6 +1173,96 @@ namespace RimTaxi
                     return true;
                 },
                 "RimTaxi_CaravanPickDestToSend".Translate());
+        }
+
+        /// <summary>
+        /// Immediate caravan taxi: pick dest → pay call fee + trip fare → launch now (no ETA wait).
+        /// </summary>
+        public static void BeginInstantSendFromCaravan(Caravan caravan)
+        {
+            string blocked = GetBlockedReasonCaravan(caravan);
+            if (blocked != null)
+            {
+                Messages.Message(blocked, caravan, MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            BeginCaravanWorldTarget(
+                caravan,
+                (GlobalTargetInfo t, int dist) => FinishCaravanInstantSend(caravan, t.Tile, dist),
+                "RimTaxi_CaravanPickDestInstant".Translate());
+        }
+
+        private static bool FinishCaravanInstantSend(Caravan caravan, PlanetTile dest, int dist)
+        {
+            string blocked = GetBlockedReasonCaravan(caravan);
+            if (blocked != null)
+            {
+                Messages.Message(blocked, caravan, MessageTypeDefOf.RejectInput, historical: false);
+                return false;
+            }
+
+            float mass = TaxiCaravanUtility.GetCaravanMass(caravan);
+            int callFee = CallFee;
+            int tripFare = TaxiFareCalculator.TripFare(mass, dist);
+            int total = callFee + tripFare;
+
+            if (!TaxiPayment.CanAfford(caravan, total))
+            {
+                Messages.Message(
+                    "RimTaxi_NeedSilver".Translate(total, TaxiPayment.CountSilver(caravan)),
+                    caravan,
+                    MessageTypeDefOf.RejectInput,
+                    historical: false);
+                return false;
+            }
+
+            // Charge call fee then trip fare (same pool)
+            if (!TaxiPayment.TryPay(caravan, callFee))
+            {
+                Messages.Message(
+                    "RimTaxi_NeedSilver".Translate(callFee, TaxiPayment.CountSilver(caravan)),
+                    caravan,
+                    MessageTypeDefOf.RejectInput,
+                    historical: false);
+                return false;
+            }
+
+            if (!TaxiPayment.TryPay(caravan, tripFare))
+            {
+                TaxiPayment.RefundToCaravan(caravan, callFee);
+                Messages.Message(
+                    "RimTaxi_NeedSilver".Translate(tripFare, TaxiPayment.CountSilver(caravan)),
+                    caravan,
+                    MessageTypeDefOf.RejectInput,
+                    historical: false);
+                return false;
+            }
+
+            Comp?.NotifyCalled();
+
+            TransportersArrivalAction arrival = TaxiArrivalUtility.CreateArrivalAction(dest);
+            if (!TaxiCaravanUtility.LaunchCaravanAsTaxi(caravan, dest, arrival))
+            {
+                if (caravan != null && !caravan.Destroyed)
+                {
+                    TaxiPayment.RefundToCaravan(caravan, total);
+                }
+
+                Messages.Message("RimTaxi_SpawnFailed".Translate(), MessageTypeDefOf.NegativeEvent);
+                return false;
+            }
+
+            if (total > 0)
+            {
+                Messages.Message(
+                    "RimTaxi_CaravanInstantDeparted".Translate(callFee, tripFare, mass.ToString("0.0"), dist),
+                    MessageTypeDefOf.TaskCompletion,
+                    historical: false);
+            }
+
+            Log.Message($"[RimTaxi] Caravan INSTANT send → {dest} dist={dist} call={callFee} trip={tripFare}");
+            return true;
         }
 
         private static bool FinishCaravanSendAfterDestination(Caravan caravan, PlanetTile dest, int dist)
