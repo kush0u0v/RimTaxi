@@ -35,9 +35,16 @@ namespace RimTaxi
             {
                 if (cachedTaxiWorldIcon == null)
                 {
+                    // Prefer world icons; fall back to command / building art
                     cachedTaxiWorldIcon = ContentFinder<Texture2D>.Get("World/WorldObjects/Expanding/RimTaxi", reportFailure: false)
                         ?? ContentFinder<Texture2D>.Get("World/WorldObjects/RimTaxi", reportFailure: false)
-                        ?? ContentFinder<Texture2D>.Get("UI/Commands/RimTaxiDisembark", reportFailure: false);
+                        ?? ContentFinder<Texture2D>.Get("UI/Commands/RimTaxiInstantSend", reportFailure: false)
+                        ?? ContentFinder<Texture2D>.Get("UI/Commands/RimTaxiDisembark", reportFailure: false)
+                        ?? ContentFinder<Texture2D>.Get("Things/Building/Misc/RimTaxiShuttle", reportFailure: false);
+                    if (cachedTaxiWorldIcon == null)
+                    {
+                        Log.Warning("[RimTaxi] Taxi world icon texture missing — caravan will stay yellow circle.");
+                    }
                 }
 
                 return cachedTaxiWorldIcon;
@@ -50,9 +57,10 @@ namespace RimTaxi
             {
                 if (cachedTaxiWorldMat == null && TaxiWorldIcon != null)
                 {
+                    // Same shader family as Caravan.Material (yellow disc uses WorldOverlayTransparentLit)
                     cachedTaxiWorldMat = MaterialPool.MatFrom(
                         TaxiWorldIcon,
-                        ShaderDatabase.WorldOverlayTransparent,
+                        ShaderDatabase.WorldOverlayTransparentLit,
                         Color.white,
                         3600);
                 }
