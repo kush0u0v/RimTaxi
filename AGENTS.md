@@ -136,10 +136,11 @@ No mid-wait “move pad anywhere” gizmo.
 ### Call fee is the default cost (locked)
 
 - **`baseFare` default = 200 silver** — settings may change amount, but the *model* is fixed: **dispatch is prepaid**.
-- Call fee is charged when the call is accepted (comms or caravan send).
-- **No refund by default** if the player never boards, cancels by waiting out, disembarks on world map, or the taxi leaves empty after wait.
-- **Only exception-style refunds** already in code for hard failures (e.g. spawn/landing failed) — not for player no-show.
-- Trip fare is separate and only at **Depart**.
+- **Call fee is paid exactly once per call** (comms confirm / caravan send). Not charged again at:
+  - set destination, depart, auto-depart, layover reboard, or next leg on the same taxi session
+- **No refund by default** if the player never boards, disembarks, or empty leave after wait.
+- Hard-failure refunds only (e.g. spawn/landing failed) — not player no-show.
+- **Trip fare** is separate: only at **Depart** (once per leg; manual depart clears booking before FlyAway so no double trip charge).
 
 **Silver sources (`TaxiPayment`) — trade beacon = player settlement orbital trade beacon:**
 

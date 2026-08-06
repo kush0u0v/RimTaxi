@@ -32,7 +32,8 @@ Identity: **service / meter**, not player spaceship (not SRTS).
 | 4 | Set destination | Gizmo / world map | Preview only |
 | 5 | Depart | Gizmo **출발** | **mass×dist×rate** |
 
-**Call fee is the default cost:** no refund on no-board / disembark / empty leave. Trip fare only at depart.
+**Call fee:** paid **once per call** only (default 200). Not again on depart/layover/next leg. No refund on no-board/disembark.  
+**Trip fare:** only at **Depart** (once per leg; no double-charge after manual depart fix).
 
 ---
 
