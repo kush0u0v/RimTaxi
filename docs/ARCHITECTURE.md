@@ -6,18 +6,19 @@
 Comms (ICommunicable "RimTaxi Dispatch" + DiaNode; optional gizmo)
   └─ ShowPickupSiteMenu
        ├─ maps / settlements / field / caravans / world pick
-       ├─ map landing: cell + Q/E rot → QueueDispatch
+      ├─ map landing: cell (fixed rotation) → QueueDispatch
        └─ caravan pickup: QueueCaravanDispatch
             └─ tick → SpawnTaxi (map) or TaxiCaravanBoarding (caravan)
 
 Player caravan top bar
-  ├─ idle: 택시 보내기 → dest → pay call fee → QueueCaravanDispatch
+  ├─ idle: no call gizmo (comms only)
+  ├─ after comms call to caravan: pending en-route gizmos
   ├─ en route: ETA + change dest (CantMove; taxi world icon)
   └─ boarding: dest / 출발 / 하차 (CantMove; taxi world icon)
        └─ 출발 → LaunchCaravanAsTaxi → TravelingRimTaxi
 
 Map TransportShip (Ship_RimTaxi)
-  ├─ WaitTime gizmos: dest / depart / reposition landing (Q/E) / dismiss
+  ├─ WaitTime gizmos: dest / landing(필요 시) / depart / dismiss
   └─ FlyAway (billing patch)
 
 TravellingTransporters (TravelingRimTaxi) — taxi world texture
@@ -46,7 +47,7 @@ TravellingTransporters (TravelingRimTaxi) — taxi world texture
 | `Caravan_Gizmos_Patch` | `Caravan.GetGizmos` | Send / en route / board / 하차 |
 | `Caravan_Movement_Patch` | `CantMove`, `StartPath` | Immobilize for taxi |
 | `Caravan_WorldIcon_Patch` | `ExpandingIcon`, `Material`, color | Taxi icon vs yellow circle |
-| `ShipJob_Wait_Gizmos_Patch` | `GetJobGizmos` | Dest / depart / reposition / dismiss |
+| `ShipJob_Wait_Gizmos_Patch` | `GetJobGizmos` | Dest / set landing (open map) / depart / dismiss |
 | `ShipJob_FlyAway_Billing_Patch` | `TryStart` | Fare / re-wait / empty leave |
 | `TravellingTransporters_Arrival_Patch` | `Arrived` | Force our arrival |
 | `TravellingTransporters_Speed_Patch` | speed getter | Slower flights |
@@ -55,7 +56,7 @@ TravellingTransporters (TravelingRimTaxi) — taxi world texture
 
 | Type | Role |
 |------|------|
-| `TaxiLandingUtility` | Land checks, ghost, **Q/E** `PlacementRot` |
+| `TaxiLandingUtility` | Land checks, ghost, fixed rotation |
 | `TaxiPayment` | Settlement beacon/stockpile/carried; caravan = beacons + inv |
 | `TaxiCaravanUtility` | Launch, immobilize, taxi world icon textures |
 | `TaxiCommsContact` / `TaxiDialogMaker` | Faction-style radio |
@@ -74,8 +75,8 @@ TravellingTransporters (TravelingRimTaxi) — taxi world texture
 
 | Field | Default | Notes |
 |-------|---------|--------|
-| baseFare | **200** | Call fee (default prepaid cost) |
-| farePerKgPerTile | 0.1 | Trip |
+| baseFare | **400** | Call fee (default prepaid cost) |
+| farePerKgPerTile | 0.18 | Trip |
 | dispatchBaseTicks | 2500 | 1h |
 | dispatchVarianceTicks | 5000 | → **1–3h ETA** |
 | waitTicks | 12500 | 5h board/layover |

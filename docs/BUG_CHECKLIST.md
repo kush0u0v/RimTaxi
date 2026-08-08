@@ -12,11 +12,11 @@
 |---|------|----------|---|
 | A1 | Comms use → contact list has **RimTaxi 배차센터** | Same style as faction radio | |
 | A2 | Radio → **택시 요청** → pickup menu | Header + world pick + sites | |
-| A3 | Pickup **here** → landing cell **(Q/E rotate)** → pay **200** | Letter + ETA **1–3h** (not instant) | |
+| A3 | Pickup **here** → landing cell → pay **400** | Letter + ETA **1–3h** (not instant) | |
 | A4 | After ETA, taxi lands | No NRE; message/letter | |
 | A5 | Load pawn → **4. 목적지** → **5. 출발** | Fare charged; flies | |
 | A6 | Arrive player base | Map land; unload; **waits** (not instant leave) | |
-| A6b | After flight to own map: pick landing + Q/E | Lands where chosen, then waits | |
+| A6b | After flight to own map: land on pre-selected cell (or fallback random if blocked) | Lands where chosen, then waits | |
 | A7 | Reboard → new dest → depart | Second leg works | |
 
 ---
@@ -50,12 +50,12 @@
 
 | # | Test | Expected | ☐ |
 |---|------|----------|---|
-| D0 | **택시 보내기** → pick dest | Call fee; ETA; caravan **immobile**; **taxi world icon** | |
+| D0 | Comms → pick caravan pickup | Call fee from **comms map**; ETA; caravan **immobile**; **taxi world icon** | |
 | D0b | En route: try move caravan | Blocked + message | |
 | D0c | Arrive ready → **하차** | Taxi dismissed; can move; yellow circle returns | |
 | D0d | Arrive ready → **출발** | Flight; trip fare | |
 |---|------|----------|---|
-| D1 | Select caravan → **택시 호출** | Fee from caravan inv; ETA letter | |
+| D1 | Comms → pick caravan → **택시 호출** | Fee from comms map; ETA letter | |
 | D2 | After ETA | Set dest + Depart on caravan bar | |
 | D3 | Depart | Whole caravan boards; world flight | |
 | D4 | No silver on caravan | Call/depart disabled or reject | |
@@ -103,7 +103,7 @@
 | G5 | Caravan taxi: silver only at home (beacon) | Pays from settlement beacon; caravan inv optional | |
 | G5b | Caravan taxi: silver only on caravan | Pays from caravan inv | |
 | G5c | Caravan: combine beacon + caravan silver | Can split across both pools | |
-| G6 | Fare math | ~`ceil(massKg × tiles × 0.1)` | |
+| G6 | Fare math | ~`ceil(massKg × tiles × 0.18)` | |
 
 ---
 

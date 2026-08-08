@@ -232,6 +232,12 @@ namespace RimTaxi
             return preferred;
         }
 
+        /// <summary>Neighbor passable tile for blocked map-land fallback (caravan one tile beside).</summary>
+        public static PlanetTile FindAdjacentPassableTilePublic(PlanetTile center)
+        {
+            return FindAdjacentPassableTile(center);
+        }
+
         private static PlanetTile FindAdjacentPassableTile(PlanetTile center)
         {
             List<PlanetTile> neighbors = new List<PlanetTile>();

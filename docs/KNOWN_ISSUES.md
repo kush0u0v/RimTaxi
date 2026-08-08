@@ -6,15 +6,16 @@
 - **Field map pickup** (from comms list) requires the map **already open** with free colonists.
 - Comms menu also lists **player caravans** and has **「월드맵에서 픽업 위치 선택…」**.
 - Comms call fee is taken from the **comms map**, even if pickup is a remote map or caravan.
-- **World caravans** can also call/board from the caravan top bar (fee from caravan silver).
+- **World caravans** do **not** call taxis themselves — use **comms** (fee from comms map). Caravan top bar only shows en-route / board / depart / disembark after a comms call.
 - **Pending dispatch** blocks another taxi to the **same** pickup map until it lands or fails.
 - Caravan **cannot move** while taxi is en route or waiting (`CantMove` + `StartPath`).
 - Caravan + taxi (pending/boarding): **world icon is taxi**, not yellow circle, until **하차** or **출발**.
-- Landing cell + **Q/E** only at **call** or when **map is visible for arrival landing** (not mid-wait reposition).
+- Landing: **pickup cell** at call (no Q/E). **Arrival landing** on open dest maps is chosen **before depart**. On arrival if blocked → random free cell; if none → caravan on adjacent world tile.
+- Taxi **cannot be deconstructed**. At **≤25% HP** from damage: dump contents and fly away empty.
 
 ## Destination / depart
 
-- **Map call:** destination after land (design). **Caravan send:** destination chosen at call, changeable while en route / boarding.
+- **Map call:** destination after land (design). **Caravan pickup (comms):** destination set on caravan after taxi arrives (or while en route).
 - Manual **Depart** clears trip booking **before** `ForceJob(FlyAway)` so billing patch does not double-charge trip fare.
 - Loaded taxi + wait expired + **no destination** → re-wait + message (does not fly loaded blind).
 - Empty taxi after wait may leave with no trip fare.
@@ -30,11 +31,11 @@
 
 ## Economy
 
-- **Call fee once per call** (`baseFare` default 200): only at call/send confirm. Not on depart, reboard, or next leg. No refund on no-board/disembark/empty leave.
+- **Call fee once per call** (`baseFare` default 400): only at call confirm. Not on depart, reboard, or next leg. No refund on no-board/disembark/empty leave.
 - **Trip fare once per depart** (manual depart clears booking before FlyAway — no double trip charge).
 - Silver rules: **settlement + trade beacon** = beacon radius + carried; **settlement no beacon** = stockpile + carried; **field** = carried only; **caravan taxi** = all open settlements’ beacon silver + caravan inventory.
 - Trip fare from taxi’s current map / caravan — remote depart needs silver under those rules there.
-- Large mass × long distance can dwarf the 200 call fee.
+- Large mass × long distance can dwarf the 400 call fee.
 
 ## Graphics
 

@@ -61,6 +61,33 @@ namespace RimTaxi
                 return;
             }
 
+            // Clear trip booking but keep pre-depart landing for arrival resolution.
+            CompRimTaxiTrip comp = GetComp(ship);
+            if (comp != null)
+            {
+                bool keepLand = comp.hasDestLanding;
+                IntVec3 cell = comp.destLandingCell;
+                int mapId = comp.destLandingMapId;
+                comp.Clear();
+                if (keepLand)
+                {
+                    comp.destLandingCell = cell;
+                    comp.destLandingMapId = mapId;
+                    comp.hasDestLanding = true;
+                }
+            }
+
+            TaxiGameComponent.Get()?.ClearTrip(ship.loadID);
+        }
+
+        /// <summary>Full clear including landing (after successful map land or cancel trip).</summary>
+        public static void ClearAll(TransportShip ship)
+        {
+            if (ship == null)
+            {
+                return;
+            }
+
             GetComp(ship)?.Clear();
             TaxiGameComponent.Get()?.ClearTrip(ship.loadID);
         }

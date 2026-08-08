@@ -5,11 +5,11 @@ namespace RimTaxi
 {
     public class TaxiSettings : ModSettings
     {
-        /// <summary>Silver charged when calling the taxi (dispatch).</summary>
-        public int baseFare = 200;
+        /// <summary>Silver charged when calling the taxi (dispatch). Rim-pricey by default.</summary>
+        public int baseFare = 400;
 
         /// <summary>Trip surcharge: massKg × distanceTiles × this rate (rounded up).</summary>
-        public float farePerKgPerTile = 0.1f;
+        public float farePerKgPerTile = 0.18f;
 
         public int maxPassengers = 4;
 
@@ -40,8 +40,8 @@ namespace RimTaxi
 
         public override void ExposeData()
         {
-            Scribe_Values.Look(ref baseFare, "baseFare", 200);
-            Scribe_Values.Look(ref farePerKgPerTile, "farePerKgPerTile", 0.1f);
+            Scribe_Values.Look(ref baseFare, "baseFare", 400);
+            Scribe_Values.Look(ref farePerKgPerTile, "farePerKgPerTile", 0.18f);
             int legacyPerTile = 15;
             Scribe_Values.Look(ref legacyPerTile, "farePerTile", 15);
 
@@ -59,8 +59,8 @@ namespace RimTaxi
 
         public void ResetToDefaults()
         {
-            baseFare = 200;
-            farePerKgPerTile = 0.1f;
+            baseFare = 400;
+            farePerKgPerTile = 0.18f;
             maxPassengers = 4;
             cooldownTicks = 2500;
             waitTicks = 5000;

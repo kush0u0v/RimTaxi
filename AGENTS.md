@@ -24,9 +24,9 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 ## Locked player flow (do not redesign unless asked)
 
 ```
-1. Call          → pay CALL FEE (default 200) — prepaid default cost
+1. Call          → pay CALL FEE (default 400) — prepaid default cost
 2. Dispatch      → ETA 1–3 in-game hours
-3. Arrive        → map land (cell+Q/E) OR caravan “taxi ready” (world icon = taxi)
+3. Arrive        → map land (preset at departure for open destination maps) OR caravan “taxi ready” (world icon = taxi)
 4. Set destination → world map; mass×distance preview (no charge yet)
 5. Depart        → trip fare, then fly
 ```
@@ -37,20 +37,20 @@ Do **not** brand features as SRTS-like in UI, docs, or commits.
 
 1. Request taxi  
 2. **In the same radio dialog:** choose where to send (pickup sites + world map pick)  
-3. Map landing: **cell + Q/E**  
+3. Map landing: **cell** (fixed rotation)
 - Call fee from **comms map** (even if remote pickup)
 
 **From player caravan (top bar):**
 
-- **택시 보내기** → dest → call fee → ETA → **출발** / **하차**
+- Call: **comms only** (can target caravan). Caravan bar: en-route / **목적지** / **출발** / **하차** (no idle 보내기)
 - While en route or boarding: caravan **cannot move**; **world icon = taxi** (not yellow circle)
 - Silver: open settlements’ **trade-beacon** silver + caravan inventory
 - **하차**: dismiss taxi layover, free movement; call fee not refunded
 
 ### Landing position (only these times)
 
-1. **Call** — map is shown → pick cell + **Q/E**
-2. **Arrival on player map** — map is shown → pick cell + **Q/E**, then drop + wait layover
+1. **Call** — map is shown → pick landing cell
+2. **Arrival on player map** — uses pre-depart landing if configured; otherwise fallback world drop
 
 No mid-wait “move pad anywhere” gizmo.
 
@@ -97,8 +97,8 @@ No mid-wait “move pad anywhere” gizmo.
 
 | Type | Role |
 |------|------|
-| `TaxiCallService` | Call / pickup / dispatch / caravan send / reposition / depart |
-| `TaxiLandingUtility` | Land checks, ghost, **Q/E** placement rotation |
+| `TaxiCallService` | Call / pickup / dispatch / caravan send / depart |
+| `TaxiLandingUtility` | Land checks, ghost, fixed rotation |
 | `TaxiPickupSite` | Pickup maps / settlements / field / caravans |
 | `TaxiPendingDispatch` + `TaxiGameComponent` | ETA queue (+ `landingRot`); caravan boarding; cooldown |
 | `TaxiCaravanBoarding` / `TaxiCaravanUtility` | Layover, launch, immobilize, **taxi world icon** |
@@ -110,7 +110,7 @@ No mid-wait “move pad anywhere” gizmo.
 | `TaxiFareCalculator` / `TaxiTripBilling` | Call vs trip fare |
 | `TaxiArrivalUtility` + MapLand / WorldDrop | Arrival chooser |
 | `TaxiCommsContact` / `TaxiDialogMaker` | Radio UI |
-| `ShipJob_Wait_Gizmos_Patch` | Dest / depart / **reposition** / dismiss |
+| `ShipJob_Wait_Gizmos_Patch` | Dest / depart / set landing (open maps) / dismiss |
 | `ShipJob_FlyAway_Billing_Patch` | Auto fare / re-wait / empty leave |
 | Arrival / speed patches | Force arrival; slower flight |
 
@@ -129,13 +129,13 @@ No mid-wait “move pad anywhere” gizmo.
 
 | When | Silver | Taken from |
 |------|--------|------------|
-| **1. Call** | `baseFare` (**default 200**) | Call map / caravan via `TaxiPayment` |
-| **5. Depart** | `ceil(massKg × tiles × farePerKgPerTile)` | Taxi map / caravan via `TaxiPayment` |
+| **1. Call** | `baseFare` (**default 400**) | Call map via `TaxiPayment` (comms only) |
+| **5. Depart** | `ceil(massKg × tiles × farePerKgPerTile)` default **0.18** | Taxi map / caravan via `TaxiPayment` |
 | Empty leave / no-board / disembark / wait expire | **Trip fare 0** | — |
 
 ### Call fee is the default cost (locked)
 
-- **`baseFare` default = 200 silver** — settings may change amount, but the *model* is fixed: **dispatch is prepaid**.
+- **`baseFare` default = 400 silver** — settings may change amount, but the *model* is fixed: **dispatch is prepaid**.
 - **Call fee is paid exactly once per call** (comms confirm / caravan send). Not charged again at:
   - set destination, depart, auto-depart, layover reboard, or next leg on the same taxi session
 - **No refund by default** if the player never boards, disembarks, or empty leave after wait.
@@ -154,8 +154,8 @@ Defaults:
 
 | Setting | Default | Notes |
 |---------|---------|--------|
-| `baseFare` | 200 | Call fee |
-| `farePerKgPerTile` | 0.1 | Trip rate |
+| `baseFare` | 400 | Call fee |
+| `farePerKgPerTile` | 0.18 | Trip rate |
 | `dispatchBaseTicks` | 2500 | 1h base ETA |
 | `dispatchVarianceTicks` | 5000 | +0–2h → **call arrival 1–3h** |
 | `dispatchTicksPerTripTile` | 0 | Keep ETA in 1–3h band |
@@ -191,7 +191,7 @@ Or repo root: `.\build.ps1`
 ## In-game smoke checklist
 
 1. Log: `[RimTaxi] Loaded` (or current load message).
-2. Call: float menu pickup list; **no world map**; pay 200; letter ETA ~1–3h.
+2. Call: float menu pickup list; **no world map**; pay 400 default; letter ETA ~1–3h.
 3. Remote: pick other settlement / field map with colonists.
 4. After land: set destination (world map) → fare preview; depart charges trip fare.
 5. Settlement arrival: map land without DropShuttle NRE; fallback caravan if needed.

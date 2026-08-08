@@ -13,7 +13,7 @@ Call a taxi from a **comms console**, wait for dispatch, board at a **pickup** (
 
 ## Play loop (baseline)
 
-1. **Call** — pay **call fee (default 200 silver)**. Comms: pick pickup + **landing cell (Q/E rotate)**. Caravan: **택시 보내기** → world destination.  
+1. **Call** — pay **call fee (default 400 silver)** from **comms only**. Pick pickup (map landing cell Q/E, or player caravan). Caravans do not call taxis themselves.  
 2. **Dispatch** — en route (**about 1–3 hours**). Caravan cannot move while waiting for taxi.  
 3. **Arrive** — map land **or** caravan taxi ready (world **taxi icon**, not yellow circle).  
 4. **Set destination** — gizmo; fare preview.  

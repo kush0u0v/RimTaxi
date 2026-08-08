@@ -178,6 +178,17 @@ namespace RimTaxi
         /// </summary>
         public static bool LaunchCaravanAsTaxi(Caravan caravan, PlanetTile destinationTile, TransportersArrivalAction arrivalAction)
         {
+            return LaunchCaravanAsTaxi(caravan, destinationTile, arrivalAction, IntVec3.Invalid, -1, false);
+        }
+
+        public static bool LaunchCaravanAsTaxi(
+            Caravan caravan,
+            PlanetTile destinationTile,
+            TransportersArrivalAction arrivalAction,
+            IntVec3 destLandingCell,
+            int destLandingMapId,
+            bool hasDestLanding)
+        {
             if (caravan == null || caravan.Destroyed || !destinationTile.Valid)
             {
                 return false;
@@ -206,6 +217,14 @@ namespace RimTaxi
                 if (shuttle.Faction == null)
                 {
                     shuttle.SetFaction(Faction.OfPlayer);
+                }
+
+                CompRimTaxiTrip trip = shuttle.TryGetComp<CompRimTaxiTrip>();
+                if (trip != null && hasDestLanding && destLandingCell.IsValid)
+                {
+                    trip.destLandingCell = destLandingCell;
+                    trip.destLandingMapId = destLandingMapId;
+                    trip.hasDestLanding = true;
                 }
 
                 ActiveTransporterInfo info = new ActiveTransporterInfo();

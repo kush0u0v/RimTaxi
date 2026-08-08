@@ -8,9 +8,14 @@
   <ThingDef ParentName="ShuttleBase">
     <defName>RimTaxiShuttle</defName>
     <label>taxi shuttle</label>
-    <description>A civilian taxi shuttle. Call it from a comms console, load passengers and limited cargo, then fly to a world-map destination for a silver fee.</description>
+    <description>A civilian taxi shuttle. Call it from a comms console, load passengers and limited cargo, then fly to a world-map destination for a silver fee. Cannot be deconstructed.</description>
     <!-- Keep collision footprint; draw larger so the sprite fills the 5x3 box -->
     <size>(5,3)</size>
+    <!-- No colony deconstruct / salvage — taxi is a service craft, not a building -->
+    <destroyable>true</destroyable>
+    <building>
+      <deconstructible>false</deconstructible>
+    </building>
     <graphicData>
       <texPath>Things/Building/Misc/RimTaxiShuttle</texPath>
       <graphicClass>Graphic_Single</graphicClass>

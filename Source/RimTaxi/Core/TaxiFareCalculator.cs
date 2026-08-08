@@ -9,9 +9,9 @@ namespace RimTaxi
     /// </summary>
     public static class TaxiFareCalculator
     {
-        public static int CallFee => RimTaxiMod.Settings?.baseFare ?? 200;
+        public static int CallFee => RimTaxiMod.Settings?.baseFare ?? 400;
 
-        public static float FarePerKgPerTile => RimTaxiMod.Settings?.farePerKgPerTile ?? 0.1f;
+        public static float FarePerKgPerTile => RimTaxiMod.Settings?.farePerKgPerTile ?? 0.18f;
 
         public static int TripFare(float massKg, int distanceTiles)
         {

@@ -5,7 +5,7 @@ using Verse;
 namespace RimTaxi
 {
     /// <summary>
-    /// Flight arrived on a player map; player must pick landing cell + Q/E rot while map is visible.
+    /// Legacy landing state kept for save compatibility while map landing target is selected before depart.
     /// </summary>
     public class TaxiPendingMapLanding : IExposable
     {

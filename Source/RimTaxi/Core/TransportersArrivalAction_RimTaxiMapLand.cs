@@ -6,8 +6,8 @@ using Verse;
 namespace RimTaxi
 {
     /// <summary>
-    /// Land the taxi on a settlement/map. Uses our own drop path (not vanilla DropShuttle),
-    /// because DropShuttle requires CompShuttle.Props.shipDef / Royalty Ship_Shuttle and NREs otherwise.
+    /// Land the taxi on a settlement/map. Uses our own drop path (not vanilla DropShuttle).
+    /// Landing cell is preferred from pre-depart pick; blocked → random; none → adjacent world caravan.
     /// </summary>
     public class TransportersArrivalAction_RimTaxiMapLand : TransportersArrivalAction
     {
@@ -74,14 +74,83 @@ namespace RimTaxi
                 return;
             }
 
-            // Map is open/visible: player picks landing cell + Q/E (same as call-time placement).
-            // Hold transporters and open targeter after this frame.
-            var held = new List<ActiveTransporterInfo>(transporters);
-            LongEventHandler.ExecuteWhenFinished(delegate
+            // Pre-depart pick → if blocked random → if none, caravan one tile beside map.
+            CompRimTaxiTrip tripComp = FindTripComp(transporters);
+            IntVec3 preferred = IntVec3.Invalid;
+            if (tripComp != null && tripComp.TryGetLandingForMap(map, out IntVec3 bookedCell))
             {
-                TaxiCallService.BeginMapLandingPick(map, held);
-            });
-            Log.Message($"[RimTaxi] MapLand: waiting for player landing pick on {map}");
+                preferred = bookedCell;
+            }
+
+            IntVec3 landing = TaxiLandingUtility.ResolveLandingCell(map, preferred);
+            if (!landing.IsValid)
+            {
+                Log.Warning("[RimTaxi] MapLand: no valid landing cell; adjacent world caravan.");
+                Messages.Message(
+                    "RimTaxi_LandingBlockedCaravan".Translate(),
+                    MessageTypeDefOf.NeutralEvent);
+                PlanetTile dropTile = TransportersArrivalAction_RimTaxiWorldDrop.FindAdjacentPassableTilePublic(tile);
+                if (!dropTile.Valid)
+                {
+                    dropTile = tile;
+                }
+
+                new TransportersArrivalAction_RimTaxiWorldDrop("RimTaxi_ArrivedCaravan").Arrived(transporters, dropTile);
+                return;
+            }
+
+            if (preferred.IsValid && landing != preferred)
+            {
+                Messages.Message(
+                    "RimTaxi_LandingBlockedRandom".Translate(),
+                    new LookTargets(landing, map),
+                    MessageTypeDefOf.NeutralEvent);
+                Log.Message($"[RimTaxi] MapLand: preferred {preferred} blocked → random {landing}");
+            }
+
+            Rot4 rot = TaxiLandingUtility.DefaultRot;
+            TaxiCallService.FinishMapLandingDropPublic(map, transporters, landing, rot);
+        }
+
+        public static CompRimTaxiTrip FindTripComp(List<ActiveTransporterInfo> transporters)
+        {
+            if (transporters == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < transporters.Count; i++)
+            {
+                ActiveTransporterInfo info = transporters[i];
+                if (info == null)
+                {
+                    continue;
+                }
+
+                Thing shuttle = info.GetShuttle();
+                CompRimTaxiTrip c = shuttle?.TryGetComp<CompRimTaxiTrip>();
+                if (c != null)
+                {
+                    return c;
+                }
+
+                if (info.innerContainer == null)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < info.innerContainer.Count; j++)
+                {
+                    Thing t = info.innerContainer[j];
+                    c = t?.TryGetComp<CompRimTaxiTrip>();
+                    if (c != null)
+                    {
+                        return c;
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -100,7 +169,6 @@ namespace RimTaxi
                 throw new System.ArgumentNullException("transporter/map");
             }
 
-            // World pawns must re-enter the map
             TransportersArrivalActionUtility.RemovePawnsFromWorldPawns(Gen.YieldSingle(transporter));
 
             Thing shuttle = transporter.RemoveShuttle();
@@ -135,7 +203,6 @@ namespace RimTaxi
                 shuttle.SetFaction(Faction.OfPlayer);
             }
 
-            // Move remaining contents into the shuttle transporter
             if (transporter.innerContainer != null && transporter.innerContainer.Count > 0)
             {
                 compTransporter.innerContainer.TryAddRangeOrTransfer(
@@ -144,13 +211,11 @@ namespace RimTaxi
                     destroyLeftover: true);
             }
 
-            // Ensure TransportShip parent (DropShuttle NRE'd when shipDef was null)
             TransportShip transportShip = compShuttle?.shipParent;
             if (transportShip == null)
             {
                 if (shipDef == null)
                 {
-                    // Last resort: still spawn the building so pawns aren't lost
                     if (!near.IsValid)
                     {
                         near = DropCellFinder.TradeDropSpot(map);
@@ -169,14 +234,11 @@ namespace RimTaxi
                 near = DropCellFinder.GetBestShuttleLandingSpot(map, Faction.OfPlayer);
             }
 
-            // Land via ship pipeline (skyfaller arrive)
             transportShip.ArriveAt(near, map.Parent);
 
-            // Clear the leg just completed so re-boarding requires a new destination (no auto re-fly).
-            TaxiTripLookup.Clear(transportShip);
-            shuttle.TryGetComp<CompRimTaxiTrip>()?.Clear();
+            // Clear completed leg so reboard needs a new dest (landing included).
+            TaxiTripLookup.ClearAll(transportShip);
 
-            // Unload passengers for trade/explore, then WAIT so they can reboard and go elsewhere.
             ShipJob_Unload unload = (ShipJob_Unload)ShipJobMaker.MakeShipJob(ShipJobDefOf.Unload);
             unload.dropMode = TransportShipDropMode.All;
             transportShip.AddJob(unload);
@@ -192,7 +254,6 @@ namespace RimTaxi
             waitJob.showGizmos = true;
             transportShip.AddJob(waitJob);
 
-            // After wait: empty leave (billing patch); loaded without dest re-waits; loaded+dest charges and flies.
             transportShip.AddJob(ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway));
 
             return shuttle;

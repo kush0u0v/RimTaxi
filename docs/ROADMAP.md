@@ -4,7 +4,7 @@
 
 Canonical loop:
 
-1. **Call** — 200 silver (comms map); pick pickup site + landing cell; **no world map**  
+1. **Call** — 400 silver default (comms map); pick pickup site + landing cell; **no world map**  
 2. **Dispatch** — ETA **1–3 hours**  
 3. **Arrive** — land at pickup  
 4. **Set destination** — world map; mass×distance **preview**  
@@ -13,7 +13,7 @@ Canonical loop:
 Also delivered:
 
 - Remote pickup (other player settlements + open field maps; no camp)
-- **World caravan** call / set dest / board (top-bar gizmos; no map)
+- **World caravan** pickup via **comms**; set dest / board / depart on caravan top bar (no idle call)
 - Dual billing (call vs trip)
 - Trip booking on vehicle Comp
 - Map landing without vanilla DropShuttle NRE
@@ -39,9 +39,9 @@ Until then: **bugfixes and small string/UX only**.
 3. Trip fare always payable from home map (optional setting)  
 4. **GUI overhaul**  
 
-**Done recently:** caravan taxi world icon while waiting; map landing Q/E + reposition gizmo.  
+**Done recently:** caravan taxi world icon while waiting; map landing pre-depart selection (fixed rotation) and fallback handling.
 
-**Locked economy:** call fee (`baseFare` default 200) is prepaid default; no-show/disembark does not refund call fee unless a future optional setting is requested.
+**Locked economy:** call fee (`baseFare` default 400) is prepaid default; no-show/disembark does not refund call fee unless a future optional setting is requested.
 
 ## Explicit non-goals
 

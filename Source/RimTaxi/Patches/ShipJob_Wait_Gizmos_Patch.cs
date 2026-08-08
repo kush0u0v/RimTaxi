@@ -76,6 +76,10 @@ namespace RimTaxi.Patches
             {
                 depart.Disable("RimTaxi_NeedDestinationBeforeDepart".Translate());
             }
+            else if (!TaxiCallService.HasRequiredDestLanding(ship))
+            {
+                depart.Disable("RimTaxi_NeedLandingBeforeDepart".Translate());
+            }
             else if (map != null && !TaxiTripBilling.CanAffordTripFare(ship, map, distance, out int need, out _))
             {
                 depart.Disable("RimTaxi_NeedSilver".Translate(need, TaxiPayment.CountSilver(map)));
@@ -83,7 +87,25 @@ namespace RimTaxi.Patches
 
             yield return depart;
 
-            // Landing cell/rot is chosen only at call or when map is shown for landing — not mid-wait.
+            // Open dest map: re-pick landing before depart
+            if (hasTrip && TaxiCallService.NeedsPreDepartLanding(dest, out Map destMap))
+            {
+                CompRimTaxiTrip trip = ship.shipThing?.TryGetComp<CompRimTaxiTrip>();
+                bool hasLand = trip != null && trip.TryGetLandingForMap(destMap, out _);
+                Command_Action setLand = new Command_Action
+                {
+                    defaultLabel = hasLand
+                        ? "RimTaxi_ChangeDestLanding".Translate()
+                        : "RimTaxi_SetDestLanding".Translate(),
+                    defaultDesc = "RimTaxi_SetDestLandingDesc".Translate(),
+                    icon = ContentFinder<Texture2D>.Get("UI/Commands/SelectLandingSpot", reportFailure: false)
+                        ?? WorldTex,
+                    alsoClickIfOtherInGroupClicked = false,
+                    Order = -19.5f,
+                    action = () => TaxiCallService.BeginPreDepartLandingPick(ship, destMap)
+                };
+                yield return setLand;
+            }
 
             // Dismiss / leave without trip
             Command_Action dismiss = new Command_Action
@@ -95,7 +117,7 @@ namespace RimTaxi.Patches
                 Order = -19f,
                 action = delegate
                 {
-                    TaxiTripLookup.Clear(ship);
+                    TaxiTripLookup.ClearAll(ship);
                     ship.ForceJob(ShipJobDefOf.Unload);
                     ship.AddJob(ShipJobMaker.MakeShipJob(ShipJobDefOf.FlyAway));
                 }
